@@ -1,7 +1,7 @@
 /***********************************************************************************
  * importDataToDestination completes two processes:                                *
  * 1. importDataToDestination calls the registrationsData function in              *
- *    the "sourceScript" file of this project and an object isreturned that        *
+ *    the "sourceScript" file of this project and an object is returned that       *
  *    includes all of the students from Registrations SY 24.25.                    *
  * 2. importDataToDestination references TENTATIVE (2024-2025 NAHS                 *
  *    Student Transition Notes) and cross references the student IDs from          *
