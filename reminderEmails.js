@@ -27,7 +27,7 @@ function sendEmailsForToday() {
     Session.getScriptTimeZone(),
     "yyyy-MM-dd"
   );
-  // let today = '2023-09-25' // This is for testing and sending emails out manually. Set today's date in the variable. When using this, don't forget to turn it back off.
+  // let today = '2024-09-07' // This is for testing and sending emails out manually. Set today's date in the variable. When using this, don't forget to turn it back off.
   let dataObjects = registrationsData();
   let studentsForToday = [];
 
@@ -119,8 +119,8 @@ function sendEmailsForToday() {
       "Transition Reminder: Today's List of Students with 10 Days at NAHS";
     let formLink = "https://forms.gle/1NirWqZkvcABGgYc9";
     let body = `NAHS Teachers,\n\nBelow is today's list of students that have been enrolled for 10 days at NAHS:\n\n${studentsForToday.join(
-      "\n"
-    )}\n\nACTION ITEM (Due by end of day, ${formattedDueDate}): If you have one of these students on your roster, please go to: ${formLink} and provide your input on their academic growth and behavioral progress.\n\nThank you`;
+      "\n",
+    )}\n\nACTION ITEM (Due by end of day, ${formattedDueDate}): If you have one of these students on your roster, please go to: ${formLink} and provide your input on their academic growth and behavioral progress.\n****REMINDER***a\nWhen inputting the period on the form, select the period that is listed on the student's schedule, the one you enter their attendance with. \n\nThank you`;
 
     // The emailRecipients array below is used for testing.
     // let emailRecipients = ['alvaro.gomez@nisd.net'];
