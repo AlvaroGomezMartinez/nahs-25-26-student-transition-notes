@@ -27,7 +27,7 @@ function sendEmailsForToday() {
     Session.getScriptTimeZone(),
     "yyyy-MM-dd"
   );
-  // let today = '2023-09-25' // This is for testing and sending emails out manually. Set a date in the variable. When using this, don't forget to turn it back off.
+  // let today = '2023-09-25' // This is for testing and sending emails out manually. Set today's date in the variable. When using this, don't forget to turn it back off.
   let dataObjects = registrationsData();
   let studentsForToday = [];
 
