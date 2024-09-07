@@ -1,4 +1,6 @@
 /**********************************************************************************
+ *                        nahs-transition-project-24-25a                          *
+ *                                                                                *
  * The function below (importEmails) gets called by the importDataToDestination   *
  * function in the script file called importIntoTENTATIVE.                        *
  * The function references the sheet called "ContactInfo" and imports the         *

@@ -1,4 +1,6 @@
 /**********************************************************************************
+ *                         nahs-transition-project-24-25a                         *
+ *                                                                                *
  * The sendEmailsForToday function below references the object returned by        *
  * registrationsData which is found in the sourceScript file in this project.     *
  *                                                                                *

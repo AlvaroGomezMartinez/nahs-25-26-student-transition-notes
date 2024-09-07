@@ -1,4 +1,6 @@
 /*****************************************************************************************
+ *                         nahs-transition-project-24-25a                                *
+ *                                                                                       *
  * The function (addThickBordersToSheets) reformats the sheets called 'TENTATIVE',       *
  * 'Withdrawn', and 'W/D Other' by adding borders to improve user experience.            *
  *                                                                                       *
