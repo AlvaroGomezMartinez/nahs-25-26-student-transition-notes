@@ -23,7 +23,7 @@ function importDataToTrackingSheet() {
   let data = registrationsData();
   let destinationSpreadsheetId = "1giJmMGPcDsmp4IOnV4hlGTgXbxQwv2SxM9DuzNehh90";
   let destinationSpreadsheet = SpreadsheetApp.openById(
-    destinationSpreadsheetId,
+    destinationSpreadsheetId
   );
   let destinationSheet = destinationSpreadsheet.getSheetByName("NAHS Students");
 
@@ -92,17 +92,17 @@ function importDataToTrackingSheet() {
         let formattedStartDate = Utilities.formatDate(
           startDate,
           "GMT",
-          "M/d/yyyy",
+          "M/d/yyyy"
         );
         let formattedTenDaysMark = Utilities.formatDate(
           tenDaysMark,
           "GMT",
-          "M/d/yyyy",
+          "M/d/yyyy"
         );
         let formattedProjectedExit = Utilities.formatDate(
           projectedExit,
           "GMT",
-          "M/d/yyyy",
+          "M/d/yyyy"
         );
 
         // Calculate the number of business days between start date and today
@@ -130,7 +130,7 @@ function importDataToTrackingSheet() {
         let hasValidData = valuesToImport
           .slice(0, 10)
           .every(
-            (value) => value !== "" && value !== undefined && value !== null,
+            (value) => value !== "" && value !== undefined && value !== null
           );
 
         if (remainingDays > 0 && hasValidData) {

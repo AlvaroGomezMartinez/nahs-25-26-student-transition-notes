@@ -41,13 +41,13 @@ function importDataToDestination() {
   SpreadsheetApp.getActiveSpreadsheet().toast(
     "The script is currently running. 🏃🏻‍♀️ It is updating the roster, contact info., and teacher input. Please stand by...",
     "Updating Sheet",
-    -1,
+    -1
   );
 
   let data = registrationsData();
   let destinationSpreadsheetId = "14-nvlNOLWebnJJOQNZPnglWx0OuE5U-_xEbXGodND6E";
   let destinationSpreadsheet = SpreadsheetApp.openById(
-    destinationSpreadsheetId,
+    destinationSpreadsheetId
   );
   let destinationSheet = destinationSpreadsheet.getSheetByName("TENTATIVE");
 
@@ -70,12 +70,12 @@ function importDataToDestination() {
       let formattedStartDate = Utilities.formatDate(
         startDate,
         Session.getScriptTimeZone(),
-        "MM/dd/yyyy",
+        "MM/dd/yyyy"
       );
       let formattedProjectedExitDate = Utilities.formatDate(
         projectedExitDate,
         Session.getScriptTimeZone(),
-        "MM/dd/yyyy",
+        "MM/dd/yyyy"
       );
 
       let valuesToImport = [
@@ -171,32 +171,32 @@ function importDataToDestination() {
   SpreadsheetApp.getActiveSpreadsheet().toast(
     "📧 Importing the contact info now. Please stand by...",
     "Updating Contact Info.",
-    -1,
+    -1
   );
   importEmails();
 
   SpreadsheetApp.getActiveSpreadsheet().toast(
     "⏰ Copying the schedules over. Please stand by...",
     "Updating Schedules",
-    -1,
+    -1
   );
   copySchedulesToTentative();
 
   SpreadsheetApp.getActiveSpreadsheet().toast(
     "👩🏻‍🏫 Adding the teacher comments. This is the step that takes a long time. Please stand by...",
     "Updating Teacher Comments",
-    -1,
+    -1
   );
   matchAndCopyValues();
 
   SpreadsheetApp.getActiveSpreadsheet().toast(
     "😅 Almost done, sorting the sheet and adding the finishing touches. Please stand by...",
     "Sorting Sheet",
-    -1,
+    -1
   );
   // Sort the rows based on columns B and C
   var rangeToSort = destinationSheet.getRange(
-    "A2:CE" + destinationSheet.getLastRow(),
+    "A2:CE" + destinationSheet.getLastRow()
   );
 
   // Get values and trim leading/trailing spaces
@@ -215,7 +215,7 @@ function importDataToDestination() {
 
   // Get the range of data after sorting
   let sortedDataRange = destinationSheet.getRange(
-    "A2:CE" + destinationSheet.getLastRow(),
+    "A2:CE" + destinationSheet.getLastRow()
   );
 
   // Insert checkboxes in column BX (index 75 after sorting) if missing
@@ -223,7 +223,7 @@ function importDataToDestination() {
     0,
     77 - 2,
     sortedDataRange.getNumRows(),
-    1,
+    1
   );
 
   // Get existing values in the checkbox column
@@ -239,7 +239,7 @@ function importDataToDestination() {
   SpreadsheetApp.getActiveSpreadsheet().toast(
     "Script finished updating! 👍🏼 You are free to work on it now.",
     "Finished",
-    5,
+    5
   );
   insertNoteWithTimestamp();
 }
@@ -257,7 +257,7 @@ function insertNoteWithTimestamp() {
   var formattedTime = Utilities.formatDate(
     currentTime,
     timeZone,
-    "yyyy-MM-dd HH:mm:ss a",
+    "yyyy-MM-dd HH:mm:ss a"
   );
 
   // Construct the note

@@ -25,7 +25,7 @@ function sendEmailsForToday() {
   let today = Utilities.formatDate(
     new Date(),
     Session.getScriptTimeZone(),
-    "yyyy-MM-dd",
+    "yyyy-MM-dd"
   );
   // let today = '2024-09-07' // This is for testing and sending emails out manually. Set today's date in the variable. When using this, don't forget to turn it back off.
   let dataObjects = registrationsData();
@@ -42,7 +42,7 @@ function sendEmailsForToday() {
       let studentGrade = dataObject["Grade"];
 
       studentsForToday.push(
-        `${lastName}, ${firstName} (${studentID}), Grade: ${studentGrade}`,
+        `${lastName}, ${firstName} (${studentID}), Grade: ${studentGrade}`
       );
     }
   }
@@ -101,8 +101,8 @@ function sendEmailsForToday() {
           Utilities.formatDate(
             dueDate,
             Session.getScriptTimeZone(),
-            "yyyy-MM-dd",
-          ),
+            "yyyy-MM-dd"
+          )
         )
       ) {
         workdaysAdded++;
@@ -113,7 +113,7 @@ function sendEmailsForToday() {
     let formattedDueDate = Utilities.formatDate(
       dueDate,
       Session.getScriptTimeZone(),
-      "MM-dd-yyyy",
+      "MM-dd-yyyy"
     );
     let subject =
       "Transition Reminder: Today's List of Students with 10 Days at NAHS";

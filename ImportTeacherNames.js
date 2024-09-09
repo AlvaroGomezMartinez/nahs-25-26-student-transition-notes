@@ -18,7 +18,7 @@
 
 function copySchedulesToTentative() {
   let sourceSheet = SpreadsheetApp.openById(
-    "14-nvlNOLWebnJJOQNZPnglWx0OuE5U-_xEbXGodND6E",
+    "14-nvlNOLWebnJJOQNZPnglWx0OuE5U-_xEbXGodND6E"
   ).getSheetByName("Schedules");
   let targetSheet =
     SpreadsheetApp.getActiveSpreadsheet().getSheetByName("TENTATIVE");
