@@ -74,7 +74,22 @@ function registrationsData() {
 
   // Retrieve data from "Form Responses 2" sheet in Irma's spreadsheet
   let sheet1 = externalSpreadsheet.getSheetByName("Form Responses 2");
-  let dataRange = sheet1.getDataRange();
+  let allData = sheet1.getDataRange().getValues();
+  let startRow = 2;
+  let lastRow = startRow;
+
+  // Iterate through the rows in Irma's sheet starting from Row 2
+  for (let i = startRow - 1; i < allData.length; i++) {
+    // Checks if the row is blank. The purpose of this is to find the last row of the first table of data in Irma's sheet.
+    if (allData[i].every((cell) => cell === "")) {
+      break;
+    }
+    lastRow = i + 1;
+  }
+
+  // Calculate the number of rows to include, this skips the second table of data in Irma's sheet
+  let numRows = lastRow - startRow + 1;
+  let dataRange = sheet1.getRange(startRow, 1, numRows, sheet1.getLastColumn());
   let dataValues1 = dataRange.getValues();
 
   // Iterate through the dataValues1 array and capitalize the values in index 5
@@ -115,7 +130,7 @@ function registrationsData() {
 
   // Retrieve data from "Students not on Registration Doc" sheet
   let sheet2 = externalSpreadsheet2.getSheetByName(
-    "Students not on Registration Doc"
+    "Students not on Registration Doc",
   );
   let dataRange2 = sheet2.getRange("A2:I");
   // let dataValues2 = dataRange2.getValues().filter(row => row.some(cell => cell !== '')); // Filter out empty rows
@@ -200,7 +215,7 @@ function registrationsData() {
   let uniqueAllWithdrawnData = [...new Set(allWithdrawnData)];
 
   let superFiltered = uniqueAllWithdrawnData.filter(
-    (value) => !uniqueNonBlankStusWScheds.includes(value)
+    (value) => !uniqueNonBlankStusWScheds.includes(value),
   );
 
   for (let i = 1; i < dataValues.length; i++) {
@@ -216,7 +231,7 @@ function registrationsData() {
       let projectedExit = calculateProjectedExit(
         startDate,
         placementDays,
-        holidayDates
+        holidayDates,
       );
       let daysLeft = calculateDaysLeft(startDate, placementDays, holidayDates);
 
