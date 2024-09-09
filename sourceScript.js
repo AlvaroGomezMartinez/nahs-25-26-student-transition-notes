@@ -115,7 +115,7 @@ function registrationsData() {
 
   // Retrieve data from "Students not on Registration Doc" sheet
   let sheet2 = externalSpreadsheet2.getSheetByName(
-    "Students not on Registration Doc"
+    "Students not on Registration Doc",
   );
   let dataRange2 = sheet2.getRange("A2:I");
   // let dataValues2 = dataRange2.getValues().filter(row => row.some(cell => cell !== '')); // Filter out empty rows
@@ -200,7 +200,7 @@ function registrationsData() {
   let uniqueAllWithdrawnData = [...new Set(allWithdrawnData)];
 
   let superFiltered = uniqueAllWithdrawnData.filter(
-    (value) => !uniqueNonBlankStusWScheds.includes(value)
+    (value) => !uniqueNonBlankStusWScheds.includes(value),
   );
 
   for (let i = 1; i < dataValues.length; i++) {
@@ -216,7 +216,7 @@ function registrationsData() {
       let projectedExit = calculateProjectedExit(
         startDate,
         placementDays,
-        holidayDates
+        holidayDates,
       );
       let daysLeft = calculateDaysLeft(startDate, placementDays, holidayDates);
 

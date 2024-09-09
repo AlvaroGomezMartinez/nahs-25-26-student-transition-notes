@@ -44,7 +44,7 @@ function addThickBordersToSheets() {
           null,
           null,
           "#000000",
-          SpreadsheetApp.BorderStyle.SOLID_THICK
+          SpreadsheetApp.BorderStyle.SOLID_THICK,
         );
       }
     }
