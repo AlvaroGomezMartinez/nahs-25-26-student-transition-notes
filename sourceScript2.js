@@ -183,20 +183,26 @@ function findStudentIdByFullName(lastName, firstName, studentDataMap) {
 }
 
 function registrationsData2(){
-    let dataFromEntryWithdrawal = getStudentsFromEntryWithdrawalSheet(); // A Map of the "Entry_Withdrawal" sheet's data
-    let dataFromIrmasSheet = getDataFromFormResponses2(); // A Map of the data from Irma's sheet
-    let dataFromWithdrawnSheet = getIdsFromWithdrawnSheet(); // A Map of the student ids in the "Withdrawn" sheet
-    let dataFromWDOtherSheet = getIdsFromWDOtherSheet(); // A Map of the student ids in the "W/D Other" sheet
+  let dataFromEntryWithdrawal = getStudentsFromEntryWithdrawalSheet(); // A Map of the "Entry_Withdrawal" sheet's data
+  let dataFromIrmasSheet = getDataFromFormResponses2(); // A Map of the data from Irma's sheet
+  let dataFromWithdrawnSheet = getIdsFromWithdrawnSheet(); // A Map of the student ids in the "Withdrawn" sheet
+  let dataFromWDOtherSheet = getIdsFromWDOtherSheet(); // A Map of the student ids in the "W/D Other" sheet
 
-    let rawDate = new Date();
-    let dateAddedToSpreadsheet = rawDate.toLocaleDateString('en-US', {
-    weekday: 'short', // Day of the week
-    month: 'short',  // Month
-    day: 'numeric',  // Day of the month
-    year: 'numeric'  // Year
-    }) + ' ' + rawDate.toLocaleTimeString('en-US', {
-    hour: '2-digit', 
-    minute: '2-digit'
+  let rawDate = new Date();
+  let dateAddedToSpreadsheet =
+    rawDate.toLocaleDateString("en-US", {
+      weekday: "short", // Day of the week
+      month: "short", // Month
+      day: "numeric", // Day of the month
+      year: "numeric", // Year
+    }) +
+    " " +
+    rawDate.toLocaleTimeString("en-US", {
+      hour: "2-digit",
+      minute: "2-digit",
     });
 
+  /**
+   * @todo Add the logic to do the SQL-like JOINs on the data from the different sheets.
+   */
 }
