@@ -26,54 +26,6 @@
  * Latest update: 09/18/24                                                        *
  **********************************************************************************/
 
-/**
- * The function below opens the "Schedules" sheet from the "NAHS 24-25 Student Transition Notes" spreadsheet.
- * It references all of the data from the sheet and stores it in a data array (const sheet).
- * It iterates through each row, adding the student names to a Map, to store only columns (A, B, C, and I).
- * Finally, it converts the map's vaues back into an array (const uniqueStudentData) and returns the unique list of students.
- */
-// function getUniqueStudentData() {
-//   const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Schedules");
-//   const data = sheet.getDataRange().getValues();
-
-//   // Creates a Map to store unique student data by student ID
-//   const studentMap = new Map();
-
-//   // Loop through each row and gets the student IDs from the third column (index 2)
-//   for (let i = 1; i < data.length; i++) {
-//     const studentID = data[i][2];
-
-//     if (!studentMap.has(studentID)) {
-//       // Extract the date from column I (index 8) and reformat it
-//       let entryDate = data[i][8];
-
-//       // If the entryDate is a Date object, format it to M/d/yy
-//       if (entryDate instanceof Date) {
-//         entryDate = Utilities.formatDate(entryDate, Session.getScriptTimeZone(), "M/d/yy");
-//       } else {
-//         // If it's not a Date object, convert it into a Date object then format it to M/d/yy
-//         entryDate = new Date(entryDate);
-//         entryDate = Utilities.formatDate(entryDate, Session.getScriptTimeZone(), "M/d/yy");
-//       }
-
-//       // Extract data from columns A, B, C, and I (indices 0, 1, 2, and 8) of studentData
-//       const studentData = [
-//         data[i][0], // Column A - Grade Level
-//         data[i][1], // Column B - Student Name
-//         data[i][2], // Column C - Student ID
-//         entryDate   // Formatted date value from Column I - Entry Date
-//       ];
-
-//       studentMap.set(studentID, studentData);
-//     }
-//   }
-
-//   // Convert the map values to an array of unique student data
-//   const uniqueStudentData = Array.from(studentMap.values());
-
-//   // Return the unique list of student data
-//   return uniqueStudentData;
-// }
 
 /**
  * The function below references the "Entry_Withdrawal" sheet of the "NAHS 24-25 Student Transition Notes".
@@ -244,12 +196,7 @@ function registrationsData() {
   let dataFromEntryWithdrawal = getStudentsFromEntryWithdrawalSheet(); // A Map of the "Entry_Withdrawal" sheet's data
   let dataFromIrmasSheet = getDataFromFormResponses2(); // A Map of the data from Irma's sheet
   let dataFromWithdrawnSheet = getIdsFromWithdrawnSheet(); // A Map of the student ids in the "Withdrawn" sheet
-  let dataFromWDOtherSheet = getIdsFromWDOtherSheet();
-  /**
-   * @todo Create a variable that calls the function that creates a Map of the data from "Students not on Registration Doc" sheet
-   * @todo Create a variable that calls the function that creates a Map of the data on the "W/D Other" sheet
-   */
-
+  let dataFromWDOtherSheet = getIdsFromWDOtherSheet(); // A Map of the student ids in the "W/D Other" sheet
 
   let externalSpreadsheetId = "1kAWRpWO4xDtRShLB5YtTtWxTbVg800fuU2RvAlYhrfA"; // Irma's sheet, "Registrations SY 24.25"
   let externalSpreadsheet = SpreadsheetApp.openById(externalSpreadsheetId);
