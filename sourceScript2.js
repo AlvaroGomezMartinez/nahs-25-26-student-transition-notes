@@ -50,6 +50,7 @@ function getStudentsFromEntryWithdrawalSheet() {
 
 /**
  * The function below references the "Form Responses 2" sheet of the "Registrations SY 24.25" spreadsheet.
+ * 
  * @returns {Map} Map of the placement days, home campus, eligibility, educational factors, and behavior contract with the id as the key.
  */
 function getDataFromFormResponses2() {
@@ -96,6 +97,7 @@ function getDataFromFormResponses2() {
 
 /**
  * The function below references the "Withdrawn" sheet of the "NAHS 24-25 Student Transition Notes".
+ * 
  * @returns {Map} Map of the id with the id as the key.
  */
 function getIdsFromWithdrawnSheet() {
@@ -123,7 +125,9 @@ function getIdsFromWithdrawnSheet() {
 
 /**
  * The function below references the "W/D Other" sheet of the "NAHS 24-25 Student Transition Notes".
+ * 
  * @calls the getStudentsFromEntryWithdrawalSheet() function and then cross-references the last and first names from "W/D Other" with the names returned by getStudentsFromEntryWithdrawalSheet to fill in any missing ids from the list of names in "W/D Other".
+ * 
  * @returns {Map} Map of the last name, first name, and student id with the id as the key.
  */
 function getIdsFromWDOtherSheet() {
@@ -168,6 +172,7 @@ function getIdsFromWDOtherSheet() {
 
 /**
  * @helper This function helps the getIdsFromWDOtherSheet() function by searching for a matching last name then if found it will look for a matching first name. It looks within the "Entry_Withdrawal" data Map.
+ * 
  * @returns {string} The student ID if found, otherwise null.
  */
 function findStudentIdByFullName(lastName, firstName, studentDataMap) {
