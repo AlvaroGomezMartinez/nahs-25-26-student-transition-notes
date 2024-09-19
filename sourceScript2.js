@@ -56,11 +56,15 @@ function getStudentsFromEntryWithdrawalSheet() {
       Session.getScriptTimeZone(),
       "M/d/yy",
     );
-    var withdrawnDate = Utilities.formatDate(
+
+    var withdrawnDate = data[i][withdrawnDateCol];
+    if (typeof withdrawnDate === "object" && withdrawnDate !== "") {
+      var withdrawnDate = Utilities.formatDate(
       data[i][withdrawnDateCol],
       Session.getScriptTimeZone(),
       "M/d/yy",
-    )
+      )
+    }
 
     // Splits the name at the comma and trims any spaces
     var nameParts = studentName.split(",").map(function (part) {
@@ -420,6 +424,6 @@ function convertArrayToObject(array, headers) {
 
 
 // Run the main function
-registrationsData2();
+// registrationsData2();
 
 
