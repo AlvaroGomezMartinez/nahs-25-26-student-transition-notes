@@ -1,5 +1,6 @@
 /**
- * The function below references the "Entry_Withdrawal" sheet of the "NAHS 24-25 Student Transition Notes" spreadsheet.
+ * getStudentsFromEntryWithdrawalSheet() references the "Entry_Withdrawal" sheet of the "NAHS 24-25 Student Transition Notes" spreadsheet.
+ * 
  * @returns {Map} Map of the grade level, id, name, and entry date with the id as the key.
  */
 function getStudentsFromEntryWithdrawalSheet() {
