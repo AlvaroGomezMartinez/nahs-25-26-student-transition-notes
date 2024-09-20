@@ -1,14 +1,13 @@
 /**
- * getStudentsFromTENTATIVESheet() references the "TENTATIVE" sheet of the "NAHS 24-25 Student Transition Notes" spreadsheet.
- * 
- * @returns {Map} Map of the date the student was added to the spreadsheet with the id as the key.
+ * This function references the "TENTATIVE" sheet of the "NAHS 24-25 Student Transition Notes" spreadsheet and creates a map of student IDs to student data.
+ * @returns {allStudentsMap1} A map where the key is the Student ID the values are an object containing student data from the rows in TENTATIVE.
  */
 function getStudentsFromTENTATIVESheet() {
   var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("TENTATIVE2(TESTING)");
   var data = sheet.getDataRange().getValues();
   var headers = data[0];
 
-  var allStudentsMap = new Map();
+  var allStudentsMap1 = new Map();
 
   for (var i = 1; i < data.length; i++) {
     var studentId = data[i][headers.indexOf("STUDENT ID")];
@@ -18,17 +17,17 @@ function getStudentsFromTENTATIVESheet() {
       studentData[headers[j]] = data[i][j];
     }
 
-    allStudentsMap.set(studentId, studentData);
+    allStudentsMap1.set(studentId, studentData);
   }
 
   // Logger.log("TENTATIVE Data: " + JSON.stringify([...allStudentsMap]));
-  return allStudentsMap;
+  return allStudentsMap1;
 }
 
 /**
- * getStudentsFromEntryWithdrawalSheet() references the "Entry_Withdrawal" sheet of the "NAHS 24-25 Student Transition Notes" spreadsheet.
+ * getStudentsFromEntryWithdrawalSheet() references the "Entry_Withdrawal" sheet of the "NAHS 24-25 Student Transition Notes" spreadsheet and creates a map of the student IDs to student data ( first name | last name | id | grade | entry date | wiithdraw date ).
  * 
- * @returns {Map} Map of the grade level, id, name, and entry date with the id as the key. The Map includes all students that enrolled throughout the year; it doesn't filter out the withdrawn students.
+ * @returns {allStudentsMap2} A map where the key is the Student ID and the values are a 64-element array containing empty values and student data. The map includes all students that enrolled throughout the year; it doesn't filter out the withdrawn students.
  */
 function getStudentsFromEntryWithdrawalSheet() {
   var sheet =
@@ -42,7 +41,7 @@ function getStudentsFromEntryWithdrawalSheet() {
   var firstDayCol = headers.indexOf("Entry Date");
   var withdrawnDateCol = headers.indexOf("Withdraw Date");
 
-  var allStudentsMap = new Map();
+  var allStudentsMap2 = new Map();
 
   // Loops through the data rows (starting at 1 to skip the header)
   for (var i = 1; i < data.length; i++) {
@@ -72,7 +71,8 @@ function getStudentsFromEntryWithdrawalSheet() {
     var firstName = nameParts[1];
 
     // Adds the student to the Map using Student ID as key
-    allStudentsMap.set(studentId, [
+    // The empty headers are needed to match the returned map so that Join logic can be performed
+    allStudentsMap2.set(studentId, [
       emptyHeader,
       lastName,
       firstName,
@@ -142,14 +142,13 @@ function getStudentsFromEntryWithdrawalSheet() {
 
   // Logger.log("Entry_Withdrawal Data: " + [...allStudentsMap]);
 
-  return allStudentsMap;
+  return allStudentsMap2;
 }
 
 /**
- * The function below references the "Form Responses 2" sheet of the "Registrations SY 24.25" spreadsheet.
+ * This function references the "Form Responses 2" sheet of the "Registrations SY 24.25" spreadsheet and creates a map of the student IDs to student data (home campus | placement days | eligibility (e.g. Compass, Reset, DNQ, parent declined) | educational factors (e.g. 504, SE, None) | behavior contract (e.g. Yes, No)).
  * This data is useful in building the database because it provides data that isn't available in any other report.
- * 
- * @returns {Map} Map of the placement days, home campus, eligibility, educational factors, and behavior contract with the id as the key.
+ * @returns {allStudentsMap3} A map where the key is the Student ID and the values contain student data.
  */
 function getDataFromFormResponses2() {
   var sheet = SpreadsheetApp.openById(
@@ -165,7 +164,7 @@ function getDataFromFormResponses2() {
   var edFactorsCol = headers.indexOf("Educational Factors");
   var behaviorContractCol = headers.indexOf("Behavior Contract");
 
-  var allStudentsMap = new Map();
+  var allStudentsMap3 = new Map();
 
   // Loops through the data rows (starting at 1 to skip the header)
   for (var i = 1; i < data.length; i++) {
@@ -178,7 +177,7 @@ function getDataFromFormResponses2() {
 
     // Adds the student to the Map using the Student ID as key
     if (typeof studentId === "number") {
-      allStudentsMap.set(studentId, [
+      allStudentsMap3.set(studentId, [
         hmCampus,
         emptyHeader,
         // add the anticipated release date
@@ -194,13 +193,19 @@ function getDataFromFormResponses2() {
 
   // Logger.log("Irma's Sheet's Data: " + [...allStudentsMap]);
 
-  return allStudentsMap;
+  return allStudentsMap3;
 }
 
 /**
- * The function below references the "Withdrawn" sheet of the "NAHS 24-25 Student Transition Notes".
- * 
- * @returns {Map} Map of the id with the id as the key.
+ * @typedef {Object} allStudentsMap4 - A map of student IDs to student IDs.
+ * @property {number} studentId - The key is the student ID.
+ * @property {number} studentId - The value is also the student ID.
+ */
+
+/**
+ * This function references the "Withdrawn" sheet of the "NAHS 24-25 Student Transition Notes" and creates a map of the student IDs to the same student IDs.
+ * This map is used in performing a left join (SQL-like logic) with the database. The left join will take out the data of the students who were moved from the "TENTATIVE" sheet to the "Withdrawn" sheet.
+ * @returns {allStudentsMap4} A map where the key is the Student ID and the value contains the Student ID as well.
  */
 function getIdsFromWithdrawnSheet() {
   var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Withdrawn");
@@ -208,20 +213,20 @@ function getIdsFromWithdrawnSheet() {
   var headers = data[0];
   var studentIdCol = headers.indexOf("STUDENT ID");
 
-  var allStudentsMap = new Map();
+  var allStudentsMap4 = new Map();
 
   // Loop through the data rows (start at 1 to skip the header)
   for (var i = 1; i < data.length; i++) {
     var studentId = data[i][studentIdCol];
     if (studentId !== "") {
       // Add the id to the Map using STUDENT ID as the key
-      allStudentsMap.set(studentId, studentId);
+      allStudentsMap4.set(studentId, studentId);
     }
   }
 
   // Logger.log("IDs from Withdrawn: " + [...allStudentsMap]);
 
-  return allStudentsMap;
+  return allStudentsMap4;
 }
 
 /**
@@ -272,8 +277,11 @@ function getIdsFromWDOtherSheet() {
 
 /**
  * @helper This function helps the getIdsFromWDOtherSheet() function by searching for a matching last name then if found it will look for a matching first name. It looks within the "Entry_Withdrawal" data Map.
+ * @param {string} lastName - The last name to search for.
+ * @param {string} firstName - The first name to search for.
+ * @param {Map} studentDataMap - The map of student data to search.
  * 
- * @returns {string} The student ID if found, otherwise null.
+ * @returns {object} - The student ID if found, otherwise null.
  */
 function findStudentIdByFullName(lastName, firstName, studentDataMap) {
   for (let [studentId, studentData] of studentDataMap) {
