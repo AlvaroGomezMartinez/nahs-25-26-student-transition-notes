@@ -3,7 +3,9 @@
  * @returns {allStudentsMap1} A map where the key is the Student ID the values are an object containing student data from the rows in TENTATIVE.
  */
 function getStudentsFromTENTATIVESheet() {
-  var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("TENTATIVE2(TESTING)");
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(
+    "TENTATIVE2(TESTING)",
+  );
   var data = sheet.getDataRange().getValues();
   var headers = data[0];
 
@@ -25,8 +27,8 @@ function getStudentsFromTENTATIVESheet() {
 }
 
 /**
- * getStudentsFromEntryWithdrawalSheet() references the "Entry_Withdrawal" sheet of the "NAHS 24-25 Student Transition Notes" spreadsheet and creates a map of the student IDs to student data ( first name | last name | id | grade | entry date | wiithdraw date ).
- * 
+ * getStudentsFromEntryWithdrawalSheet() references the "Entry_Withdrawal" sheet of the "NAHS 24-25 Student Transition Notes" spreadsheet and creates a map of the student IDs to student data ( first name | last name | id | grade | entry date | withdraw date ).
+ *
  * @returns {allStudentsMap2} A map where the key is the Student ID and the values are a 64-element array containing empty values and student data. The map includes all students that enrolled throughout the year; it doesn't filter out the withdrawn students.
  */
 function getStudentsFromEntryWithdrawalSheet() {
@@ -57,10 +59,10 @@ function getStudentsFromEntryWithdrawalSheet() {
     var withdrawnDate = data[i][withdrawnDateCol];
     if (typeof withdrawnDate === "object" && withdrawnDate !== "") {
       var withdrawnDate = Utilities.formatDate(
-      data[i][withdrawnDateCol],
-      Session.getScriptTimeZone(),
-      "M/d/yy",
-      )
+        data[i][withdrawnDateCol],
+        Session.getScriptTimeZone(),
+        "M/d/yy",
+      );
     }
 
     // Splits the name at the comma and trims any spaces
@@ -183,7 +185,7 @@ function getDataFromFormResponses2() {
         // add the anticipated release date
         emptyHeader,
         placementDays,
-        
+
         eligibility,
         educationalFactors,
         behaviorContract,
@@ -231,9 +233,9 @@ function getIdsFromWithdrawnSheet() {
 
 /**
  * The function below references the "W/D Other" sheet of the "NAHS 24-25 Student Transition Notes".
- * 
+ *
  * @calls the getStudentsFromEntryWithdrawalSheet() function and then cross-references the last and first names from "W/D Other" with the names returned by getStudentsFromEntryWithdrawalSheet to fill in any missing ids from the list of names in "W/D Other".
- * 
+ *
  * @returns {Map} Map of the last name, first name, and student id with the id as the key.
  */
 function getIdsFromWDOtherSheet() {
@@ -280,7 +282,7 @@ function getIdsFromWDOtherSheet() {
  * @param {string} lastName - The last name to search for.
  * @param {string} firstName - The first name to search for.
  * @param {Map} studentDataMap - The map of student data to search.
- * 
+ *
  * @returns {object} - The student ID if found, otherwise null.
  */
 function findStudentIdByFullName(lastName, firstName, studentDataMap) {
@@ -296,7 +298,6 @@ function findStudentIdByFullName(lastName, firstName, studentDataMap) {
   return null; // Return null if no match is found. Consider using regex in the future to account for name typos in the "W/D Other" sheet.
 }
 
-
 function registrationsData2() {
   let dataFromTENTATIVE = getStudentsFromTENTATIVESheet();
   let dataFromEntryWithdrawal = getStudentsFromEntryWithdrawalSheet();
@@ -306,7 +307,6 @@ function registrationsData2() {
 
   // Now you can perform further operations on joinedData as needed
   Logger.log("Second Joined Data: " + JSON.stringify([...secondJoinedData]));
-
 }
 
 /**
@@ -427,11 +427,6 @@ function convertArrayToObject(array, headers) {
   return obj;
 }
 
-
-
-
-
-
 /**
  * Function to perform a LEFT JOIN operation between two Maps.
  * @param {Map} map1 - The left map where values are objects (joinedData)
@@ -528,5 +523,3 @@ function leftJoin(map1, map2) {
 
 // Run the main function
 // registrationsData2();
-
-
