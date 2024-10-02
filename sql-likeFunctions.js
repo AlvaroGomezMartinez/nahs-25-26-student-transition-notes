@@ -107,41 +107,6 @@ function leftJoinMaps(mapA, ...maps) {
 }
 
 /**
- * Filters out entries from mapA that have matching keys in mapB.
- * 
- * @param {Map<number, Array<Object>>} mapA - The source map, where the key is the student ID and the value is an array representing the row.
- * @param {Map<number, Array<Object>>} mapB - The map containing keys to filter out from mapA, where the key is the student ID and the value is an array representing the row.
- * @returns {Map<number, Array<Object>>} - A new map containing entries from mapA that do not have matching keys in mapB.
- * 
- * @example
- * const mapA = new Map([
- *   [123456, [{ name: 'Alice', age: 20 }]],
- *   [234567, [{ name: 'Bob', age: 22 }]]
- * ]);
- * const mapB = new Map([
- *   [123456, [{ grade: 'A' }]],
- *   [345678, [{ grade: 'B' }]]
- * ]);
- * 
- * const result = filterOutMatchesFromMapA(mapA, mapB);
- * console.log(result); // Map { 234567 => [{ name: 'Bob', age: 22 }] }
- */
-function filterOutMatchesFromMapA(mapA, mapB) {
-    let result = new Map();
-
-    // Iterate over Map A
-    mapA.forEach((valuesA, studentID_A) => {
-        // Check if Map B has an entry with the same studentID
-        if (!mapB.has(studentID_A)) {
-            // If no match is found in Map B, add the entry from Map A to the result
-            result.set(studentID_A, valuesA);
-        }
-    });
-
-    return result;
-}
-
-/**
  * Performs a SQL-like RIGHT (OUTER) JOIN on two or more maps (https://www.w3schools.com/sql/sql_join_right.asp).
  * 
  * @param {Map<number, Array<Object>>} mapA - This is the left "table", where the key is the student ID and the value is an array representing the row.
@@ -233,6 +198,41 @@ function fullJoinMaps(mapA, mapB) {
         if (!result.has(studentID_B)) {
             let combinedData = [[null], valuesB];
             result.set(studentID_B, combinedData);
+        }
+    });
+
+    return result;
+}
+
+/**
+ * Filters out entries from mapA that have matching keys in mapB.
+ * 
+ * @param {Map<number, Array<Object>>} mapA - The source map, where the key is the student ID and the value is an array representing the row.
+ * @param {Map<number, Array<Object>>} mapB - The map containing keys to filter out from mapA, where the key is the student ID and the value is an array representing the row.
+ * @returns {Map<number, Array<Object>>} - A new map containing entries from mapA that do not have matching keys in mapB.
+ * 
+ * @example
+ * const mapA = new Map([
+ *   [123456, [{ name: 'Alice', age: 20 }]],
+ *   [234567, [{ name: 'Bob', age: 22 }]]
+ * ]);
+ * const mapB = new Map([
+ *   [123456, [{ grade: 'A' }]],
+ *   [345678, [{ grade: 'B' }]]
+ * ]);
+ * 
+ * const result = filterOutMatchesFromMapA(mapA, mapB);
+ * console.log(result); // Map { 234567 => [{ name: 'Bob', age: 22 }] }
+ */
+function filterOutMatchesFromMapA(mapA, mapB) {
+    let result = new Map();
+
+    // Iterate over Map A
+    mapA.forEach((valuesA, studentID_A) => {
+        // Check if Map B has an entry with the same studentID
+        if (!mapB.has(studentID_A)) {
+            // If no match is found in Map B, add the entry from Map A to the result
+            result.set(studentID_A, valuesA);
         }
     });
 
