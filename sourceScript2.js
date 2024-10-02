@@ -1,37 +1,4 @@
 /**
- * @typedef {Object} allStudentsMap4 - A map of student IDs to student IDs.
- * @property {number} studentId - The key is the student ID.
- * @property {number} studentId - The value is also the student ID.
- */
-
-/**
- * This function references the "Withdrawn" sheet of the "NAHS 24-25 Student Transition Notes" and creates a map of the student IDs to the same student IDs.
- * This map is used in performing a left join (SQL-like logic) with the database. The left join will take out the data of the students who were moved from the "TENTATIVE" sheet to the "Withdrawn" sheet.
- * @returns {allStudentsMap4} A map where the key is the Student ID and the value contains the Student ID as well.
- */
-function getIdsFromWithdrawnSheet() {
-  var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Withdrawn");
-  var data = sheet.getDataRange().getValues();
-  var headers = data[0];
-  var studentIdCol = headers.indexOf("STUDENT ID");
-
-  var allStudentsMap4 = new Map();
-
-  // Loop through the data rows (start at 1 to skip the header)
-  for (var i = 1; i < data.length; i++) {
-    var studentId = data[i][studentIdCol];
-    if (studentId !== "") {
-      // Add the id to the Map using STUDENT ID as the key
-      allStudentsMap4.set(studentId, studentId);
-    }
-  }
-
-  // Logger.log("IDs from Withdrawn: " + [...allStudentsMap]);
-
-  return allStudentsMap4;
-}
-
-/**
  * The function below references the "W/D Other" sheet of the "NAHS 24-25 Student Transition Notes".
  *
  * @calls the getStudentsFromEntryWithdrawalSheet() function and then cross-references the last and first names from "W/D Other" with the names returned by getStudentsFromEntryWithdrawalSheet to fill in any missing ids from the list of names in "W/D Other".
@@ -320,6 +287,3 @@ function leftJoin(map1, map2) {
 
   return joinedMap;
 }
-
-// Run the main function
-// registrationsData2();
