@@ -12,20 +12,25 @@ function schedulesSheet() {
   var schedulesMap6 = new Map();
 
   for (var i = 1; i < data.length; i++) {
-    var studentId = data[i][headers.indexOf("Student Id")];
+    var rowData = data[i];
+    var studentId = rowData[headers.indexOf("Student Id")];
 
+    // Create an object with key-value pairs for each row
     var studentData = {};
-    for (var j = 0; j < headers.length; j++) {
-      studentData[headers[j]] = data[i][j];
-    }
+    headers.forEach((header, index) => {
+      studentData[header] = rowData[index];
+    });
 
-    if (schedulesMap6.has(studentId)) {
-      schedulesMap6.get(studentId).push(studentData);
+    if (studentId) {
+      if (schedulesMap6.has(studentId)) {
+        schedulesMap6.get(studentId).push(studentData);
+      } else {
+        schedulesMap6.set(studentId, [studentData]);
+      }
     } else {
-      schedulesMap6.set(studentId, [studentData]);
+      Logger.log(`Schedules: Empty student ID at row ${i + 1}`);
     }
   }
 
-  // Logger.log("Withdrawn Data: " + JSON.stringify([...schedulesMap6]));
   return schedulesMap6;
 }
