@@ -28,16 +28,23 @@ function loadEntryWithdrawalData() {
     });
 
     let studentId = row[1]; // The student ID is in the second column (index 1)
+
+    // Convert student ID to a number
     if (studentId) {
-      studentId = String(studentId).trim();
+      studentId = Number(String(studentId).trim()); // Convert to string and then to number
 
-      // Track occurrences of student IDs
-      occurrencesMap.set(studentId, (occurrencesMap.get(studentId) || 0) + 1);
+      // Check if the conversion was successful
+      if (!isNaN(studentId)) {
+        // Track occurrences of student IDs
+        occurrencesMap.set(studentId, (occurrencesMap.get(studentId) || 0) + 1);
 
-      if (entryWithdrawalMap.has(studentId)) {
-        entryWithdrawalMap.get(studentId).push(rowData);
+        if (entryWithdrawalMap.has(studentId)) {
+          entryWithdrawalMap.get(studentId).push(rowData);
+        } else {
+          entryWithdrawalMap.set(studentId, [rowData]);
+        }
       } else {
-        entryWithdrawalMap.set(studentId, [rowData]);
+        Logger.log(`Entry_Withdrawal: Invalid student ID at row ${i + 1}`);
       }
     } else {
       Logger.log(`Entry_Withdrawal: Empty student ID at row ${i + 1}`);
@@ -55,3 +62,4 @@ function loadEntryWithdrawalData() {
   // Logger.log(`Total entries in Entry Withdrawal Map: ${entryWithdrawalMap.size}`);
   return entryWithdrawalMap;
 }
+
