@@ -9,7 +9,8 @@
  * @file loadRegistrationsData.js
  * @return {Map<number, Array<Object>>} A map of student IDs with the values from "Form Responses 2".
  */
-function loadRegistrationsData() {const Form_Responses_2 = SpreadsheetApp.openById("1kAWRpWO4xDtRShLB5YtTtWxTbVg800fuU2RvAlYhrfA")
+function loadRegistrationsData() {
+  const Form_Responses_2 = SpreadsheetApp.openById("1kAWRpWO4xDtRShLB5YtTtWxTbVg800fuU2RvAlYhrfA")
     .getSheetByName("Form Responses 2")
     .getDataRange()
     .getValues();
@@ -28,11 +29,18 @@ function loadRegistrationsData() {const Form_Responses_2 = SpreadsheetApp.openBy
 
     let studentId = row[3]; // The student ID is in the fourth column (index 3)
     if (studentId) {
-      studentId = String(studentId).trim();
-      if (registrationsMap.has(studentId)) {
-        registrationsMap.get(studentId).push(rowData);
+      // Convert student ID to a number
+      studentId = Number(String(studentId).trim()); // Convert to string first to trim any whitespace
+
+      // Check if the conversion was successful
+      if (!isNaN(studentId)) {
+        if (registrationsMap.has(studentId)) {
+          registrationsMap.get(studentId).push(rowData);
+        } else {
+          registrationsMap.set(studentId, [rowData]);
+        }
       } else {
-        registrationsMap.set(studentId, [rowData]);
+        Logger.log(`Registrations SY 24.25: Invalid student ID at row ${i + 1}`);
       }
     } else {
       Logger.log(`Registrations SY 24.25: Empty student ID at row ${i + 1}`);
@@ -42,3 +50,4 @@ function loadRegistrationsData() {const Form_Responses_2 = SpreadsheetApp.openBy
   // Logger.log(`Total entries in map: ${registrationsMap.size}`);
   return registrationsMap;
 }
+
