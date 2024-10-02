@@ -125,79 +125,28 @@ function loadTENTATIVE2_TESTING () {
     },
   );
 
-
+const updatedUpdatedUpdatedUdatedUpdatedUpdatedUpdatedActiveStudentDataMap = new Map();
+updatedUpdatedUdatedUpdatedUpdatedUpdatedActiveStudentDataMap.forEach(
+  (studentData, studentId) => {
+    // Get Entry_Withdrawal data for the current student or null if not found
+    const entry_withdrawal = Entry_Withdrawal.get(studentId) || null;
+    // Merge the existing student data with contactInfo data
+    updatedUpdatedUpdatedUdatedUpdatedUpdatedUpdatedActiveStudentDataMap.set(
+      studentId,
+      {
+        ...studentData,
+        Entry_Withdrawal: entry_withdrawal,
+      },
+    );
+  },
+);
 
 
   // Push it to TENTATIVE2(TESTING)
 
-  // writeToTENTATIVE2_TESTINGSheet(leftJoinResults);
+  writeToTENTATIVE2_TESTINGSheet(
+    updatedUpdatedUpdatedUdatedUpdatedUpdatedUpdatedActiveStudentDataMap,
+  );
 
-  /* Push values from leftJoinResults to TENTATIVE2(TESTING). The entries in leftJoinResults are "[[Entries]]: Array (153)". Inside each array element is an object "{123456 => Array (13)}". The size of the array can vary depending on the result of the left join, however, this is how I need the data to be pushed to an array so that it can then be added to the sheet called "TENTATIVE2(TESTING)":
-  let dataArray = [
-    "DATE ADDED TO SPREADSHEET", // This will be the date the row is added to the spreadsheet
-    "LAST", // 
-    "FIRST",
-    "STUDENT ID",
-    "GRADE",
-    "1st Period - Course Title",
-    "1st Period - Teacher Name",
-    "1st Period - Transfer Grade",
-    "1st Period - Current Grade",
-    "1st Period - How would you assess this student's academic growth?",
-    "1st Period - Academic and Behavioral Progress Notes",
-    "2nd Period - Course Title",
-    "2nd Period - Teacher Name",
-    "2nd Period - Transfer Grade",
-    "2nd Period - Current Grade",
-    "2nd Period - How would you assess this student's academic progress?",
-    "2nd Period - Academic and Behavioral Progress Notes",
-    "3rd Period - Course Title",
-    "3rd Period - Teacher Name",
-    "3rd Period - Transfer Grade",
-    "3rd Period - Current Grade",
-    "3rd Period - How would you assess this student's academic progress?",
-    "3rd Period - Academic and Behavioral Progress Notes",
-    "4th Period - Course Title",
-    "4th Period - Teacher Name",
-    "4th Period - Transfer Grade",
-    "4th Period - Current Grade",
-    "4th Period - How would you assess this student's academic progress?",
-    "4th Period - Academic and Behavioral Progress Notes",
-    "5th Period - Course Title",
-    "5th Period - Teacher Name",
-    "5th Period - Transfer Grade",
-    "5th Period - Current Grade",
-    "5th Period - How would you assess this student's academic progress?",
-    "5th Period - Academic and Behavioral Progress Notes",
-    "6th Period - Course Title",
-    "6th Period - Teacher Name",
-    "6th Period - Transfer Grade",
-    "6th Period - Current Grade",
-    "6th Period - How would you assess this student's academic progress?",
-    "6th Period - Academic and Behavioral Progress Notes",
-    "7th Period - Course Title",
-    "7th Period - Teacher Name",
-    "7th Period - Transfer Grade",
-    "7th Period - Current Grade",
-    "7th Period - How would you assess this student's progress?",
-    "7th Period - Academic and Behavioral Progress Notes",
-    "8th Period - Course Title",
-    "8th Period - Teacher Name",
-    "8th Period - Transfer Grade",
-    "8th Period - Current Grade",
-    "8th Period - How would you assess this student's progress?",
-    "8th Period - Academic and Behavioral Progress Notes",
-    "SE - Special Education Case Manager",
-    "SE - What accommodations seem to work well with this student to help them be successful?",
-    "SE - What are the student's strengths, as far as behavior?",
-    "SE - What are the student's needs, as far as behavior?  (Pick behavior having most effect on his/her ability to be successful in class.  If there are no concerns, note that.)",
-    "SE - What are the student's needs, as far as functional skills?  (Include daily living skills, fine/gross motor skills, organizational skills, self-advocacy, attendance, etc.)",
-    "SE - Please add any other comments or concerns here:",
-    "REGULAR CAMPUS",
-    "FIRST DAY OF AEP",
-    "Anticipated Release Date",
-    "Parent Notice Date",
-    "Withdrawn Date",
-  ];
-  */
+  
 }
