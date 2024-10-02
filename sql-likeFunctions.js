@@ -141,11 +141,55 @@ function filterOutMatchesFromMapA(mapA, mapB) {
     return result;
 }
 
+/**
+ * Performs a SQL-like RIGHT (OUTER) JOIN on two or more maps (https://www.w3schools.com/sql/sql_join_right.asp).
+ * 
+ * @param {Map<number, Array<Object>>} mapA - This is the left "table", where the key is the student ID and the value is an array representing the row.
+ * @param {...Map<number, Array<Object>>} maps - These are the right "tables", where the key is the student ID and the value is an array representing the row.
+ * @returns {Map<number, Array<Array<Object|null>>>} - A map where each key is a student ID and the value is an array of arrays. Each inner array contains all records from the right maps, and the matched records from the left map. If no match is found in the left map, null is used as a placeholder.
+ * 
+ * @example
+ * const mapA = new Map([
+ *   [123456, [{ name: 'Alice', age: 20 }]],
+ *   [234567, [{ name: 'Bob', age: 22 }]]
+ * ]);
+ * const mapB = new Map([
+ *   [123456, [{ grade: 'A' }]],
+ *   [345678, [{ grade: 'B' }]]
+ * ]);
+ * 
+ * const result = rightJoinMaps(mapA, mapB);
+ * console.log(result); // Map { 123456 => [[{ name: 'Alice', age: 20 }], [{ grade: 'A' }]], 345678 => [[null], [{ grade: 'B' }]] }
+ */
+function rightJoinMaps(mapA, ...maps) {
+    let result = new Map();
+
+    // Iterate over all provided maps
+    maps.forEach((mapB) => {
+        mapB.forEach((valuesB, studentID_B) => {
+            // Initialize the combined data with values from Map B
+            let combinedData = [valuesB];  // Wrap valuesB in an array
+
+            // Check if Map A has an entry with the same studentID
+            let valuesA = mapA.get(studentID_B); // Use the numeric student ID directly
+
+            if (valuesA) {
+                // If a match is found in Map A, prepend the array to combinedData
+                combinedData.unshift(valuesA);  // Prepend the values from Map A to the combined array
+            } else {
+                // If no match is found, prepend null or placeholder for the current map's missing values
+                combinedData.unshift([null]);
+            }
+
+            // Add the combined data to the result Map, using the studentID as the key
+            result.set(studentID_B, combinedData); // Store the ID as a number
+        });
+    });
+
+    return result;
+}
 
 
-
-
-// RIGHT (OUTER) JOIN: Returns all records from the right map, and the matched records from the left map (https://www.w3schools.com/sql/sql_join.asp)
 
 // FULL (OUTER) JOIN: Returns all records when there is a match in either left or right map (https://www.w3schools.com/sql/sql_join.asp)
 
