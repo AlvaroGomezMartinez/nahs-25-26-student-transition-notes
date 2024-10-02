@@ -16,20 +16,25 @@ function getStudentsFromFormResponses1Sheet() {
   for (var i = 1; i < data.length; i++) {
     var student = data[i][studentColumnIndex];
     var match = student.match(/\((\d{6})\)/);
-    var studentId = match ? match[1] : null;
+    var studentId = match ? Number(match[1]) : null; // Convert matched student ID to number
 
-    var studentData = {};
-    for (var j = 0; j < headers.length; j++) {
-      studentData[headers[j]] = data[i][j];
-    }
+    if (studentId !== null) { // Check if studentId is valid
+      var studentData = {};
+      for (var j = 0; j < headers.length; j++) {
+        studentData[headers[j]] = data[i][j];
+      }
 
-    if (allResponsesMap4.has(studentId)) {
-        allResponsesMap4.get(studentId).push(studentData);
+      if (allResponsesMap4.has(studentId)) {
+          allResponsesMap4.get(studentId).push(studentData);
+      } else {
+          allResponsesMap4.set(studentId, [studentData]);
+      }
     } else {
-        allResponsesMap4.set(studentId, [studentData]);
+      Logger.log(`Form Responses 1: Invalid student ID at row ${i + 1}`);
     }
-    }
+  }
 
-  // Logger.log("TENTATIVE Data: " + JSON.stringify([...allStudentsMap]));
+  // Logger.log("Responses Data: " + JSON.stringify([...allResponsesMap4]));
   return allResponsesMap4;
 }
+
