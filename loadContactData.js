@@ -1,3 +1,9 @@
+/**
+ * Returns a map of student IDs using the data from "ContactInfo".
+ *
+ * @file loadContactData.js
+ * @return {Map<number, Array<Object>>} A map of student IDs with the values from "ContactInfo".
+ */
 function loadContactData() {
     let sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("ContactInfo");
     let data = sheet.getDataRange().getValues();
