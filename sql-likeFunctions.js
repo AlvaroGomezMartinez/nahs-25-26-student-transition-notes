@@ -16,8 +16,6 @@ function selectAllFromMap(map) {
   return result;
 }
 
-// https://www.w3schools.com/sql/sql_join.asp
-
 /**
  * Performs a SQL-like (INNER) JOIN on two maps (https://www.w3schools.com/sql/sql_join.asp).
  * 
@@ -60,7 +58,7 @@ function innerJoinMaps(mapA, mapB) {
 }
 
 /**
- * Performs a SQL-like LEFT (OUTER) JOIN on two or more maps.
+ * Performs a SQL-like LEFT (OUTER) JOIN on two or more maps (https://www.w3schools.com/sql/sql_join.asp).
  * 
  * @param {Map<number, Array<Object>>} mapA - This is the left "table", where the key is the student ID and the value is an array representing the row.
  * @param {...Map<number, Array<Object>>} maps - These are the right "tables", where the key is the student ID and the value is an array representing the row.
@@ -147,7 +145,7 @@ function filterOutMatchesFromMapA(mapA, mapB) {
 
 
 
-// RIGHT (OUTER) JOIN: Returns all records from the right map, and the matched records from the left map
+// RIGHT (OUTER) JOIN: Returns all records from the right map, and the matched records from the left map (https://www.w3schools.com/sql/sql_join.asp)
 
-// FULL (OUTER) JOIN: Returns all records when there is a match in either left or right map
+// FULL (OUTER) JOIN: Returns all records when there is a match in either left or right map (https://www.w3schools.com/sql/sql_join.asp)
 
