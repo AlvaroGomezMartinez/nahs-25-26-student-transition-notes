@@ -6,7 +6,7 @@
  * ID will contain an array with multiple elements, each representing their
  * subsequent placement at NAHS.
  *
- * @file loadRegistrationsData.js
+ * @see loadRegistrationsData.js
  * @return {Map<number, Array<Object>>} A map of student IDs with the values from "Form Responses 2".
  */
 function loadRegistrationsData() {

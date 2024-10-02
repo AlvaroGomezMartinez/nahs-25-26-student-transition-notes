@@ -5,7 +5,7 @@
  * ID will contain an array with multiple elements, each representing their
  * subsequent placement at NAHS.
  *
- * @file loadEntryWithdrawalData.js
+ * @see loadEntryWithdrawalData.js
  * @return {Map<number, Array<Object>>} A map of student IDs with the values from "Entry_Withdrawal".
  */
 function loadEntryWithdrawalData() {

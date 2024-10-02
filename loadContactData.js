@@ -1,7 +1,7 @@
 /**
  * Returns a map of student IDs using the data from "ContactInfo".
  *
- * @file loadContactData.js
+ * @see loadContactData.js
  * @return {Map<number, Array<Object>>} A map of student IDs with the values from "ContactInfo".
  */
 function loadContactData() {
