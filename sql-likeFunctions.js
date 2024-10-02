@@ -189,7 +189,52 @@ function rightJoinMaps(mapA, ...maps) {
     return result;
 }
 
+/**
+ * Performs a SQL-like FULL (OUTER) JOIN on two maps (https://www.w3schools.com/sql/sql_join_full.asp).
+ * 
+ * @param {Map<number, Array<Object>>} mapA - This is the left "table", where the key is the student ID and the value is an array representing the row.
+ * @param {Map<number, Array<Object>>} mapB - This is the right "table", where the key is the student ID and the value is an array representing the row.
+ * @returns {Map<number, Array<Array<Object|null>>>} - A map where each key is a student ID and the value is an array of arrays. Each inner array contains all records from both maps. If no match is found in one of the maps, null is used as a placeholder.
+ * 
+ * @example
+ * const mapA = new Map([
+ *   [123456, [{ name: 'Alice', age: 20 }]],
+ *   [234567, [{ name: 'Bob', age: 22 }]]
+ * ]);
+ * const mapB = new Map([
+ *   [123456, [{ grade: 'A' }]],
+ *   [345678, [{ grade: 'B' }]]
+ * ]);
+ * 
+ * const result = fullJoinMaps(mapA, mapB);
+ * console.log(result); // Map { 123456 => [[{ name: 'Alice', age: 20 }], [{ grade: 'A' }]], 234567 => [[{ name: 'Bob', age: 22 }], [null]], 345678 => [[null], [{ grade: 'B' }]] }
+ */
+function fullJoinMaps(mapA, mapB) {
+    let result = new Map();
 
+    // Add all entries from mapA to the result
+    mapA.forEach((valuesA, studentID_A) => {
+        let combinedData = [valuesA];
 
-// FULL (OUTER) JOIN: Returns all records when there is a match in either left or right map (https://www.w3schools.com/sql/sql_join.asp)
+        // Check if mapB has an entry with the same studentID
+        let valuesB = mapB.get(studentID_A);
 
+        if (valuesB) {
+            combinedData.push(valuesB);
+        } else {
+            combinedData.push([null]);
+        }
+
+        result.set(studentID_A, combinedData);
+    });
+
+    // Add entries from mapB that are not in mapA to the result
+    mapB.forEach((valuesB, studentID_B) => {
+        if (!result.has(studentID_B)) {
+            let combinedData = [[null], valuesB];
+            result.set(studentID_B, combinedData);
+        }
+    });
+
+    return result;
+}
