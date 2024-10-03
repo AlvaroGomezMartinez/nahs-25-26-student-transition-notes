@@ -210,7 +210,7 @@ function writeToTENTATIVE2_TESTINGSheet(
       }
 
       const educationalFactors =
-        registrationArray[0] &&
+        registrationArray && registrationArray[0] &&
         registrationArray[0]["Educational Factors"] !== undefined
           ? registrationArray[0]["Educational Factors"]
           : null;
@@ -367,7 +367,7 @@ function writeToTENTATIVE2_TESTINGSheet(
         lastName,
         firstName,
         studentId ? studentId : null,
-        tentativeArray[0] ? tentativeArray[0]["GRADE"] : null,
+        tentativeArray && tentativeArray[0] ? tentativeArray[0]["GRADE"] : null,
 
         teacherInput["1st"]["Course Title"], // "1st Period - Course Title",
         teacherInput["1st"]["Teacher Name"], // "1st Period - Teacher Name",
