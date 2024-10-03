@@ -52,6 +52,8 @@ function getStudentsFromFormResponses1Sheet() {
     "miranda.wenzlaff@nisd.net": { "proper name": "Wenzlaff, Miranda" },
   };
 
+  var schedulesMap = schedulesSheet();
+
   for (var i = 1; i < data.length; i++) {
     var student = data[i][studentColumnIndex];
     var email = data[i][emailColumnIndex];
@@ -70,6 +72,16 @@ function getStudentsFromFormResponses1Sheet() {
         studentData["Teacher"] = emails[email]["proper name"];
       } else {
         studentData["Teacher"] = "Unknown"; // Default value if email not found
+      }
+
+      // Perform a left join with the schedules data
+      var scheduleDataArray = schedulesMap.get(studentId) || [];
+      var matchingScheduleData = scheduleDataArray.find(
+        (schedule) => schedule["Teacher Name"] === studentData["Teacher"],
+      );
+
+      if (matchingScheduleData) {
+        studentData = { ...studentData, ...matchingScheduleData };
       }
 
       if (allResponsesMap4.has(studentId)) {
