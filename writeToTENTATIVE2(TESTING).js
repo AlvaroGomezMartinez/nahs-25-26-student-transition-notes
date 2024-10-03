@@ -24,9 +24,13 @@ function writeToTENTATIVE2_TESTINGSheet(updatedUpdatedUpdatedUdatedUpdatedUpdate
     return; // Exit the function if it's not iterable
   }
 
-  // Prepare the data in the desired order
+  // Array that will contain the prepared data to be written to the sheet
   const outputData = [];
 
+  /**
+   * TODO: This function might not be needed, however, there are several places
+   * in the script below where it could be used. It's a good idea to keep it here
+   */
   function formatDateToMMDDYYYY(date) {
     const d = new Date(date);
     if (isNaN(d.getTime())) return null; // Check for invalid date
@@ -38,7 +42,8 @@ function writeToTENTATIVE2_TESTINGSheet(updatedUpdatedUpdatedUdatedUpdatedUpdate
 
   /**
    * Calculates the expected withdraw date for the student.
-   * @todo Update the function to reference the correct value references from the updatedUpdatedUdatedUpdatedUpdatedUpdatedActiveStudentDataMap object.
+   * 
+   * TODO: Update the function to reference the correct value references from the updatedUpdatedUpdatedUdatedUpdatedUpdatedUpdatedActiveStudentDataMap object.
    * @param {*} studentData 
    * @returns 
    */
@@ -118,12 +123,12 @@ function writeToTENTATIVE2_TESTINGSheet(updatedUpdatedUpdatedUdatedUpdatedUpdate
       }
 
       // Continue with the rest of your logic
-      const formattedEntryDate = entryData["Entry Date"];
+      const formattedEntryDate = entryData["Entry Date"]; // TODO: This is a place where I can use the formatDateToMMDDYYYY(date) function
       const gradeString = entryData["Grd Lvl"];
       const formattedGrade =
         typeof gradeString === "string" && gradeString
           ? gradeString.split("-")[0].trim().replace(/^0+/, "")
-          : null;
+          : null; // TODO: Is this variable needed? If not, remove it
 
       // Validate the entry date
       const entryDateString = new Date(formattedEntryDate);
@@ -159,7 +164,8 @@ function writeToTENTATIVE2_TESTINGSheet(updatedUpdatedUpdatedUdatedUpdatedUpdate
         .map((name) => name.trim());
 
       /**
-       * Checks if the string or number contains the word "504".
+       * This is a helper function that checks if the
+       * value contains the word "504".
        *
        * @param {string|number|null} value - The value to check.
        * @returns {string} - "Yes" if the value contains "504", otherwise "No".
@@ -171,7 +177,8 @@ function writeToTENTATIVE2_TESTINGSheet(updatedUpdatedUpdatedUdatedUpdatedUpdate
       }
 
       /**
-       * Checks if the string or number contains the word "ESL".
+       * This is a helper function that checks if the
+       * value contains the word "ESL".
        *
        * @param {string|number|null} value - The value to check.
        * @returns {string} - "Yes" if the value contains "ESL", otherwise "No".
@@ -218,7 +225,7 @@ function writeToTENTATIVE2_TESTINGSheet(updatedUpdatedUpdatedUdatedUpdatedUpdate
       outputData.push([
         studentData.TENTATIVE
           ? studentData["TENTATIVE"][0]["DATE ADDED TO SPREADSHEET"]
-          : null, // @TODO ADD A FUNCTION TO CHECK IF THIS VALUE IS BLANK, IF IT IS THEN ADD THE CURRENT DATE & TIME IF IT ISN'T BLANK THEN BRING IN THE DATA
+          : null, // TODO: ADD A FUNCTION TO CHECK IF THIS VALUE IS BLANK, IF IT IS THEN ADD THE CURRENT DATE & TIME IF IT ISN'T BLANK THEN BRING IN THE DATA
         lastName, // "LAST"
         firstName, // "FIRST"
         studentData["Entry_Withdrawal"]
