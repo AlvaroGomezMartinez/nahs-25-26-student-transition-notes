@@ -25,6 +25,50 @@ function loadTENTATIVE2_TESTING() {
    *
    */
   const updatedActiveStudentDataMap = new Map();
+
+  // Iterate through firstFilteredResults (Table A) to add all students
+  firstFilteredResults.forEach((entry) => {
+    // Extract the studentId and dataArray from the entry
+    const studentId = entry[0]["Student Id"];
+    const dataArray = entry;
+
+    // Add the student to the map with the data from firstFilteredResults
+    updatedActiveStudentDataMap.set(studentId, {
+      FirstFilteredData: dataArray,
+    });
+  });
+
+  // Iterate through TENTATIVE2_TESTING (Table B) to merge data
+// TENTATIVE2_TESTING.forEach((entryDataArray) => {
+//   // Extract the studentId from the entryDataArray
+//   const studentId = entryDataArray[0]["STUDENT ID"];
+
+//   // Check if the studentId is already in updatedActiveStudentDataMap
+//   if (updatedActiveStudentDataMap.has(studentId)) {
+//     // Merge student data with existing data in the map
+//     const existingData = updatedActiveStudentDataMap.get(studentId);
+//     updatedActiveStudentDataMap.set(studentId, {
+//       ...existingData,
+//       TENTATIVE2DATA: entryDataArray,
+//     });
+//   } else {
+//     // Add the student to the map with only the data from TENTATIVE2_TESTING
+//     updatedActiveStudentDataMap.set(studentId, {
+//       TENTATIVE2DATA: entryDataArray,
+//     });
+//   }
+// });
+
+  // TENTATIVE2_TESTING.forEach((studentData, studentId) => {
+  //   // Get firstFilteredResults data for the current student or null if not found
+  //   const firstFilteredData = firstFilteredResults.get(studentId) || null;
+  //   // Merge student data with firstFilteredData data and store it in the updatedActiveStudentDataMap map
+  //   updatedActiveStudentDataMap.set(studentId, {
+  //     ...studentData,
+  //     FirstFilteredData: firstFilteredData,
+  //   });
+  // });
+
   // Iterate through TENTATIVE2_TESTING (Table B)
   TENTATIVE2_TESTING.forEach((entryDataArray, studentId) => {
     let withdrawnData = null;
