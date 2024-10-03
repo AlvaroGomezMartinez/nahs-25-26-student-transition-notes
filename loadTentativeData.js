@@ -5,7 +5,7 @@
  * @returns {allStudentsMap1} A map where the key is the Student ID the values are an object containing student data from the rows in TENTATIVE.
  */
 function getStudentsFromTENTATIVESheet() {
-  var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("TENTATIVE");
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("TENTATIVE2(TESTING)");
   var data = sheet.getDataRange().getValues();
   var headers = data[0];
 
