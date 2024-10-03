@@ -1,4 +1,9 @@
-function loadTENTATIVE2_TESTING () {
+/**
+ * Main function that is used to build and write the roster to the TENTATIVE2(TESTING) sheet.
+ * It builds the roster by loading and processing student data from eight separate Google sheets.
+ * The function filters and merges the separate maps.
+ */
+function loadTENTATIVE2_TESTING() {
   const TENTATIVE2_TESTING = getStudentsFromTENTATIVESheet();
   const Registrations_SY_24_25 = loadRegistrationsData();
   const ContactInfo = loadContactData();
@@ -8,12 +13,17 @@ function loadTENTATIVE2_TESTING () {
   const Withdrawn = getWithdrawnStudentsSheet();
   const Attendance = loadStudentAttendanceData();
 
-  // Load Entry_Withdrawal and filter it with Withdrawn
+  // Load Entry_Withdrawal and filter out any students in the Withdrawn sheet
   let firstFilteredResults = filterOutMatchesFromMapA(
     Entry_Withdrawal,
     Withdrawn,
   );
 
+  /**
+   * TODO: Check if this function is needed. It seems to be doing the same thing as the
+   * filterOutMatchesFromMapA function which is called by firstFilteredResults above.
+   *
+   */
   const updatedActiveStudentDataMap = new Map();
   // Iterate through TENTATIVE2_TESTING (Table B)
   TENTATIVE2_TESTING.forEach((entryDataArray, studentId) => {
@@ -60,7 +70,9 @@ function loadTENTATIVE2_TESTING () {
   });
 
   /**
-   * Filters the schedules data to only include elements where "Wdraw Date" is empty.
+   * This is a helper function, called by const filteredSchedules.
+   * Its purpose is to filter a student's course lists (schedules) so that only the active courses
+   * are returned. It returns elements from schedules where "Wdraw Date" is empty.
    *
    * @param {Array<Object>} schedules - The schedules data array.
    * @returns {Array<Object>} - Returns a filtered array with only elements where "Wdraw Date" is empty.
@@ -76,7 +88,7 @@ function loadTENTATIVE2_TESTING () {
       // Get Schedules data for the current student or null if not found
       const schedules = Schedules.get(studentId) || null;
 
-      // Filter schedules to only include elements with empty "Wdraw Date"
+      // Filter courses to only include elements with empty "Wdraw Date"
       const filteredSchedules = filterSchedulesWithEmptyWdrawDate(schedules);
 
       // Check if the filtered schedules array is not empty
@@ -109,7 +121,11 @@ function loadTENTATIVE2_TESTING () {
     },
   );
 
-  const updatedUpdatedUdatedUpdatedUpdatedUpdatedActiveStudentDataMap = new Map();
+  /**
+   * TODO: Find a way to handle multiple Form_Responses_1 entries for the same student when they re-enroll.
+   */
+  const updatedUpdatedUdatedUpdatedUpdatedUpdatedActiveStudentDataMap =
+    new Map();
   updatedUdatedUpdatedUpdatedUpdatedActiveStudentDataMap.forEach(
     (studentData, studentId) => {
       // Get Form_Responses_1 data for the current student or null if not found
@@ -125,28 +141,24 @@ function loadTENTATIVE2_TESTING () {
     },
   );
 
-const updatedUpdatedUpdatedUdatedUpdatedUpdatedUpdatedActiveStudentDataMap = new Map();
-updatedUpdatedUdatedUpdatedUpdatedUpdatedActiveStudentDataMap.forEach(
-  (studentData, studentId) => {
-    // Get Entry_Withdrawal data for the current student or null if not found
-    const entry_withdrawal = Entry_Withdrawal.get(studentId) || null;
-    // Merge the existing student data with contactInfo data
-    updatedUpdatedUpdatedUdatedUpdatedUpdatedUpdatedActiveStudentDataMap.set(
-      studentId,
-      {
-        ...studentData,
-        Entry_Withdrawal: entry_withdrawal,
-      },
-    );
-  },
-);
-
-
-  // Push it to TENTATIVE2(TESTING)
+  const updatedUpdatedUpdatedUdatedUpdatedUpdatedUpdatedActiveStudentDataMap =
+    new Map();
+  updatedUpdatedUdatedUpdatedUpdatedUpdatedActiveStudentDataMap.forEach(
+    (studentData, studentId) => {
+      // Get Entry_Withdrawal data for the current student or null if not found
+      const entry_withdrawal = Entry_Withdrawal.get(studentId) || null;
+      // Merge the existing student data with contactInfo data
+      updatedUpdatedUpdatedUdatedUpdatedUpdatedUpdatedActiveStudentDataMap.set(
+        studentId,
+        {
+          ...studentData,
+          Entry_Withdrawal: entry_withdrawal,
+        },
+      );
+    },
+  );
 
   writeToTENTATIVE2_TESTINGSheet(
     updatedUpdatedUpdatedUdatedUpdatedUpdatedUpdatedActiveStudentDataMap,
   );
-
-  
 }
