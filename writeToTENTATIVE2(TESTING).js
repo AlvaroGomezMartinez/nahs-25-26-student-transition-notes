@@ -361,7 +361,9 @@ function writeToTENTATIVE2_TESTINGSheet(
 
       // Extract the needed data fields in the specified order
       outputData.push([
-        tentativeArray ? formatDateToMMDDYYYY(tentativeArray[0]["DATE ADDED TO SPREADSHEET"]) : null, // TODO: ADD A FUNCTION TO CHECK IF THIS VALUE IS BLANK, IF IT IS THEN ADD THE CURRENT DATE & TIME IF IT ISN'T BLANK THEN BRING IN THE DATA
+        tentativeArray
+          ? formatDateToMMDDYYYY(tentativeArray[0]["DATE ADDED TO SPREADSHEET"])
+          : null, // TODO: ADD A FUNCTION TO CHECK IF THIS VALUE IS BLANK, IF IT IS THEN ADD THE CURRENT DATE & TIME IF IT ISN'T BLANK THEN BRING IN THE DATA
         lastName,
         firstName,
         studentId ? studentId : null,
@@ -369,8 +371,8 @@ function writeToTENTATIVE2_TESTINGSheet(
 
         teacherInput["1st"]["Course Title"], // "1st Period - Course Title",
         teacherInput["1st"]["Teacher Name"], // "1st Period - Teacher Name",
-        "", // "1st Period - Transfer Grade",
-        "", // "1st Period - Current Grade",
+        tentativeArray ? tentativeArray[0]["1st Period - Transfer Grade"] : "", // "1st Period - Transfer Grade",
+        tentativeArray ? tentativeArray[0]["1st Period - Current Grade"] : "", // "1st Period - Current Grade",
         teacherInput["1st"][
           "How would you assess this student's academic growth?"
         ],
@@ -378,8 +380,8 @@ function writeToTENTATIVE2_TESTINGSheet(
 
         teacherInput["2nd"]["Course Title"], // "2nd Period - Course Title",
         teacherInput["2nd"]["Teacher Name"], // "2nd Period - Teacher Name",
-        "", // "2nd Period - Transfer Grade",
-        "", // "2nd Period - Current Grade",
+        tentativeArray ? tentativeArray[0]["2nd Period - Transfer Grade"] : "", // "2nd Period - Transfer Grade",
+        tentativeArray ? tentativeArray[0]["2nd Period - Current Grade"] : "", // "2nd Period - Current Grade",
         teacherInput["2nd"][
           "How would you assess this student's academic growth?"
         ],
@@ -387,8 +389,8 @@ function writeToTENTATIVE2_TESTINGSheet(
 
         teacherInput["3rd"]["Course Title"], // "3rd Period - Course Title",
         teacherInput["3rd"]["Teacher Name"], // "3rd Period - Teacher Name",
-        "", // "3rd Period - Transfer Grade",
-        "", // "3rd Period - Current Grade",
+        tentativeArray ? tentativeArray[0]["3rd Period - Transfer Grade"] : "", // "3rd Period - Transfer Grade",
+        tentativeArray ? tentativeArray[0]["3rd Period - Current Grade"] : "", // "3rd Period - Current Grade",
         teacherInput["3rd"][
           "How would you assess this student's academic growth?"
         ],
@@ -396,8 +398,8 @@ function writeToTENTATIVE2_TESTINGSheet(
 
         teacherInput["4th"]["Course Title"], // "4th Period - Course Title",
         teacherInput["4th"]["Teacher Name"], // "4th Period - Teacher Name",
-        "", // "4th Period - Transfer Grade",
-        "", // "4th Period - Current Grade",
+        tentativeArray ? tentativeArray[0]["4th Period - Transfer Grade"] : "", // "4th Period - Transfer Grade",
+        tentativeArray ? tentativeArray[0]["4th Period - Current Grade"] : "", // "4th Period - Current Grade",
         teacherInput["4th"][
           "How would you assess this student's academic growth?"
         ],
@@ -405,8 +407,8 @@ function writeToTENTATIVE2_TESTINGSheet(
 
         teacherInput["5th"]["Course Title"], // "5th Period - Course Title",
         teacherInput["5th"]["Teacher Name"], // "5th Period - Teacher Name",
-        "", // "5th Period - Transfer Grade",
-        "", // "5th Period - Current Grade",
+        tentativeArray ? tentativeArray[0]["5th Period - Transfer Grade"] : "", // "5th Period - Transfer Grade",
+        tentativeArray ? tentativeArray[0]["5th Period - Current Grade"] : "", // "5th Period - Current Grade",
         teacherInput["5th"][
           "How would you assess this student's academic growth?"
         ],
@@ -414,8 +416,8 @@ function writeToTENTATIVE2_TESTINGSheet(
 
         teacherInput["6th"]["Course Title"], // "6th Period - Course Title",
         teacherInput["6th"]["Teacher Name"], // "6th Period - Teacher Name",
-        "", // "6th Period - Transfer Grade",
-        "", // "6th Period - Current Grade",
+        tentativeArray ? tentativeArray[0]["6th Period - Transfer Grade"] : "", // "6th Period - Transfer Grade",
+        tentativeArray ? tentativeArray[0]["6th Period - Current Grade"] : "", // "6th Period - Current Grade",
         teacherInput["6th"][
           "How would you assess this student's academic growth?"
         ],
@@ -423,8 +425,8 @@ function writeToTENTATIVE2_TESTINGSheet(
 
         teacherInput["7th"]["Course Title"], // "7th Period - Course Title",
         teacherInput["7th"]["Teacher Name"], // "7th Period - Teacher Name",
-        "", // "7th Period - Transfer Grade",
-        "", // "7th Period - Current Grade",
+        tentativeArray ? tentativeArray[0]["7th Period - Transfer Grade"] : "", // "7th Period - Transfer Grade",
+        tentativeArray ? tentativeArray[0]["7th Period - Current Grade"] : "", // "7th Period - Current Grade",
         teacherInput["7th"][
           "How would you assess this student's academic growth?"
         ],
@@ -432,8 +434,8 @@ function writeToTENTATIVE2_TESTINGSheet(
 
         teacherInput["8th"]["Course Title"], // "8th Period - Course Title",
         teacherInput["8th"]["Teacher Name"], // "8th Period - Teacher Name",
-        "", // "8th Period - Transfer Grade",
-        "", // "8th Period - Current Grade",
+        tentativeArray ? tentativeArray[0]["8th Period - Transfer Grade"] : "", // "8th Period - Transfer Grade",
+        tentativeArray ? tentativeArray[0]["8th Period - Current Grade"] : "", // "8th Period - Current Grade",
         teacherInput["8th"][
           "How would you assess this student's academic growth?"
         ],
