@@ -27,8 +27,8 @@ function NAHS_EXPECTED_WITHDRAW_DATE(
   }
 
   var inputDateObj = new Date(inputDate);
-  var additionalDaysH = Number(additionalDays[0]); // First column in additionalDaysRange
-  var additionalDaysI = Number(additionalDays[1]); // Second column in additionalDaysRange
+  var additionalDaysH = Number(additionalDays[0]);
+  var additionalDaysI = Number(additionalDays[1]);
 
   // Calculate the additional days to be added
   var additionalDaysTotal = additionalDaysI - additionalDaysH;

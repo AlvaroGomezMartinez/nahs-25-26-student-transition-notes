@@ -28,8 +28,7 @@ function writeToTENTATIVE2_TESTINGSheet(updatedUpdatedUpdatedUdatedUpdatedUpdate
   const outputData = [];
 
   /**
-   * TODO: This function might not be needed, however, there are several places
-   * in the script below where it could be used. It's a good idea to keep it here
+   * This is a helper function used to format a date to MM/DD/YYYY.
    */
   function formatDateToMMDDYYYY(date) {
     const d = new Date(date);
@@ -43,23 +42,14 @@ function writeToTENTATIVE2_TESTINGSheet(updatedUpdatedUpdatedUdatedUpdatedUpdate
   /**
    * Calculates the expected withdraw date for the student.
    * 
-   * TODO: Update the function to reference the correct value references from the updatedUpdatedUpdatedUdatedUpdatedUpdatedUpdatedActiveStudentDataMap object.
-   * @param {*} studentData 
-   * @returns 
+   * @param {formattedEntryDate} - The date student registered at DAEP.
+   * @param {placementDays} - The number of placement days.
+   * @param {daysInEnrl} - The number of days the student has been enrolled at DAEP.
+   * @param {daysInAtt} - The number of days the student has been in attendance at DAEP.
+   * @returns
+   * TODO: Is this function needed? Can we just call NAHS_EXPECTED_WITHDRAW_DATE directly?
    */
-  function calculateExpectedWithdrawDate(studentData) {
-    const formattedEntryDate = studentData["Entry_Withdrawal"]
-      ? studentData["Entry_Withdrawal"][0]["Entry Date"]
-      : null;
-    const placementDays = studentData["Registrations_SY_24_25"]
-      ? studentData["Registrations_SY_24_25"][0]["Placement Days"]
-      : null;
-    const daysInEnrl = studentData["Alt_HS_Attendance_Enrollment_Count"]
-      ? studentData["Alt_HS_Attendance_Enrollment_Count"][0][5]
-      : null; // Days in Enrl
-    const daysInAtt = studentData["Alt_HS_Attendance_Enrollment_Count"]
-      ? studentData["Alt_HS_Attendance_Enrollment_Count"][0][4]
-      : null; // Days in Att
+  function calculateExpectedWithdrawDate(formattedEntryDate, placementDays, daysInEnrl, daysInAtt) {
 
     // Validate dates
     if (!formattedEntryDate || isNaN(new Date(formattedEntryDate).getTime())) {
@@ -103,8 +93,8 @@ function writeToTENTATIVE2_TESTINGSheet(updatedUpdatedUpdatedUdatedUpdatedUpdate
 
       // Ensure the Entry_Withdrawal array is defined and has at least one element
       if (
-        !studentData["Entry_Withdrawal"] ||
-        studentData["Entry_Withdrawal"][0].length === 0
+        !entryWithdrawalArray ||
+        entryWithdrawalArray[0]["Entry Date"].length === 0
       ) {
         console.error(
           "Entry_Withdrawal data is missing for Student ID:",
@@ -114,7 +104,7 @@ function writeToTENTATIVE2_TESTINGSheet(updatedUpdatedUpdatedUdatedUpdatedUpdate
       }
 
       // Access the first element of the Entry_Withdrawal array
-      const entryData = studentData["Entry_Withdrawal"][0];
+      const entryData = entryWithdrawalArray[0]["Entry Date"];
 
       // Ensure entryData is defined
       if (!entryData) {
@@ -123,45 +113,49 @@ function writeToTENTATIVE2_TESTINGSheet(updatedUpdatedUpdatedUdatedUpdatedUpdate
       }
 
       // Continue with the rest of your logic
-      const formattedEntryDate = entryData["Entry Date"]; // TODO: This is a place where I can use the formatDateToMMDDYYYY(date) function
-      const gradeString = entryData["Grd Lvl"];
-      const formattedGrade =
-        typeof gradeString === "string" && gradeString
-          ? gradeString.split("-")[0].trim().replace(/^0+/, "")
-          : null; // TODO: Is this variable needed? If not, remove it
+      const formattedEntryDate = formatDateToMMDDYYYY(entryData);
+      const gradeString = tentativeArray[0]["GRADE"]; // TODO: Is this variable needed? If not, remove it
+      // const formattedGrade =
+      //   typeof gradeString === "string" && gradeString
+      //     ? gradeString.split("-")[0].trim().replace(/^0+/, "")
+      //     : null; // TODO: Is this variable needed? If not, remove it
 
       // Validate the entry date
-      const entryDateString = new Date(formattedEntryDate);
-      if (isNaN(entryDateString)) {
-        console.error(
-          "Invalid entry date for Student ID:",
-          studentId,
-          "Date:",
-          formattedEntryDate,
-        );
-        return; // Skip this entry if the date is invalid
-      }
-
-      // Calculate Expected Withdraw Date
-      const estimatedExitDay = calculateExpectedWithdrawDate(studentData); // Call the function to get the expected withdraw date
+      // const entryDateString = new Date(formattedEntryDate);
+      // if (isNaN(entryDateString)) {
+      //   console.error(
+      //     "Invalid entry date for Student ID:",
+      //     studentId,
+      //     "Date:",
+      //     formattedEntryDate,
+      //   );
+      //   return; // Skip this entry if the date is invalid
+      // }
 
       // Calculate Estimated Days Left
-      const placementDays = studentData.registration
-        ? studentData.registration[0]["Placement Days"]
+      const placementDays = registrationArray
+        ? registrationArray[0]["Placement Days"]
         : null;
-      const daysInAttendance = studentData.attendance
-        ? studentData.attendance[0][4]
+      const daysInAttendance = attendanceArray
+        ? attendanceArray[0][4]
         : null;
-      const estimatedDaysLeft =
+      const estimatedDaysLeft = // TODO: Is this variable needed? If not, remove it
         placementDays !== null && daysInAttendance !== null
           ? placementDays - daysInAttendance
           : null;
 
+      const daysInEnrl = attendanceArray ? attendanceArray[0][5] : 0;
+
+      // Calculate Expected Withdraw Date
+      const estimatedExitDay = calculateExpectedWithdrawDate(formattedEntryDate, placementDays, daysInEnrl, daysInAttendance); // Call the function to get the expected withdraw date
+
       const fullName =
         studentData["Entry_Withdrawal"][0]["Student Name(Last, First)"];
-      const [lastName, firstName] = fullName
+      const [backUpLastName, backUpFirstName] = fullName
         .split(",")
         .map((name) => name.trim());
+      const lastName = tentativeArray ? tentativeArray[0]["LAST"] : backUpLastName;
+      const firstName = tentativeArray ? tentativeArray[0]["FIRST"] : backUpFirstName;
 
       /**
        * This is a helper function that checks if the
@@ -190,49 +184,48 @@ function writeToTENTATIVE2_TESTINGSheet(updatedUpdatedUpdatedUdatedUpdatedUpdate
       }
 
       const educationalFactors =
-        studentData.Registrations_SY_24_25 &&
-        studentData.Registrations_SY_24_25[0] &&
-        studentData.Registrations_SY_24_25[0]["Educational Factors"] !==
+        registrationArray[0] &&
+        registrationArray[0]["Educational Factors"] !==
           undefined
-          ? studentData.Registrations_SY_24_25[0]["Educational Factors"]
+          ? registrationArray[0]["Educational Factors"]
           : null;
 
       const contains504Result = contains504(educationalFactors);
       const containsESLResult = containsESL(educationalFactors);
 
-      const contactInfo =
-        studentData.TENTATIVE &&
-        studentData.ContactInfo &&
-        Array.isArray(studentData.ContactInfo) &&
-        studentData.ContactInfo.length > 0
-          ? studentData.ContactInfo[0]
-          : null;
+      // const contactInfo =
+      //   studentData.TENTATIVE &&
+      //   studentData.ContactInfo &&
+      //   Array.isArray(studentData.ContactInfo) &&
+      //   studentData.ContactInfo.length > 0
+      //     ? studentData.ContactInfo[0]
+      //     : null;
 
-      const mergedDocId = contactInfo
-        ? contactInfo[0]["Merged Doc ID - Transition Letter"]
+      const mergedDocId = tentativeArray
+        ? tentativeArray[0]["Merged Doc ID - Transition Letter"]
         : null;
-      const mergedDocUrl = contactInfo
-        ? contactInfo[0]["Merged Doc URL - Transition Letter"]
+      const mergedDocUrl = tentativeArray
+        ? tentativeArray[0]["Merged Doc URL - Transition Letter"]
         : null;
-      const linkToMergedDoc = contactInfo
-        ? contactInfo[0]["Link to merged Doc - Transition Letter"]
+      const linkToMergedDoc = tentativeArray
+        ? tentativeArray[0]["Link to merged Doc - Transition Letter"]
         : null;
-      const documentMergeStatus = contactInfo
-        ? contactInfo[0]["Document Merge Status - Transition Letter"]
+      const documentMergeStatus = tentativeArray
+        ? tentativeArray[0]["Document Merge Status - Transition Letter"]
         : null;
 
       // Extract the needed data fields in the specified order
       outputData.push([
-        studentData.TENTATIVE
-          ? studentData["TENTATIVE"][0]["DATE ADDED TO SPREADSHEET"]
+        tentativeArray
+          ? tentativeArray[0]["DATE ADDED TO SPREADSHEET"]
           : null, // TODO: ADD A FUNCTION TO CHECK IF THIS VALUE IS BLANK, IF IT IS THEN ADD THE CURRENT DATE & TIME IF IT ISN'T BLANK THEN BRING IN THE DATA
         lastName, // "LAST"
         firstName, // "FIRST"
-        studentData["Entry_Withdrawal"]
-          ? studentData["Entry_Withdrawal"][0]["Student Id"]
+        studentId
+          ? studentId
           : null, // "STUDENT ID",
-        studentData["Entry_Withdrawal"]
-          ? studentData["Entry_Withdrawal"][0]["Grd Lvl"]
+        tentativeArray[0]
+          ? tentativeArray[0]["GRADE"]
           : null, // "GRADE",
 
         // "1st Period - Course Title",
@@ -302,7 +295,7 @@ function writeToTENTATIVE2_TESTINGSheet(updatedUpdatedUpdatedUdatedUpdatedUpdate
           ? studentData.Registrations_SY_24_25[0]["Home Campus"]
           : null, // "REGULAR CAMPUS",
         formattedEntryDate, // "FIRST DAY OF AEP",
-        estimatedExitDay || null, // "Anticipated Release Date",
+        formatDateToMMDDYYYY(estimatedExitDay) || null, // "Anticipated Release Date",
         "", // "Parent Notice Date",
         "", // "Withdrawn Date",
         "", // "Attendance Recovery",
