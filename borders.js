@@ -17,7 +17,7 @@
 
 function addThickBordersToSheets() {
   var spreadsheet = SpreadsheetApp.getActive();
-  var sheetsToApplyBorders = ["TENTATIVE", "Withdrawn", "W/D Other"];
+  var sheetsToApplyBorders = ["TENTATIVE", "Withdrawn", "W/D Other", "TENTATIVE2(TESTING)"];
   var rangesToApplyBorders = [
     "F:F",
     "L:L",
