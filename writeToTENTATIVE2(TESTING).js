@@ -119,23 +119,6 @@ function writeToTENTATIVE2_TESTINGSheet(updatedUpdatedUpdatedUdatedUpdatedUpdate
 
       // Continue with the rest of your logic
       const formattedEntryDate = formatDateToMMDDYYYY(entryData);
-      // const gradeString = tentativeArray[0]["GRADE"]; // TODO: Is this variable needed? If not, remove it
-      // const formattedGrade =
-      //   typeof gradeString === "string" && gradeString
-      //     ? gradeString.split("-")[0].trim().replace(/^0+/, "")
-      //     : null; // TODO: Is this variable needed? If not, remove it
-
-      // Validate the entry date
-      // const entryDateString = new Date(formattedEntryDate);
-      // if (isNaN(entryDateString)) {
-      //   console.error(
-      //     "Invalid entry date for Student ID:",
-      //     studentId,
-      //     "Date:",
-      //     formattedEntryDate,
-      //   );
-      //   return; // Skip this entry if the date is invalid
-      // }
 
       // Calculate Estimated Days Left
       const placementDays = registrationArray
@@ -205,14 +188,6 @@ function writeToTENTATIVE2_TESTINGSheet(updatedUpdatedUpdatedUdatedUpdatedUpdate
       const contains504Result = contains504(educationalFactors);
       const containsESLResult = containsESL(educationalFactors);
 
-      // const contactInfo =
-      //   studentData.TENTATIVE &&
-      //   studentData.ContactInfo &&
-      //   Array.isArray(studentData.ContactInfo) &&
-      //   studentData.ContactInfo.length > 0
-      //     ? studentData.ContactInfo[0]
-      //     : null;
-
       const mergedDocId = tentativeArray
         ? tentativeArray[0]["Merged Doc ID - Transition Letter"]
         : null;
@@ -226,45 +201,7 @@ function writeToTENTATIVE2_TESTINGSheet(updatedUpdatedUpdatedUdatedUpdatedUpdate
         ? tentativeArray[0]["Document Merge Status - Transition Letter"]
         : null;
 
-      /**
-       * Option 1: Updates the teacherInput object with values from formResponses1Array.
-       *
-       * @param {Object} teacherInput - The teacher input object to be updated.
-       * @param {Array<Object>} formResponses1Array - The array of form responses.
-       */
-      function updateTeacherInput(teacherInput, formResponses1Array) {
-        // Iterate through each period in the teacherInput object
-        for (const period in teacherInput) {
-          if (teacherInput.hasOwnProperty(period)) {
-            // Find the matching entry in the formResponsesArray
-            const matchingEntry = formResponses1Array.find(
-              (response) =>
-                response["What period do you have this student?"] === period,
-            );
 
-            // If a matching entry is found, update the teacherInput object
-            if (matchingEntry) {
-              teacherInput[period][
-                "How would you assess this student's academic growth?"
-              ] =
-                matchingEntry[
-                  "How would you assess this student's academic growth?"
-                ] || "";
-              teacherInput[period]["Academic and Behavioral Progress Notes"] =
-                matchingEntry["Academic and Behavioral Progress Notes"] || "";
-              teacherInput[period]["Teacher Name"] =
-                matchingEntry["Teacher"] || "";
-              teacherInput[period]["Course Title"] =
-                matchingEntry["Course Title"] || "";
-            }
-          }
-        }
-      }
-
-      /**
-       * Option 2, incase the formResponses1Array is blank.
-       */
-      function updateTeacherInput2(teacherInput, schedulesArray) {
         function periodToNumber(period) {
           const periodMapping = {
             1: "1st",
@@ -288,6 +225,105 @@ function writeToTENTATIVE2_TESTINGSheet(updatedUpdatedUpdatedUdatedUpdatedUpdate
           return array.reduce((flat, current) => flat.concat(current), []); // TODO: See if I can add the student ID to continue troubleshooting.
         }
 
+
+      /**
+       * Option 1: Updates the teacherInput object with values from formResponses1Array.
+       *
+       * @param {Object} teacherInput - The teacher input object to be updated.
+       * @param {Array<Object>} formResponses1Array - The array of form responses.
+       */
+      function updateTeacherInput(teacherInput, formResponses1Array, schedulesArray) {
+
+        // Flatten the schedulesArray in case it's a nested array
+        const flatSchedulesArray = flattenArray(schedulesArray);
+
+        // Check if schedulesArray is defined and an array
+        if (!Array.isArray(flatSchedulesArray)) {
+          console.warn(
+            "schedulesArray is undefined or not an array, assigning empty strings.",
+          );
+
+          // Iterate through each period in the teacherInput object and set empty strings
+          for (const period in teacherInput) {
+            if (teacherInput.hasOwnProperty(period)) {
+              teacherInput[period]["Teacher Name"] = "";
+              teacherInput[period]["Course Title"] = "";
+              teacherInput[period]["Case Manager"] = "";
+            }
+          }
+          return; // Exit the function since schedulesArray is invalid
+        }
+
+        // Iterate through each period in the teacherInput object
+        for (const period in teacherInput) {
+          if (teacherInput.hasOwnProperty(period)) {
+            // Find the matching entry in the formResponsesArray
+            const matchingEntry = formResponses1Array.find(
+              (response) =>
+                response["What period do you have this student?"] === period,
+            );
+
+            // If a matching entry is found, update the teacherInput object
+            if (matchingEntry) {
+              teacherInput[period][
+                "How would you assess this student's academic growth?"
+              ] =
+                matchingEntry[
+                  "How would you assess this student's academic growth?"
+                ] || "";
+              teacherInput[period]["Academic and Behavioral Progress Notes"] =
+                matchingEntry["Academic and Behavioral Progress Notes"] || "";
+              teacherInput[period]["Teacher Name"] =
+                matchingEntry["Teacher"] || "";
+              teacherInput[period]["Course Title"] =
+                matchingEntry["Course Title"] || "";
+            } else {
+                      // Iterate through each period in the flatSchedulesArray object
+                      for (let i = 0; i < flatSchedulesArray.length; i++) {
+                        if (flatSchedulesArray[i].hasOwnProperty("Per Beg")) {
+                          // Get the numeric equivalent of the period (e.g., "1st" => "1")
+                          const periodNumber = periodToNumber(
+                            flatSchedulesArray[i]["Per Beg"],
+                          );
+
+                          if (periodNumber) {
+                            // Find the matching entry in the flattened schedulesArray
+                            const matchingEntry = flatSchedulesArray.find(
+                              (response) =>
+                                response &&
+                                response["Per Beg"] === flatSchedulesArray[i]["Per Beg"],
+                            );
+
+                            // If a matching entry is found, update the teacherInput object
+                            if (matchingEntry) {
+                              teacherInput[periodNumber]["Teacher Name"] =
+                                matchingEntry["Teacher Name"] ||
+                                "almost, work on the matchingEntry value";
+                              teacherInput[periodNumber]["Course Title"] =
+                                matchingEntry["Course Title"] ||
+                                "almost, work on the matchingEntry value";
+                              teacherInput[periodNumber]["Case Manager"] =
+                                matchingEntry["Teacher Name"] ||
+                                "almost, work on the matchingEntry value";
+                            }
+                          } else {
+                            console.warn(
+                              `No matching period number found for ${periodNumber}`,
+                            );
+                          }
+                        } else {
+                          console.warn(`No matching period number found for ${periodNumber}`);
+                        }
+                      }
+            }
+          }
+        }
+      }
+
+      /**
+       * Option 2, incase the formResponses1Array is blank.
+       */
+      function updateTeacherInput2(teacherInput, schedulesArray) {
         // Flatten the schedulesArray in case it's a nested array
         const flatSchedulesArray = flattenArray(schedulesArray);
 
@@ -425,9 +461,9 @@ function writeToTENTATIVE2_TESTINGSheet(updatedUpdatedUpdatedUdatedUpdatedUpdate
 
       // Check if formResponses1Array is null before calling updateTeacherInput
       if (formResponses1Array !== null) {
-        updateTeacherInput(teacherInput, formResponses1Array);
+        updateTeacherInput(teacherInput, formResponses1Array, schedulesArray);
       } else {
-        Logger.log("formResponses1Array is null. Skipping updateTeacherInput.");
+        Logger.log("formResponses1Array is null. Skipping updateTeacherInput. Going to updateTeacherInput2 instead.");
         updateTeacherInput2(teacherInput, schedulesArray);
       }
 
