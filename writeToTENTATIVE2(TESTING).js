@@ -2,7 +2,6 @@
  * Writes the data from updatedUpdatedUpdatedUdatedUpdatedUpdatedUpdatedActiveStudentDataMap to the "TENTATIVE2(TESTING)" sheet.
  */
 function writeToTENTATIVE2_TESTINGSheet(updatedUpdatedUpdatedUdatedUpdatedUpdatedUpdatedActiveStudentDataMap) {
-
   // Check if the input is defined and log its content
   if (!updatedUpdatedUpdatedUdatedUpdatedUpdatedUpdatedActiveStudentDataMap) {
     console.error(
@@ -11,8 +10,9 @@ function writeToTENTATIVE2_TESTINGSheet(updatedUpdatedUpdatedUdatedUpdatedUpdate
     return; // Exit the function if it's undefined
   }
 
-  if (typeof updatedUpdatedUpdatedUdatedUpdatedUpdatedUpdatedActiveStudentDataMap !==
-    "object" ||
+  if (
+    typeof updatedUpdatedUpdatedUdatedUpdatedUpdatedUpdatedActiveStudentDataMap !==
+      "object" ||
     !(
       "forEach" in
       updatedUpdatedUpdatedUdatedUpdatedUpdatedUpdatedActiveStudentDataMap
@@ -196,8 +196,9 @@ function writeToTENTATIVE2_TESTINGSheet(updatedUpdatedUpdatedUdatedUpdatedUpdate
       }
 
       const educationalFactors =
-        registrationArray && registrationArray[0] &&
-          registrationArray[0]["Educational Factors"] !== undefined
+        registrationArray &&
+        registrationArray[0] &&
+        registrationArray[0]["Educational Factors"] !== undefined
           ? registrationArray[0]["Educational Factors"]
           : null;
 
@@ -247,7 +248,7 @@ function writeToTENTATIVE2_TESTINGSheet(updatedUpdatedUpdatedUdatedUpdatedUpdate
                 "How would you assess this student's academic growth?"
               ] =
                 matchingEntry[
-                "How would you assess this student's academic growth?"
+                  "How would you assess this student's academic growth?"
                 ] || "";
               teacherInput[period]["Academic and Behavioral Progress Notes"] =
                 matchingEntry["Academic and Behavioral Progress Notes"] || "";
@@ -264,7 +265,6 @@ function writeToTENTATIVE2_TESTINGSheet(updatedUpdatedUpdatedUdatedUpdatedUpdate
        * Option 2, incase the formResponses1Array is blank.
        */
       function updateTeacherInput2(teacherInput, schedulesArray) {
-        
         function periodToNumber(period) {
           const periodMapping = {
             1: "1st",
@@ -275,16 +275,15 @@ function writeToTENTATIVE2_TESTINGSheet(updatedUpdatedUpdatedUdatedUpdatedUpdate
             6: "6th",
             7: "7th",
             8: "8th",
-            9: "Special Education"
+            9: "Special Education",
           };
-        return periodMapping[period] || null;
+          return periodMapping[period] || null;
         }
- 
-        
+
         function flattenArray(array) {
           if (!Array.isArray(array)) {
-            console.warn('Expected an array but got:', array);
-            return [];  // Return an empty array if the input is not valid
+            console.warn("Expected an array but got:", array);
+            return []; // Return an empty array if the input is not valid
           }
           return array.reduce((flat, current) => flat.concat(current), []); // TODO: See if I can add the student ID to continue troubleshooting.
         }
@@ -294,48 +293,59 @@ function writeToTENTATIVE2_TESTINGSheet(updatedUpdatedUpdatedUdatedUpdatedUpdate
 
         // Check if schedulesArray is defined and an array
         if (!Array.isArray(flatSchedulesArray)) {
-        console.warn("schedulesArray is undefined or not an array, assigning empty strings.");
-    
+          console.warn(
+            "schedulesArray is undefined or not an array, assigning empty strings.",
+          );
+
           // Iterate through each period in the teacherInput object and set empty strings
           for (const period in teacherInput) {
             if (teacherInput.hasOwnProperty(period)) {
-            teacherInput[period]["Teacher Name"] = "";
-            teacherInput[period]["Course Title"] = "";
-            teacherInput[period]["Case Manager"] = "";
+              teacherInput[period]["Teacher Name"] = "";
+              teacherInput[period]["Course Title"] = "";
+              teacherInput[period]["Case Manager"] = "";
             }
           }
-          return;  // Exit the function since schedulesArray is invalid
+          return; // Exit the function since schedulesArray is invalid
         }
 
         // Iterate through each period in the teacherInput object
         for (let i = 0; i < flatSchedulesArray.length; i++) {
           if (flatSchedulesArray[i].hasOwnProperty("Per Beg")) {
             // Get the numeric equivalent of the period (e.g., "1st" => "1")
-            const periodNumber = periodToNumber(flatSchedulesArray[i]["Per Beg"]);
-            
+            const periodNumber = periodToNumber(
+              flatSchedulesArray[i]["Per Beg"],
+            );
+
             if (periodNumber) {
               // Find the matching entry in the flattened schedulesArray
               const matchingEntry = flatSchedulesArray.find(
-                (response) => response && response["Per Beg"] === flatSchedulesArray[i]["Per Beg"]
+                (response) =>
+                  response &&
+                  response["Per Beg"] === flatSchedulesArray[i]["Per Beg"],
               );
 
               // If a matching entry is found, update the teacherInput object
               if (matchingEntry) {
                 teacherInput[periodNumber]["Teacher Name"] =
-                  matchingEntry["Teacher Name"] || "almost, work on the matchingEntry value";
+                  matchingEntry["Teacher Name"] ||
+                  "almost, work on the matchingEntry value";
                 teacherInput[periodNumber]["Course Title"] =
-                  matchingEntry["Course Title"] || "almost, work on the matchingEntry value";
-                teacherInput[periodNumber]["Case Manager"] = 
-                  matchingEntry["Teacher Name"] || "almost, work on the matchingEntry value"
+                  matchingEntry["Course Title"] ||
+                  "almost, work on the matchingEntry value";
+                teacherInput[periodNumber]["Case Manager"] =
+                  matchingEntry["Teacher Name"] ||
+                  "almost, work on the matchingEntry value";
               }
             } else {
-              console.warn(`No matching period number found for ${periodNumber}`);
-            } 
-            } else {
-              console.warn(`No matching period number found for ${periodNumber}`);
+              console.warn(
+                `No matching period number found for ${periodNumber}`,
+              );
             }
+          } else {
+            console.warn(`No matching period number found for ${periodNumber}`);
           }
         }
+      }
 
       const teacherInput = {
         "1st": {
@@ -417,28 +427,30 @@ function writeToTENTATIVE2_TESTINGSheet(updatedUpdatedUpdatedUdatedUpdatedUpdate
       if (formResponses1Array !== null) {
         updateTeacherInput(teacherInput, formResponses1Array);
       } else {
-        Logger.log(
-          "formResponses1Array is null. Skipping updateTeacherInput.",
-        );
-        updateTeacherInput2(teacherInput,  schedulesArray)
+        Logger.log("formResponses1Array is null. Skipping updateTeacherInput.");
+        updateTeacherInput2(teacherInput, schedulesArray);
       }
 
       // Extract the needed data fields in the specified order
       outputData.push([
-        tentativeArray && tentativeArray[0] && tentativeArray[0]["DATE ADDED TO SPREADSHEET"]
+        tentativeArray &&
+        tentativeArray[0] &&
+        tentativeArray[0]["DATE ADDED TO SPREADSHEET"]
           ? formatDateToMMDDYYYY(tentativeArray[0]["DATE ADDED TO SPREADSHEET"])
           : formatDateToMMDDYYYY(new Date()),
         lastName,
         firstName,
         studentId ? studentId : null,
-        tentativeArray && tentativeArray[0] ? tentativeArray[0]["GRADE"] : entryWithdrawalArray[0]["Grd Lvl"],
+        tentativeArray && tentativeArray[0]
+          ? tentativeArray[0]["GRADE"]
+          : entryWithdrawalArray[0]["Grd Lvl"],
 
         teacherInput["1st"]["Course Title"], // "1st Period - Course Title",
         teacherInput["1st"]["Teacher Name"], // "1st Period - Teacher Name",
         tentativeArray ? tentativeArray[0]["1st Period - Transfer Grade"] : "", // "1st Period - Transfer Grade",
         tentativeArray ? tentativeArray[0]["1st Period - Current Grade"] : "", // "1st Period - Current Grade",
         teacherInput["1st"][
-        "How would you assess this student's academic growth?"
+          "How would you assess this student's academic growth?"
         ],
         teacherInput["1st"]["Academic and Behavioral Progress Notes"],
 
@@ -447,7 +459,7 @@ function writeToTENTATIVE2_TESTINGSheet(updatedUpdatedUpdatedUdatedUpdatedUpdate
         tentativeArray ? tentativeArray[0]["2nd Period - Transfer Grade"] : "", // "2nd Period - Transfer Grade",
         tentativeArray ? tentativeArray[0]["2nd Period - Current Grade"] : "", // "2nd Period - Current Grade",
         teacherInput["2nd"][
-        "How would you assess this student's academic growth?"
+          "How would you assess this student's academic growth?"
         ],
         teacherInput["2nd"]["Academic and Behavioral Progress Notes"],
 
@@ -456,7 +468,7 @@ function writeToTENTATIVE2_TESTINGSheet(updatedUpdatedUpdatedUdatedUpdatedUpdate
         tentativeArray ? tentativeArray[0]["3rd Period - Transfer Grade"] : "", // "3rd Period - Transfer Grade",
         tentativeArray ? tentativeArray[0]["3rd Period - Current Grade"] : "", // "3rd Period - Current Grade",
         teacherInput["3rd"][
-        "How would you assess this student's academic growth?"
+          "How would you assess this student's academic growth?"
         ],
         teacherInput["3rd"]["Academic and Behavioral Progress Notes"],
 
@@ -465,7 +477,7 @@ function writeToTENTATIVE2_TESTINGSheet(updatedUpdatedUpdatedUdatedUpdatedUpdate
         tentativeArray ? tentativeArray[0]["4th Period - Transfer Grade"] : "", // "4th Period - Transfer Grade",
         tentativeArray ? tentativeArray[0]["4th Period - Current Grade"] : "", // "4th Period - Current Grade",
         teacherInput["4th"][
-        "How would you assess this student's academic growth?"
+          "How would you assess this student's academic growth?"
         ],
         teacherInput["4th"]["Academic and Behavioral Progress Notes"],
 
@@ -474,7 +486,7 @@ function writeToTENTATIVE2_TESTINGSheet(updatedUpdatedUpdatedUdatedUpdatedUpdate
         tentativeArray ? tentativeArray[0]["5th Period - Transfer Grade"] : "", // "5th Period - Transfer Grade",
         tentativeArray ? tentativeArray[0]["5th Period - Current Grade"] : "", // "5th Period - Current Grade",
         teacherInput["5th"][
-        "How would you assess this student's academic growth?"
+          "How would you assess this student's academic growth?"
         ],
         teacherInput["5th"]["Academic and Behavioral Progress Notes"],
 
@@ -483,7 +495,7 @@ function writeToTENTATIVE2_TESTINGSheet(updatedUpdatedUpdatedUdatedUpdatedUpdate
         tentativeArray ? tentativeArray[0]["6th Period - Transfer Grade"] : "", // "6th Period - Transfer Grade",
         tentativeArray ? tentativeArray[0]["6th Period - Current Grade"] : "", // "6th Period - Current Grade",
         teacherInput["6th"][
-        "How would you assess this student's academic growth?"
+          "How would you assess this student's academic growth?"
         ],
         teacherInput["6th"]["Academic and Behavioral Progress Notes"],
 
@@ -492,7 +504,7 @@ function writeToTENTATIVE2_TESTINGSheet(updatedUpdatedUpdatedUdatedUpdatedUpdate
         tentativeArray ? tentativeArray[0]["7th Period - Transfer Grade"] : "", // "7th Period - Transfer Grade",
         tentativeArray ? tentativeArray[0]["7th Period - Current Grade"] : "", // "7th Period - Current Grade",
         teacherInput["7th"][
-        "How would you assess this student's academic growth?"
+          "How would you assess this student's academic growth?"
         ],
         teacherInput["7th"]["Academic and Behavioral Progress Notes"],
 
@@ -501,7 +513,7 @@ function writeToTENTATIVE2_TESTINGSheet(updatedUpdatedUpdatedUdatedUpdatedUpdate
         tentativeArray ? tentativeArray[0]["8th Period - Transfer Grade"] : "", // "8th Period - Transfer Grade",
         tentativeArray ? tentativeArray[0]["8th Period - Current Grade"] : "", // "8th Period - Current Grade",
         teacherInput["8th"][
-        "How would you assess this student's academic growth?"
+          "How would you assess this student's academic growth?"
         ],
         teacherInput["8th"]["Academic and Behavioral Progress Notes"],
 
@@ -552,16 +564,24 @@ function writeToTENTATIVE2_TESTINGSheet(updatedUpdatedUpdatedUdatedUpdatedUpdate
     },
   );
 
-
-  const activeSheet = SpreadsheetApp.getActiveSpreadsheet()
-      .getSheetByName("TENTATIVE2(TESTING)");
-    // Clear existing data from Row 2 downwards
-    const lastRow = activeSheet.getLastRow();
+  const activeSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(
+    "TENTATIVE2(TESTING)",
+  );
+  // Clear existing data from Row 2 downwards
+  const lastRow = activeSheet.getLastRow();
   if (lastRow > 1) {
     activeSheet
       .getRange(2, 1, lastRow - 1, activeSheet.getLastColumn())
       .clear();
   }
+
+  // Sort the outputData by Lastname (index 1) then by Firstname (index 2)
+  outputData.sort((a, b) => {
+    if (a[1] === b[1]) {
+      return a[2].localeCompare(b[2]);
+    }
+    return a[1].localeCompare(b[1]);
+  });
 
   // Write the prepared data to the "Active" sheet starting from Row 2
   if (outputData.length > 0) {
