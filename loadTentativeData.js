@@ -1,11 +1,11 @@
 /**
- * This function references the "TENTATIVE" sheet of the "NAHS 24-25 Student Transition Notes" spreadsheet and creates a map of student IDs to student data.
+ * This function references the "TENTATIVE-Version2" sheet of the "NAHS 24-25 Student Transition Notes" spreadsheet and creates a map of student IDs to student data.
  *
  * @see loadTentativeData.js
  * @returns {allStudentsMap1} A map where the key is the Student ID the values are an object containing student data from the rows in TENTATIVE.
  */
 function getStudentsFromTENTATIVESheet() {
-  var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("TENTATIVE2(TESTING)");
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("TENTATIVE-Version2");
   var data = sheet.getDataRange().getValues();
   var headers = data[0];
 
