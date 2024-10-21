@@ -1,18 +1,39 @@
 {
   "timeZone": "America/Chicago",
   "dependencies": {
-    "enabledAdvancedServices": [{
-      "userSymbol": "Calendar",
-      "serviceId": "calendar",
-      "version": "v3"
-    }]
+    "enabledAdvancedServices": [
+      {
+        "userSymbol": "Calendar",
+        "serviceId": "calendar",
+        "version": "v3"
+      }
+    ],
+    "libraries": [
+      {
+        "userSymbol": "QUnitGS2",
+        "version": "23",
+        "libraryId": "1tXPhZmIyYiA_EMpTRJw0QpVGT5Pdb02PpOHCi9A9FFidblOc9CY_VLgG"
+      },
+      {
+        "userSymbol": "NISDHolidayLibrary",
+        "version": "0",
+        "libraryId": "1OjYgamk2Sz8G1B4IOJKdWNM9-t6RwSJ_uq7nUJJO6h_7jSogTDT7CX10",
+        "developmentMode": true
+      }
+    ]
   },
   "exceptionLogging": "STACKDRIVER",
   "runtimeVersion": "V8",
   "sheets": {
-    "macros": [{
-      "menuName": "addBorders",
-      "functionName": "addBorders"
-    }]
+    "macros": [
+      {
+        "menuName": "addBorders",
+        "functionName": "addBorders"
+      }
+    ]
+  },
+  "webapp": {
+    "executeAs": "USER_DEPLOYING",
+    "access": "MYSELF"
   }
 }
