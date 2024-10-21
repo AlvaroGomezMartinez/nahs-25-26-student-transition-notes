@@ -1,20 +1,28 @@
-/**********************************************************************************
- *                        nahs-transition-project-24-25a                          *
- *                                                                                *
- * The function below (importEmails) gets called by the importDataToDestination   *
- * function in the script file called importIntoTENTATIVE.                        *
- * The function references the sheet called "ContactInfo" and imports the         *
- * Student Email, Guardian 1 Email, and Parent Name values into TENTATIVE.        *
- *                                                                                *
- * Point of contact: Alvaro Gomez                                                 *
- *                   Academic Technology Coach                                    *
- *                   alvaro.gomez@nisd.net                                        *
- *                   Office: +1-210-397-9408                                      *
- *                   Mobile: +1-210-363-1577                                      *
- *                                                                                *
- * Latest update: 09/03/24                                                        *
- **********************************************************************************/
-
+/**
+ * Imports student and guardian email information from the "ContactInfo" sheet into the "TENTATIVE" sheet.
+ * This function fetches email data in batches from the "ContactInfo" sheet and processes it to map 
+ * student IDs to their emails, guardian names, and guardian emails. The processed data is then inserted 
+ * into corresponding columns in the "TENTATIVE" sheet.
+ *
+ * @function
+ * @name importEmails
+ * 
+ * @summary
+ * Imports Student Email, Guardian 1 Email, and Guardian Name from the "ContactInfo" sheet into the 
+ * "TENTATIVE" sheet.
+ *
+ * @description
+ * This function is called by `importDataToDestination` to transfer email information from "ContactInfo" 
+ * to "TENTATIVE". It processes the data in batches to avoid memory issues with large datasets. 
+ * The processed data includes the Student Email (column BY), Guardian Name (column BZ), 
+ * and Guardian Email (column CA) in the "TENTATIVE" sheet. 
+ * Data is fetched starting from row 2 to the last row in "ContactInfo".
+ * 
+ * @global
+ * SpreadsheetApp - The Google Apps Script service for working with Google Sheets.
+ *
+ * @see importDataToDestination
+ */
 function importEmails() {
   let ss = SpreadsheetApp.getActiveSpreadsheet();
   let emailsSheet = ss.getSheetByName("ContactInfo");
@@ -36,6 +44,28 @@ function importEmails() {
   }
 }
 
+/**
+ * Processes a batch of email data and inserts corresponding student and guardian information 
+ * into the "TENTATIVE" sheet.
+ * 
+ * @function
+ * @name processBatch
+ * 
+ * @summary
+ * Maps Student IDs to email and guardian information, then inserts that data into the "TENTATIVE" sheet.
+ *
+ * @param {Array<Array>} batchData - A 2D array representing rows of data fetched from "ContactInfo". 
+ * Each row contains values for Student ID, Guardian Name, Guardian Email, and Student Email.
+ * 
+ * @param {Sheet} tentativeSheet - The Google Sheets sheet object representing the "TENTATIVE" sheet.
+ * This sheet is where the processed email information will be inserted.
+ *
+ * @description
+ * For each row in the batch, the function creates a map of Student IDs to email and guardian information. 
+ * It then compares the Student IDs in the "TENTATIVE" sheet and inserts the corresponding data 
+ * (Student Email, Guardian Name, and Guardian Email) in the appropriate columns: 
+ * BY (Student Email), BZ (Guardian Name), and CA (Guardian Email).
+ */
 function processBatch(batchData, tentativeSheet) {
   let emailMap = {};
 
