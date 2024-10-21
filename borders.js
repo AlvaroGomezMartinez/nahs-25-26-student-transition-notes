@@ -1,23 +1,31 @@
-/*****************************************************************************************
- *                         nahs-transition-project-24-25a                                *
- *                                                                                       *
- * The function (addThickBordersToSheets) reformats the sheets called 'TENTATIVE',       *
- * 'Withdrawn', and 'W/D Other' by adding borders to improve user experience.            *
- *                                                                                       *
- * A trigger is set to run addThickBordersToSheets on every change to the spreadsheet.   *
- *                                                                                       *
- * Point of Contact: Alvaro Gomez                                                        *
- *                   Academic Technology Coach                                           *
- *                   alvaro.gomez@nisd.net                                               *
- *                   Office: +1-210-397-9408                                             *
- *                   Mobile: +1-210-363-1577                                             *
- *                                                                                       *
- * Latest update: 11/21/23                                                               *
- *****************************************************************************************/
-
+/**
+ * Adds thick borders to specific columns on the sheets 'TENTATIVE', 'Withdrawn', 'W/D Other', 
+ * and 'TENTATIVE2(TESTING)' in the active Google Sheets document. The borders are applied to a 
+ * predefined set of column ranges on each sheet.
+ * 
+ * @function
+ * @name addThickBordersToSheets
+ * 
+ * @summary
+ * Applies thick borders to specified columns on select sheets to improve user experience.
+ * 
+ * @description
+ * This function retrieves the active spreadsheet and applies a thick black border to specific 
+ * columns across the sheets: 'TENTATIVE', 'Withdrawn', 'W/D Other', and 'TENTATIVE2(TESTING)'. 
+ * It loops over the sheets and the predefined column ranges, applying a thick border to each range.
+ * The function is triggered on every change made to the spreadsheet, improving the visual 
+ * layout and enhancing readability.
+ * 
+ * @global
+ * SpreadsheetApp - Google Apps Script service to work with Google Sheets.
+ * 
+ * @see SpreadsheetApp.getActive - Gets the active spreadsheet.
+ * @see SpreadsheetApp.BorderStyle.SOLID_THICK - Sets a thick solid border style.
+ * 
+ */
 function addThickBordersToSheets() {
   var spreadsheet = SpreadsheetApp.getActive();
-  var sheetsToApplyBorders = ["TENTATIVE", "Withdrawn", "W/D Other", "TENTATIVE2(TESTING)"];
+  var sheetsToApplyBorders = ["TENTATIVE", "Withdrawn", "W/D Other", "TENTATIVE-Version2"];
   var rangesToApplyBorders = [
     "F:F",
     "L:L",
@@ -37,14 +45,14 @@ function addThickBordersToSheets() {
       for (var i = 0; i < rangesToApplyBorders.length; i++) {
         var range = sheet.getRange(rangesToApplyBorders[i]);
         range.setBorder(
-          null,
-          true,
-          null,
-          null,
-          null,
-          null,
-          "#000000",
-          SpreadsheetApp.BorderStyle.SOLID_THICK
+          null, // Top
+          true, // Right
+          null, // Bottom
+          null, // Left
+          null, // Vertical
+          null, // Horizontal
+          "#000000", // Border color
+          SpreadsheetApp.BorderStyle.SOLID_THICK // Border style
         );
       }
     }
