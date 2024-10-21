@@ -33,8 +33,8 @@
 function onOpen() {
   const ui = SpreadsheetApp.getUi();
   ui.createMenu("🚩Update")
-    .addItem("Update Tentative", "importDataToDestination")
-    .addItem("Update Tentative2(Testing)", "loadTENTATIVE2_TESTING")
+    .addItem("Update TENTATIVE", "importDataToDestination")
+    .addItem("Update TENTATIVE-Version2", "loadTENTATIVEVersion2")
     .addToUi();
 }
 
