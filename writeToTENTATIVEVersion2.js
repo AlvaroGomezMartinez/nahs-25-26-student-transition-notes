@@ -718,10 +718,20 @@ function writeToTENTATIVEVersion2Sheet(
   });
 
   // Write the prepared data to the "Active" sheet starting from Row 2
+  // if (outputData.length > 0) {
+  //   activeSheet
+  //     .getRange(2, 1, outputData.length, outputData[0].length)
+  //     .setValues(outputData);
+  // }
   if (outputData.length > 0) {
-    activeSheet
-      .getRange(2, 1, outputData.length, outputData[0].length)
-      .setValues(outputData);
+    const range = activeSheet.getRange(
+      2,
+      1,
+      outputData.length,
+      outputData[0].length,
+    );
+    range.setValues(outputData);
+    range.setWrapStrategy(SpreadsheetApp.WrapStrategy.CLIP);
   }
 
   addThickBordersToSheets();
