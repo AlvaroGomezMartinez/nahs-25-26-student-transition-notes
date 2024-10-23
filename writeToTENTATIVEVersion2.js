@@ -1,7 +1,9 @@
 /**
  * Writes the data from updatedUpdatedUpdatedUdatedUpdatedUpdatedUpdatedActiveStudentDataMap to the "TENTATIVE-Version2" sheet.
  */
-function writeToTENTATIVEVersion2Sheet(updatedUpdatedUpdatedUdatedUpdatedUpdatedUpdatedActiveStudentDataMap) {
+function writeToTENTATIVEVersion2Sheet(
+  updatedUpdatedUpdatedUdatedUpdatedUpdatedUpdatedActiveStudentDataMap,
+) {
   // Check if the input is defined and log its content
   if (!updatedUpdatedUpdatedUdatedUpdatedUpdatedUpdatedActiveStudentDataMap) {
     console.error(
@@ -102,7 +104,7 @@ function writeToTENTATIVEVersion2Sheet(updatedUpdatedUpdatedUdatedUpdatedUpdated
         entryWithdrawalArray[0]["Entry Date"].length === 0
       ) {
         console.error(
-          "Entry_Withdrawal data is missing for Student ID:",
+          `${studentId}: Entry_Withdrawal data is missing`,
           studentId,
         );
         return; // Skip this student if Entry_Withdrawal data is not available
@@ -113,7 +115,7 @@ function writeToTENTATIVEVersion2Sheet(updatedUpdatedUpdatedUdatedUpdatedUpdated
 
       // Ensure entryData is defined
       if (!entryData) {
-        console.error("Entry data is missing for Student ID:", studentId);
+        console.error(`${studentId}: Entry data is missing`);
         return; // Skip this student if entry data is not available
       }
 
@@ -201,30 +203,28 @@ function writeToTENTATIVEVersion2Sheet(updatedUpdatedUpdatedUdatedUpdatedUpdated
         ? tentativeArray[0]["Document Merge Status - Transition Letter"]
         : null;
 
+      function periodToNumber(period) {
+        const periodMapping = {
+          1: "1st",
+          2: "2nd",
+          3: "3rd",
+          4: "4th",
+          5: "5th",
+          6: "6th",
+          7: "7th",
+          8: "8th",
+          9: "Special Education",
+        };
+        return periodMapping[period] || null;
+      }
 
-        function periodToNumber(period) {
-          const periodMapping = {
-            1: "1st",
-            2: "2nd",
-            3: "3rd",
-            4: "4th",
-            5: "5th",
-            6: "6th",
-            7: "7th",
-            8: "8th",
-            9: "Special Education",
-          };
-          return periodMapping[period] || null;
+      function flattenArray(array) {
+        if (!Array.isArray(array)) {
+          console.warn(`${studentId}: Expected an array but got: ${array}`);
+          return []; // Return an empty array if the input is not valid
         }
-
-        function flattenArray(array) {
-          if (!Array.isArray(array)) {
-            console.warn("Expected an array but got:", array);
-            return []; // Return an empty array if the input is not valid
-          }
-          return array.reduce((flat, current) => flat.concat(current), []); // TODO: See if I can add the student ID to continue troubleshooting.
-        }
-
+        return array.reduce((flat, current) => flat.concat(current), []);
+      }
 
       /**
        * Option 1: Updates the teacherInput object with values from formResponses1Array.
@@ -232,8 +232,11 @@ function writeToTENTATIVEVersion2Sheet(updatedUpdatedUpdatedUdatedUpdatedUpdated
        * @param {Object} teacherInput - The teacher input object to be updated.
        * @param {Array<Object>} formResponses1Array - The array of form responses.
        */
-      function updateTeacherInput(teacherInput, formResponses1Array, schedulesArray) {
-
+      function updateTeacherInput(
+        teacherInput,
+        formResponses1Array,
+        schedulesArray,
+      ) {
         // Flatten the schedulesArray in case it's a nested array
         const flatSchedulesArray = flattenArray(schedulesArray);
 
@@ -246,9 +249,9 @@ function writeToTENTATIVEVersion2Sheet(updatedUpdatedUpdatedUdatedUpdatedUpdated
           // Iterate through each period in the teacherInput object and set empty strings
           for (const period in teacherInput) {
             if (teacherInput.hasOwnProperty(period)) {
-              teacherInput[period]["Teacher Name"] = "";
-              teacherInput[period]["Course Title"] = "";
-              teacherInput[period]["Case Manager"] = "";
+              teacherInput[period]["Teacher Name"] = "Line 249, empty string";
+              teacherInput[period]["Course Title"] = "Line 250, empty string";
+              teacherInput[period]["Case Manager"] = "Line 251, empty string";
             }
           }
           return; // Exit the function since schedulesArray is invalid
@@ -270,51 +273,57 @@ function writeToTENTATIVEVersion2Sheet(updatedUpdatedUpdatedUdatedUpdatedUpdated
               ] =
                 matchingEntry[
                   "How would you assess this student's academic growth?"
-                ] || "";
+                ] || "Line 273, empty string";
               teacherInput[period]["Academic and Behavioral Progress Notes"] =
-                matchingEntry["Academic and Behavioral Progress Notes"] || "";
+                matchingEntry["Academic and Behavioral Progress Notes"] ||
+                "Line 275, empty string";
               teacherInput[period]["Teacher Name"] =
-                matchingEntry["Teacher"] || "";
+                matchingEntry["Teacher"] || "Line 277, empty string";
               teacherInput[period]["Course Title"] =
-                matchingEntry["Course Title"] || "";
+                matchingEntry["Course Title"] ||
+                tentativeArray[0][`${period} Period - Course Title`] ||
+                "Line 280, empty string";
             } else {
-                      // Iterate through each period in the flatSchedulesArray object
-                      for (let i = 0; i < flatSchedulesArray.length; i++) {
-                        if (flatSchedulesArray[i].hasOwnProperty("Per Beg")) {
-                          // Get the numeric equivalent of the period (e.g., "1st" => "1")
-                          const periodNumber = periodToNumber(
-                            flatSchedulesArray[i]["Per Beg"],
-                          );
+              // Iterate through each period in the flatSchedulesArray object
+              for (let i = 0; i < flatSchedulesArray.length; i++) {
+                if (flatSchedulesArray[i].hasOwnProperty("Per Beg")) {
+                  // Get the numeric equivalent of the period (e.g., "1st" => "1")
+                  const periodNumber = periodToNumber(
+                    flatSchedulesArray[i]["Per Beg"],
+                  );
 
-                          if (periodNumber) {
-                            // Find the matching entry in the flattened schedulesArray
-                            const matchingEntry = flatSchedulesArray.find(
-                              (response) =>
-                                response &&
-                                response["Per Beg"] === flatSchedulesArray[i]["Per Beg"],
-                            );
+                  if (periodNumber) {
+                    // Find the matching entry in the flattened schedulesArray
+                    const matchingEntry = flatSchedulesArray.find(
+                      (response) =>
+                        response &&
+                        response["Per Beg"] ===
+                          flatSchedulesArray[i]["Per Beg"],
+                    );
 
-                            // If a matching entry is found, update the teacherInput object
-                            if (matchingEntry) {
-                              teacherInput[periodNumber]["Teacher Name"] =
-                                matchingEntry["Teacher Name"] ||
-                                "almost, work on the matchingEntry value";
-                              teacherInput[periodNumber]["Course Title"] =
-                                matchingEntry["Course Title"] ||
-                                "almost, work on the matchingEntry value";
-                              teacherInput[periodNumber]["Case Manager"] =
-                                matchingEntry["Teacher Name"] ||
-                                "almost, work on the matchingEntry value";
-                            }
-                          } else {
-                            console.warn(
-                              `${studentId}: No matching period number found for ${periodNumber}`,
-                            );
-                          }
-                        } else {
-                          console.warn(`${studentId}: No matching period number found for ${periodNumber}`);
-                        }
-                      }
+                    // If a matching entry is found, update the teacherInput object
+                    if (matchingEntry) {
+                      teacherInput[periodNumber]["Teacher Name"] =
+                        matchingEntry["Teacher Name"] ||
+                        "Line 301, empty string";
+                      teacherInput[periodNumber]["Course Title"] =
+                        matchingEntry["Course Title"] ||
+                        "Line 304, empty string";
+                      teacherInput[periodNumber]["Case Manager"] =
+                        matchingEntry["Teacher Name"] ||
+                        "Line 307, empty string";
+                    }
+                  } else {
+                    console.warn(
+                      `${studentId}: No matching period number found for ${periodNumber}`,
+                    );
+                  }
+                } else {
+                  console.warn(
+                    `${studentId}: No matching period number found for ${periodNumber}`,
+                  );
+                }
+              }
             }
           }
         }
@@ -323,7 +332,11 @@ function writeToTENTATIVEVersion2Sheet(updatedUpdatedUpdatedUdatedUpdatedUpdated
       /**
        * Option 2, incase the formResponses1Array is blank.
        */
-      function updateTeacherInput2(teacherInput, schedulesArray, tentativeArray) {
+      function updateTeacherInput2(
+        teacherInput,
+        schedulesArray,
+        tentativeArray,
+      ) {
         // Helper function to flatten the array in case it's nested
         function flattenArray(arr) {
           return Array.isArray(arr) ? arr.flat() : [];
@@ -343,32 +356,71 @@ function writeToTENTATIVEVersion2Sheet(updatedUpdatedUpdatedUdatedUpdatedUpdated
           };
 
           for (const period in teacherInput) {
-            if (teacherInput.hasOwnProperty(period) && periodMap.hasOwnProperty(period)) {
+            if (
+              teacherInput.hasOwnProperty(period) &&
+              periodMap.hasOwnProperty(period)
+            ) {
               const periodPrefix = periodMap[period]; // E.g., "1st Period"
-              teacherInput[period]["Course Title"] = tentativeEntry[`${periodPrefix} - Course Title`] || "";
-              teacherInput[period]["Teacher Name"] = tentativeEntry[`${periodPrefix} - Teacher Name`] || "";
-              teacherInput[period]["Transfer Grade"] = tentativeEntry[`${periodPrefix} - Transfer Grade`] || "";
-              teacherInput[period]["Current Grade"] = tentativeEntry[`${periodPrefix} - Current Grade`] || "";
-              teacherInput[period]["How would you assess this student's academic progress?"] = 
-                tentativeEntry[`${periodPrefix} - How would you assess this student's academic progress?`] || "";
-              teacherInput[period]["Academic and Behavioral Progress Notes"] = 
-                tentativeEntry[`${periodPrefix} - Academic and Behavioral Progress Notes`] || "";
+              teacherInput[period]["Course Title"] =
+                tentativeEntry[`${periodPrefix} - Course Title`] ||
+                "Line 348, empty string";
+              teacherInput[period]["Teacher Name"] =
+                tentativeEntry[`${periodPrefix} - Teacher Name`] ||
+                "Line 349, empty string";
+              teacherInput[period]["Transfer Grade"] =
+                tentativeEntry[`${periodPrefix} - Transfer Grade`] ||
+                "Line 350, empty string";
+              teacherInput[period]["Current Grade"] =
+                tentativeEntry[`${periodPrefix} - Current Grade`] ||
+                "Line 351, empty string";
+              teacherInput[period][
+                "How would you assess this student's academic growth?"
+              ] =
+                tentativeEntry[
+                  `${periodPrefix} - How would you assess this student's academic growth?`
+                ] || "Line 353, empty string";
+              teacherInput[period]["Academic and Behavioral Progress Notes"] =
+                tentativeEntry[
+                  `${periodPrefix} - Academic and Behavioral Progress Notes`
+                ] || "Line 356, empty string";
             }
           }
 
           // Handle Special Education field separately if it exists
           if (teacherInput.hasOwnProperty("Special Education")) {
-            teacherInput["Special Education"]["Case Manager"] = tentativeEntry["Special Education - Case Manager"] || "";
-            teacherInput["Special Education"]["What accommodations seem to work well with this student to help them be successful?"] = 
-              tentativeEntry["Special Education - What accommodations seem to work well with this student to help them be successful?"] || "";
-            teacherInput["Special Education"]["What are the student's strengths, as far as behavior?"] = 
-              tentativeEntry["Special Education - What are the student's strengths, as far as behavior?"] || "";
-            teacherInput["Special Education"]["What are the student's needs, as far as behavior?"] = 
-              tentativeEntry["Special Education - What are the student's needs, as far as behavior?"] || "";
-            teacherInput["Special Education"]["What are the student's needs, as far as functional skills?"] = 
-              tentativeEntry["Special Education - What are the student's needs, as far as functional skills?"] || "";
-            teacherInput["Special Education"]["Please add any other comments or concerns here:"] = 
-              tentativeEntry["Special Education - Please add any other comments or concerns here:"] || "";
+            teacherInput["Special Education"]["Case Manager"] =
+              tentativeEntry["Special Education - Case Manager"] ||
+              "Line 361, empty string";
+            teacherInput["Special Education"][
+              "What accommodations seem to work well with this student to help them be successful?"
+            ] =
+              tentativeEntry[
+                "Special Education - What accommodations seem to work well with this student to help them be successful?"
+              ] || "Line 363, empty string";
+            teacherInput["Special Education"][
+              "What are the student's strengths, as far as behavior?"
+            ] =
+              tentativeEntry[
+                "Special Education - What are the student's strengths, as far as behavior?"
+              ] || "Line 365, empty string";
+            teacherInput["Special Education"][
+              "What are the student's needs, as far as behavior?"
+            ] =
+              tentativeEntry[
+                "Special Education - What are the student's needs, as far as behavior?"
+              ] || "Line 367, empty string";
+            teacherInput["Special Education"][
+              "What are the student's needs, as far as functional skills?"
+            ] =
+              tentativeEntry[
+                "Special Education - What are the student's needs, as far as functional skills?"
+              ] || "Line 369, empty string";
+            teacherInput["Special Education"][
+              "Please add any other comments or concerns here:"
+            ] =
+              tentativeEntry[
+                "Special Education - Please add any other comments or concerns here:"
+              ] || "Line 371, empty string";
           }
         }
 
@@ -376,11 +428,20 @@ function writeToTENTATIVEVersion2Sheet(updatedUpdatedUpdatedUdatedUpdatedUpdated
         const flatSchedulesArray = flattenArray(schedulesArray);
 
         // If schedulesArray is undefined, use tentativeArray
-        if (!Array.isArray(flatSchedulesArray) || flatSchedulesArray.length === 0) {
-          console.warn(`${studentId}: schedulesArray is undefined or not an array, using tentativeArray for data.`);
-          
+        if (
+          !Array.isArray(flatSchedulesArray) ||
+          flatSchedulesArray.length === 0
+        ) {
+          console.warn(
+            `${studentId}: schedulesArray is undefined or not an array, using tentativeArray for data.`,
+          );
+
           // Assuming tentativeArray[0] contains the required object
-          if (tentativeArray && Array.isArray(tentativeArray) && tentativeArray.length > 0) {
+          if (
+            tentativeArray &&
+            Array.isArray(tentativeArray) &&
+            tentativeArray.length > 0
+          ) {
             const tentativeEntry = tentativeArray[0]; // Accessing index 0
             mapTentativeToTeacherInput(teacherInput, tentativeEntry);
           } else {
@@ -392,27 +453,32 @@ function writeToTENTATIVEVersion2Sheet(updatedUpdatedUpdatedUdatedUpdatedUpdated
         // Normal flow if schedulesArray is valid
         for (let i = 0; i < flatSchedulesArray.length; i++) {
           if (flatSchedulesArray[i].hasOwnProperty("Per Beg")) {
-            const periodNumber = periodToNumber(flatSchedulesArray[i]["Per Beg"]);
+            const periodNumber = periodToNumber(
+              flatSchedulesArray[i]["Per Beg"],
+            );
             if (periodNumber) {
               const matchingEntry = flatSchedulesArray.find(
-                (response) => response && response["Per Beg"] === flatSchedulesArray[i]["Per Beg"],
+                (response) =>
+                  response &&
+                  response["Per Beg"] === flatSchedulesArray[i]["Per Beg"],
               );
 
               if (matchingEntry) {
                 teacherInput[periodNumber]["Teacher Name"] =
-                  matchingEntry["Teacher Name"] || "almost, work on the matchingEntry value";
+                  matchingEntry["Teacher Name"] || "Line 403, empty string";
                 teacherInput[periodNumber]["Course Title"] =
-                  matchingEntry["Course Title"] || "almost, work on the matchingEntry value";
+                  matchingEntry["Course Title"] || "Line 405, empty string";
                 teacherInput[periodNumber]["Case Manager"] =
-                  matchingEntry["Teacher Name"] || "almost, work on the matchingEntry value";
+                  matchingEntry["Teacher Name"] || "Line 407, empty string";
               }
             } else {
-            console.warn(`${studentId}: No matching period number found for ${flatSchedulesArray[i]["Per Beg"]}`);
+              console.warn(
+                `${studentId}: No matching period number found for ${flatSchedulesArray[i]["Per Beg"]}`,
+              );
             }
           }
         }
       }
-
 
       const teacherInput = {
         "1st": {
@@ -494,7 +560,9 @@ function writeToTENTATIVEVersion2Sheet(updatedUpdatedUpdatedUdatedUpdatedUpdated
       if (formResponses1Array !== null) {
         updateTeacherInput(teacherInput, formResponses1Array, schedulesArray);
       } else {
-        Logger.log(`${studentId}: formResponses1Array is null. Skipping updateTeacherInput. Going to updateTeacherInput2 instead.`);
+        Logger.log(
+          `${studentId}: formResponses1Array is null. Skipping updateTeacherInput. Going to updateTeacherInput2 instead.`,
+        );
         updateTeacherInput2(teacherInput, schedulesArray, tentativeArray);
       }
 
@@ -631,9 +699,8 @@ function writeToTENTATIVEVersion2Sheet(updatedUpdatedUpdatedUdatedUpdatedUpdated
     },
   );
 
-  const activeSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(
-    "TENTATIVE-Version2",
-  );
+  const activeSheet =
+    SpreadsheetApp.getActiveSpreadsheet().getSheetByName("TENTATIVE-Version2");
   // Clear existing data from Row 2 downwards
   const lastRow = activeSheet.getLastRow();
   if (lastRow > 1) {
@@ -656,4 +723,6 @@ function writeToTENTATIVEVersion2Sheet(updatedUpdatedUpdatedUdatedUpdatedUpdated
       .getRange(2, 1, outputData.length, outputData[0].length)
       .setValues(outputData);
   }
+
+  addThickBordersToSheets();
 }
