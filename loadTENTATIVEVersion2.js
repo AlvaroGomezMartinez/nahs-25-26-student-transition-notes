@@ -4,6 +4,24 @@
  * The function filters and merges the separate maps.
  */
 function loadTENTATIVEVersion2() {
+  var sheet =
+    SpreadsheetApp.getActiveSpreadsheet().getSheetByName("TENTATIVE-Version2");
+  var dataRange = sheet.getDataRange();
+  var data = dataRange.getValues();
+  var backgrounds = dataRange.getBackgrounds();
+
+  // Store student IDs and their row colors
+  var studentColors = {};
+  for (var i = 0; i < data.length; i++) {
+    var studentId = data[i][3];
+    var rowColor = backgrounds[i].every((color) => color === backgrounds[i][0])
+      ? backgrounds[i][0]
+      : null;
+    if (rowColor) {
+      studentColors[studentId] = rowColor;
+    }
+  }
+
   const TentativeVer2 = getStudentsFromTENTATIVESheet();
   const Registrations_SY_24_25 = loadRegistrationsData();
   const ContactInfo = loadContactData();
@@ -21,7 +39,10 @@ function loadTENTATIVEVersion2() {
     Withdrawn,
   );
 
-  let secondFilteredResults = filterOutMatchesFromMapA(firstFilteredResults,WDOther);
+  let secondFilteredResults = filterOutMatchesFromMapA(
+    firstFilteredResults,
+    WDOther,
+  );
 
   /**
    * TODO: Check if this function is needed. It seems to be doing the same thing as the
@@ -63,13 +84,6 @@ function loadTENTATIVEVersion2() {
       // withdrawnData: withdrawnData, // If found, otherwise it remains null
     });
   });
-
-
-
-
-
-
-
 
   const updatedUpdatedActiveStudentDataMap = new Map();
   updatedActiveStudentDataMap.forEach((studentData, studentId) => {
@@ -185,4 +199,15 @@ function loadTENTATIVEVersion2() {
   writeToTENTATIVEVersion2Sheet(
     updatedUpdatedUpdatedUdatedUpdatedUpdatedUpdatedActiveStudentDataMap,
   );
+
+  // Reapply the colors to the correct rows by matching student IDs
+  var newDataRange = sheet.getDataRange();
+  var newData = newDataRange.getValues();
+  for (var j = 0; j < newData.length; j++) {
+    var newStudentId = newData[j][3]; // Assuming student ID is in column D (index 3)
+    if (studentColors[newStudentId]) {
+      var range = sheet.getRange(j + 1, 1, 1, newData[0].length);
+      range.setBackground(studentColors[newStudentId]);
+    }
+  }
 }
