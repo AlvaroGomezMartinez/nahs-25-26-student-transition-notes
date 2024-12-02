@@ -724,12 +724,7 @@ function writeToTENTATIVEVersion2Sheet(
   //     .setValues(outputData);
   // }
   if (outputData.length > 0) {
-    const range = activeSheet.getRange(
-      2,
-      1,
-      outputData.length,
-      outputData[0].length,
-    );
+    const range = activeSheet.getRange(2,1,outputData.length,outputData[0].length,);
     range.setValues(outputData);
     range.setWrapStrategy(SpreadsheetApp.WrapStrategy.CLIP);
   }

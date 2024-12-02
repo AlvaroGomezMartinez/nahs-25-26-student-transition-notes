@@ -1,11 +1,11 @@
 /**
- * Main function that is used to build and write the roster to the TENTATIVE-Version2 sheet.
+ * This is the main function that is used to build and write the roster to the TENTATIVE-Version2 sheet.
  * It builds the roster by loading and processing student data from eight separate Google sheets.
  * The function filters and merges the separate maps.
+ * The function has five triggers set to run each weekday between 1:00 - 2:00 AM.
  */
 function loadTENTATIVEVersion2() {
-  var sheet =
-    SpreadsheetApp.getActiveSpreadsheet().getSheetByName("TENTATIVE-Version2");
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("TENTATIVE-Version2");
   var dataRange = sheet.getDataRange();
   var data = dataRange.getValues();
   var backgrounds = dataRange.getBackgrounds();
@@ -14,11 +14,8 @@ function loadTENTATIVEVersion2() {
   var studentColors = {};
   for (var i = 0; i < data.length; i++) {
     var studentId = data[i][3];
-    var rowColor = backgrounds[i].every((color) => color === backgrounds[i][0])
-      ? backgrounds[i][0]
-      : null;
-    if (rowColor) {
-      studentColors[studentId] = rowColor;
+    if (studentId) {  // Check if student ID exists
+      studentColors[studentId] = backgrounds[i];
     }
   }
 
@@ -205,9 +202,37 @@ function loadTENTATIVEVersion2() {
   var newData = newDataRange.getValues();
   for (var j = 0; j < newData.length; j++) {
     var newStudentId = newData[j][3]; // Assuming student ID is in column D (index 3)
-    if (studentColors[newStudentId]) {
+    if (newStudentId && studentColors[newStudentId]) {
       var range = sheet.getRange(j + 1, 1, 1, newData[0].length);
-      range.setBackground(studentColors[newStudentId]);
+      range.setBackgrounds([studentColors[newStudentId]]);
     }
   }
+
+  ensureCheckboxesInColumnBX();
 }
+
+function ensureCheckboxesInColumnBX() {
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("TENTATIVE-Version2");
+  var lastRow = sheet.getLastRow();
+  var bxRange = sheet.getRange(1, 76, lastRow); // Column BX is the 76th column
+
+  // Get current validations for the entire range in one call
+  var validations = bxRange.getDataValidations();
+  var needsValidation = false;
+
+  // Check if any cell lacks a checkbox validation
+  for (var i = 0; i < validations.length; i++) {
+    if (!validations[i][0] || validations[i][0].getCriteriaType() !== SpreadsheetApp.DataValidationCriteria.CHECKBOX) {
+      needsValidation = true;
+      break;
+    }
+  }
+
+  // Apply checkbox validation to the whole range if needed
+  if (needsValidation) {
+    var checkboxRule = SpreadsheetApp.newDataValidation().requireCheckbox().build();
+    bxRange.setDataValidation(checkboxRule); // Set checkbox validation in a single call
+  }
+}
+
+
