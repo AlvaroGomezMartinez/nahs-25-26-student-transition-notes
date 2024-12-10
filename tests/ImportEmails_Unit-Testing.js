@@ -33,7 +33,7 @@ function test_sendEmailsForToday() {
     Logger.log("Running test_sendEmailsForToday"); // Debugging log
 
     // Set the date for testing to a specific day
-    const mockToday = "2024-11-01";
+    const mockToday = "2024-12-10";
     const originalFormatDate = Utilities.formatDate;
     Utilities.formatDate = function (date, timeZone, format) {
       Logger.log("Mocking Utilities.formatDate to return mockToday"); // Debugging log
