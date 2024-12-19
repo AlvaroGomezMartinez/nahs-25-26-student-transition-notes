@@ -29,18 +29,18 @@
  * input on students' academic and behavioral progress.
  */
 function sendEmailsForToday() {
-  const today = new Date();
+  const today = new Date(); // new Date(2025, 01, 6, 15, 16, 19); // For testing
   const formattedDate = `${today.getMonth() + 1}/${today.getDate()}/${today.getFullYear()}`; // Adding 1 to getMonth() because months are 0-indexed
 
   // Check if today is a weekend
   const dayOfWeek = today.getDay(); // Sunday = 0, Monday = 1, ..., Saturday = 6
-  const isWeekend = (dayOfWeek === 0 || dayOfWeek === 6);
+  const isWeekend2 = (dayOfWeek === 0 || dayOfWeek === 6);
 
   // Check if today is a holiday
   const isHoliday = holidayDates.includes(formattedDate);
 
   // Run the emails only if it's a weekday and not a holiday
-  if (!isWeekend && !isHoliday) {
+  if (!isWeekend2 && !isHoliday) {
     // const today = '2024-12-13' // This is for debugging and sending emails out manually. Set today's date in the variable. When using this, don't forget to turn it back off.
     const today = Utilities.formatDate(
       new Date(),
