@@ -3,10 +3,12 @@
  * The sendEmailsForToday function below references the object returned by the
  * getStudentsFromTENTATIVESheet() which is found in the loadTENTATIVEVersion2.gs
  * file in this project.
- *
- * sendEmailsForToday looks at the tenDaysMark date for each student and if the
- * date is today, then it sends an email to the teachers in emailRecipients with
- * a list of the students at the 10 Day Mark.
+ * 
+ * Sends an email notification to specific recipients with a list of students 
+ * who have been enrolled for 10 school days at NAHS. The function checks if each 
+ * student's 10-day mark matches today's date and compiles a list of such students.
+ * If matches are found, an email is sent with an action item for teachers to provide 
+ * input on students' academic and behavioral progress.
  *
  * sendEmailsForToday has five triggers set to run it every Monday, Tuesday,
  * Wednesday, Thursday, and Friday on Zina Gonzales' (social worker at NAHS)
@@ -18,18 +20,11 @@
  *                   Office: +1-210-397-9408
  *                   Mobile: +1-210-363-1577
  *
- * Latest update: 12/18/24
- */
-
-/**
- * Sends an email notification to specific recipients with a list of students 
- * who have been enrolled for 10 days at NAHS. The function checks if each 
- * student's 10-day mark matches today's date and compiles a list of such students.
- * If matches are found, an email is sent with an action item for teachers to provide 
- * input on students' academic and behavioral progress.
+ * Latest update: 1/4/25
  */
 function sendEmailsForToday() {
-  const today = new Date(); // new Date(2025, 01, 6, 15, 16, 19); // For testing
+  // const today = new Date(2025, 0, 6, 15, 16, 19); // Used for debugging. Uncomment the const below and comment out this one when done debugging.
+  const today = new Date();
   const formattedDate = `${today.getMonth() + 1}/${today.getDate()}/${today.getFullYear()}`; // Adding 1 to getMonth() because months are 0-indexed
 
   // Check if today is a weekend
@@ -41,7 +36,7 @@ function sendEmailsForToday() {
 
   // Run the emails only if it's a weekday and not a holiday
   if (!isWeekend2 && !isHoliday) {
-    // const today = '2024-12-13' // This is for debugging and sending emails out manually. Set today's date in the variable. When using this, don't forget to turn it back off.
+    // const today = '2025-01-06' // This is for debugging and sending emails out manually. Set today's date in the variable. When using this, don't forget to turn it back off.
     const today = Utilities.formatDate(
       new Date(),
       Session.getScriptTimeZone(),
@@ -86,12 +81,12 @@ function sendEmailsForToday() {
     try {
       dataObjects = getStudentsFromTENTATIVESheet();
     } catch (error) {
-      Logger.log("Check Line 44: Error calling getStudentsFromTENTATIVESheet " + error);
+      Logger.log("Check Line 87 in the reminderEmails.gs file: Error calling getStudentsFromTENTATIVESheet " + error);
       return;
     }
 
     if (!dataObjects || dataObjects.size === 0) {
-      Logger.log("Check Line 51: No data found in dataObjects or dataObjects is undefined.");
+      Logger.log("Check Line 93 in the reminderEmails.gs file: No data found in dataObjects or dataObjects is undefined.");
       return;
     }
 
@@ -101,7 +96,9 @@ function sendEmailsForToday() {
       for (let [studentID, dataArray] of dataObjects.entries()) {
         if (dataArray && dataArray[0] && dataArray[0]["FIRST DAY OF AEP"]) {
           let startDate = new Date(dataArray[0]["FIRST DAY OF AEP"]);
+
           let tenDaysMark = addWorkdays(startDate, 10, holidayDates || []);
+          
           let formattedTenDaysMark = Utilities.formatDate(
             tenDaysMark,
             Session.getScriptTimeZone(),
@@ -135,7 +132,10 @@ function sendEmailsForToday() {
       let workdaysAdded = 0;
       while (workdaysAdded < 2) {
         dueDate.setDate(dueDate.getDate() + 1);
-        if (!isWeekend(dueDate) && !holidayDates.includes(Utilities.formatDate(dueDate, Session.getScriptTimeZone(), "yyyy-MM-dd"))) {
+
+        const formattedDate = Utilities.formatDate(dueDate, Session.getScriptTimeZone(), "M/d/yyyy");
+
+        if (!isWeekend(dueDate) && !holidayDates.includes(formattedDate)) {
           workdaysAdded++;
         }
       }
@@ -155,6 +155,6 @@ function sendEmailsForToday() {
       sendEmail(emailRecipients, subject, body);
     }
   } else {
-    Logger.log("Reminder emails were not sent because it is a holiday.")
+    Logger.log("Reminder emails were not sent because it is either a weekend or a holiday.")
   }
 }

@@ -247,21 +247,73 @@ function addWorkdays(startDate, numWorkdays, holidays) {
     }
   }
 
+  // Ensure the result is not on a holiday
+  while (isHoliday(currentDate, holidays)) {
+    currentDate.setDate(currentDate.getDate() + 1); // Skip to the next day
+  }
+  
   return currentDate;
 }
 
+// Old function. I am checing the one below it.
+// function isWeekend(date) {
+//   return date.getDay() === 0 || date.getDay() === 6;
+// }
+/**
+ * Checks if a date is a weekend.
+ * @param {Date} date - Date object to check.
+ * @return {boolean} - True if weekend, false otherwise.
+ */
 function isWeekend(date) {
-  return date.getDay() === 0 || date.getDay() === 6;
+  const day = date.getDay();
+  return day === 0 || day === 6; // Sunday (0) or Saturday (6)
 }
 
+// Old function. I am checking the one below it.
+// function isHoliday(date, holidays) {
+//   return holidays.includes(formatDate(date));
+// }
+/**
+ * Checks if a date is a holiday.
+ * @param {Date} date - Date object to check.
+ * @param {Array} holidays - Array of holiday strings in "MM/DD/YYYY" format.
+ * @return {boolean} - True if holiday, false otherwise.
+ */
 function isHoliday(date, holidays) {
-  return holidays.includes(formatDate(date));
+  const formattedDate = formatDateForHolidays(date); // Format date to "MM/DD/YYYY"
+  return holidays.includes(formattedDate);
 }
 
+/**
+ * Formats a date as "MM/DD/YYYY".
+ * @param {Date} date - Date object to format.
+ * @return {string} - Formatted date string.
+ */
+function formatDateForHolidays(date) {
+  const month = (date.getMonth() + 1); // Months are 0-based
+  const day = date.getDate();
+  const year = date.getFullYear();
+
+  return `${month}/${day}/${year}`;
+}
+
+// Old function. I am checking the one below it.
+// function formatDate(date) {
+//   let year = date.getFullYear();
+//   let month = (date.getMonth() + 1).toString().padStart(2, "0");
+//   let day = date.getDate().toString().padStart(2, "0");
+
+//   return `${year}-${month}-${day}`;
+// }
+/**
+ * Formats a date as "yyyy-MM-dd".
+ * @param {Date} date - Date object to format.
+ * @return {string} - Formatted date string.
+ */
 function formatDate(date) {
-  let year = date.getFullYear();
-  let month = (date.getMonth() + 1).toString().padStart(2, "0");
-  let day = date.getDate().toString().padStart(2, "0");
+  const year = date.getFullYear();
+  const month = (date.getMonth() + 1).toString().padStart(2, "0");
+  const day = date.getDate().toString().padStart(2, "0");
 
   return `${year}-${month}-${day}`;
 }
