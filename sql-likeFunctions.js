@@ -238,3 +238,31 @@ function filterOutMatchesFromMapA(mapA, mapB) {
 
     return result;
 }
+
+function enhancedFilterOutMatches(entryWithdrawalMap, withdrawnMap) {
+  // Filter out entries based on withdrawn status and re-enrollment conditions
+  const returned = Array.from(entryWithdrawalMap.entries()).filter(
+    ([studentID, entries]) =>
+      entries.length > 1 && entries[0]["Withdraw Date"] === ""
+  );
+
+  let result = new Map();
+
+  entryWithdrawalMap.forEach((entryData, studentID) => {
+    // Check if the student is present in the withdrawnMap
+    if (!withdrawnMap.has(studentID)) {
+      // If not withdrawn, add the entry to the result map
+      result.set(studentID, entryData);
+    } else {
+      // If withdrawn, check if the student is in the "returned" list
+      const isReturned = returned.some(([id]) => id === studentID);
+
+      if (isReturned) {
+        // If returned, include the student in the result
+        result.set(studentID, entryData);
+      }
+    }
+  });
+
+  return result;
+}

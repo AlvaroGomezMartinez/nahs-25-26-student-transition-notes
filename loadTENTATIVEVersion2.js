@@ -32,7 +32,7 @@ function loadTENTATIVEVersion2() {
     // const holidayDates = NISDHolidayLibrary.getHolidayDates();
 
     // Load Entry_Withdrawal and filter out any students in the Withdrawn sheet
-    let firstFilteredResults = filterOutMatchesFromMapA(
+    let firstFilteredResults = enhancedFilterOutMatches(
       Entry_Withdrawal,
       Withdrawn,
     );
