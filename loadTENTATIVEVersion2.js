@@ -37,10 +37,14 @@ function loadTENTATIVEVersion2() {
       Withdrawn,
     );
 
-    let secondFilteredResults = filterOutMatchesFromMapA(
+    // let secondFilteredResults = filterOutMatchesFromMapA(
+    //   firstFilteredResults,
+    //   WDOther,
+    // );
+    // This is a test to troubleshoot secondFilteredResults above
+    let secondFilteredResults = enhancedFilterOutMatches(
       firstFilteredResults,
-      WDOther,
-    );
+      Withdrawn);
 
     /**
      * TODO: Check if this function is needed. It seems to be doing the same thing as the
