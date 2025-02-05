@@ -240,7 +240,7 @@ function filterOutMatchesFromMapA(mapA, mapB) {
 }
 
 function enhancedFilterOutMatches(entryWithdrawalMap, withdrawnMap) {
-  // Filter out entries based on withdrawn status and re-enrollment conditions
+  // const returned is a filtered result of students based on their withdrawn status and re-enrollment conditions; in other words "returned" has students who are currently active that are repeating a placement. These students will get added to the result below.
   const returned = Array.from(entryWithdrawalMap.entries()).filter(
     ([studentID, entries]) =>
       entries.length > 1 && entries[0]["Withdraw Date"] === ""
