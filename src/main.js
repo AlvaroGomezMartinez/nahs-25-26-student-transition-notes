@@ -62,18 +62,10 @@ function loadAllStudentData() {
  * @returns {Map} Processed student data map
  */
 function processStudentData(rawData) {
-  console.log('Processing student data...');
+  console.log('Processing student data using new processors...');
   
-  // Start with entry/withdrawal data as the base
-  let processedMap = new Map();
-  
-  // TODO: Implement proper data merging logic here
-  // This is a placeholder that maintains existing functionality
-  
-  // For now, return the existing complex processing
-  // This should be broken down into smaller, testable functions
-  
-  return processedMap;
+  // Use the new comprehensive data processing pipeline
+  return processAllStudentData(rawData);
 }
 
 /**
@@ -82,11 +74,10 @@ function processStudentData(rawData) {
  * @returns {Map} Filtered active students
  */
 function filterActiveStudents(studentData) {
-  console.log('Filtering active students...');
+  console.log('Student filtering already handled in processing pipeline...');
   
-  // TODO: Implement filtering logic using the new utility functions
-  // This should replace the current complex filtering in the original file
-  
+  // Filtering is now handled within processAllStudentData
+  // This function is kept for compatibility but may be removed later
   return studentData;
 }
 
