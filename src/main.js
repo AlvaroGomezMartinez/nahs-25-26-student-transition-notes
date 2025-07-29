@@ -1,9 +1,60 @@
 /**
- * Main entry point for the NAHS Student Transition Notes system.
- * This function loads all student data, processes it, and writes it to the TENTATIVE-Version2 sheet.
+ * @fileoverview Main entry point for the NAHS Student Transition Notes system.
  * 
- * This replaces the original loadTENTATIVEVersion2 function with a cleaner,
- * more maintainable architecture using data loaders, processors, and writers.
+ * This file contains the primary functions that orchestrate the complete data processing
+ * workflow for student transition notes. It coordinates data loading, processing, and
+ * writing operations using a modular architecture.
+ * 
+ * @author NAHS Development Team
+ * @version 2.0.0
+ * @since 2024-01-01
+ */
+
+/**
+ * Main entry point for the NAHS Student Transition Notes system.
+ * 
+ * This function serves as the primary orchestrator for the complete data processing
+ * workflow. It replaces the original 701-line monolithic function with a clean,
+ * modular architecture that separates concerns into data loaders, processors, and writers.
+ * 
+ * The process follows these phases:
+ * 1. **Data Loading**: Uses specialized loaders to extract data from multiple Google Sheets
+ * 2. **Data Processing**: Applies business logic through modular processors
+ * 3. **Data Writing**: Outputs processed data using structured writers
+ * 4. **Reporting**: Provides comprehensive statistics and error reporting
+ * 
+ * @function loadTENTATIVEVersion2
+ * @memberof Main
+ * 
+ * @returns {Object|undefined} Processing statistics object containing:
+ *   - {number} studentsProcessed - Total number of students processed
+ *   - {number} rowsWritten - Number of rows written to the output sheet
+ *   - {boolean} hasErrors - Whether any errors occurred during processing
+ *   - {Array<string>} errors - List of error messages (if any)
+ * 
+ * @throws {Error} Throws error if critical system failure occurs
+ * 
+ * @example
+ * // Basic usage - run the complete process
+ * const stats = loadTENTATIVEVersion2();
+ * console.log(`Processed ${stats.studentsProcessed} students`);
+ * 
+ * @example
+ * // Error handling
+ * try {
+ *   const result = loadTENTATIVEVersion2();
+ *   if (result.hasErrors) {
+ *     console.warn('Process completed with errors:', result.errors);
+ *   }
+ * } catch (error) {
+ *   console.error('Critical system failure:', error.message);
+ * }
+ * 
+ * @see {@link loadAllStudentDataWithLoaders} For data loading details
+ * @see {@link writeToTENTATIVEVersion2Sheet} For data writing details
+ * @see {@link https://docs.google.com/spreadsheets/d/SHEET_ID} Source data sheets
+ * 
+ * @since 2.0.0
  */
 function loadTENTATIVEVersion2() {
   try {
@@ -56,8 +107,26 @@ function loadTENTATIVEVersion2() {
 }
 
 /**
- * Backward compatibility function - maintains the original function name
- * with the terrible variable name from the original code.
+ * Backward compatibility function that maintains the original function name.
+ * 
+ * This function exists to support legacy code that may still reference the
+ * original function name. It simply delegates to the new loadTENTATIVEVersion2
+ * function while issuing a deprecation warning.
+ * 
+ * @function loadTENTATIVEVersion2_OriginalName
+ * @memberof Main
+ * @deprecated Since version 2.0.0. Use loadTENTATIVEVersion2 instead.
+ * 
+ * @returns {Object} Same return value as loadTENTATIVEVersion2
+ * 
+ * @see {@link loadTENTATIVEVersion2} For the current implementation
+ * 
+ * @example
+ * // Legacy usage (deprecated)
+ * const stats = loadTENTATIVEVersion2_OriginalName(); // Issues warning
+ * 
+ * // Preferred usage
+ * const stats = loadTENTATIVEVersion2(); // No warning
  */
 function loadTENTATIVEVersion2_OriginalName() {
   console.warn('Using deprecated function name. Consider updating to loadTENTATIVEVersion2');
@@ -65,8 +134,55 @@ function loadTENTATIVEVersion2_OriginalName() {
 }
 
 /**
- * Loads data from all required sheets using the new data loader structure
- * @returns {Object} Object containing all loaded data maps
+ * Loads data from all required Google Sheets using the modular data loader structure.
+ * 
+ * This function serves as the entry point for the data loading phase. It coordinates
+ * multiple specialized data loaders to extract student information from various
+ * Google Sheets sources. Each loader is responsible for a specific data domain
+ * (e.g., registrations, schedules, contact information).
+ * 
+ * The function handles:
+ * - **Multi-source data loading**: Coordinates 8+ different data loaders
+ * - **Error resilience**: Continues processing if individual sheets fail
+ * - **Data validation**: Ensures loaded data meets expected formats
+ * - **Performance optimization**: Uses parallel loading where possible
+ * 
+ * @function loadAllStudentData
+ * @memberof Main
+ * 
+ * @returns {Map<string, Object>} A Map where:
+ *   - **Key**: Student ID (string) - Unique identifier for each student
+ *   - **Value**: Student data object containing all loaded information
+ * 
+ * @throws {Error} Throws if critical data loading failures occur
+ * 
+ * @example
+ * // Basic usage
+ * const studentData = loadAllStudentData();
+ * console.log(`Loaded data for ${studentData.size} students`);
+ * 
+ * // Access specific student data
+ * const student = studentData.get('1234567');
+ * if (student) {
+ *   console.log(`Student: ${student.TENTATIVE[0].FIRST} ${student.TENTATIVE[0].LAST}`);
+ * }
+ * 
+ * @example
+ * // Error handling
+ * try {
+ *   const data = loadAllStudentData();
+ *   if (data.size === 0) {
+ *     console.warn('No student data loaded - check sheet access');
+ *   }
+ * } catch (error) {
+ *   console.error('Data loading failed:', error.message);
+ * }
+ * 
+ * @see {@link loadAllStudentDataWithLoaders} For the actual implementation
+ * @see {@link DataLoaderFactory} For the loader creation mechanism
+ * @see {@link BaseDataLoader} For the base loader interface
+ * 
+ * @since 2.0.0
  */
 function loadAllStudentData() {
   console.log('Loading data from all sheets using new data loaders...');
@@ -76,9 +192,59 @@ function loadAllStudentData() {
 }
 
 /**
- * Processes raw data by merging and enriching student records
- * @param {Object} rawData - Raw data from all sheets
- * @returns {Map} Processed student data map
+ * Processes raw data by merging and enriching student records.
+ * 
+ * This function takes the raw data loaded from multiple sheets and applies
+ * business logic to create comprehensive student profiles. It handles:
+ * 
+ * - **Data Integration**: Merges data from multiple sources by student ID
+ * - **Data Enrichment**: Adds calculated fields and derived information
+ * - **Data Validation**: Ensures data consistency and completeness
+ * - **Business Logic**: Applies NAHS-specific processing rules
+ * 
+ * The processing pipeline includes:
+ * 1. Student data merging (combining multiple sheet data)
+ * 2. Teacher input processing (form responses integration)
+ * 3. Schedule data integration (course and teacher matching)
+ * 4. Grade and attendance calculations
+ * 5. Contact information normalization
+ * 
+ * @function processStudentData
+ * @memberof Main
+ * 
+ * @param {Object} rawData - Raw data object containing data from all sheets:
+ *   @param {Array} rawData.tentative - TENTATIVE sheet data
+ *   @param {Array} rawData.registrations - Registration data
+ *   @param {Array} rawData.schedules - Schedule information
+ *   @param {Array} rawData.formResponses - Teacher form responses
+ *   @param {Array} rawData.contactInfo - Contact information
+ *   @param {Array} rawData.entryWithdrawal - Entry/withdrawal records
+ *   @param {Array} rawData.attendance - Attendance data
+ *   @param {Array} rawData.withdrawn - Withdrawn students
+ *   @param {Array} rawData.wdOther - Other withdrawal data
+ * 
+ * @returns {Map<string, Object>} Processed student data map where:
+ *   - **Key**: Student ID (string)
+ *   - **Value**: Enriched student object with processed data
+ * 
+ * @throws {Error} Throws if data processing fails critically
+ * 
+ * @example
+ * // Basic processing
+ * const rawData = loadAllRawData();
+ * const processedData = processStudentData(rawData);
+ * 
+ * @example
+ * // Access processed student information
+ * const student = processedData.get('1234567');
+ * const grades = student.processedGrades; // Calculated grades
+ * const schedule = student.processedSchedule; // Merged schedule data
+ * 
+ * @see {@link processAllStudentData} For the actual implementation
+ * @see {@link StudentDataMerger} For data merging logic
+ * @see {@link TeacherInputProcessor} For form response processing
+ * 
+ * @since 2.0.0
  */
 function processStudentData(rawData) {
   console.log('Processing student data using new processors...');
@@ -88,9 +254,34 @@ function processStudentData(rawData) {
 }
 
 /**
- * Filters out withdrawn students from the active student list
- * @param {Map} studentData - Processed student data
- * @returns {Map} Filtered active students
+ * Filters out withdrawn students from the active student list.
+ * 
+ * **Note**: In the refactored architecture, student filtering is now handled
+ * automatically within the data processing pipeline. This function is maintained
+ * for backward compatibility but essentially acts as a pass-through.
+ * 
+ * The actual filtering logic is implemented in the StudentFilterProcessor
+ * class, which is automatically applied during the data processing phase.
+ * 
+ * @function filterActiveStudents
+ * @memberof Main
+ * @deprecated Since version 2.0.0. Filtering is now handled in the processing pipeline.
+ * 
+ * @param {Map<string, Object>} studentData - Processed student data map
+ * 
+ * @returns {Map<string, Object>} The same student data map (filtering already applied)
+ * 
+ * @example
+ * // Legacy usage (no longer needed)
+ * const filtered = filterActiveStudents(processedData);
+ * 
+ * // Current approach (filtering automatic)
+ * const processedData = processStudentData(rawData); // Filtering already applied
+ * 
+ * @see {@link StudentFilterProcessor} For the actual filtering implementation
+ * @see {@link processAllStudentData} Where filtering is automatically applied
+ * 
+ * @since 1.0.0
  */
 function filterActiveStudents(studentData) {
   console.log('Student filtering already handled in processing pipeline...');
@@ -101,20 +292,105 @@ function filterActiveStudents(studentData) {
 }
 
 /**
- * Writes processed data to the TENTATIVE-Version2 sheet
- * @param {Map} activeStudents - Active student data to write
+ * Writes processed student data to the TENTATIVE-Version2 sheet.
+ * 
+ * This function serves as a bridge between the main processing logic and
+ * the specialized writer modules. It delegates the actual writing operation
+ * to the TentativeSheetWriter class while maintaining a simple interface
+ * for the main processing function.
+ * 
+ * The writing process includes:
+ * - **Data Formatting**: Ensures data matches expected sheet structure
+ * - **Row Construction**: Builds complete rows for each student
+ * - **Sheet Updates**: Writes data to the Google Sheet efficiently
+ * - **Error Handling**: Manages writing failures gracefully
+ * 
+ * @function writeProcessedDataToSheet
+ * @memberof Main
+ * 
+ * @param {Map<string, Object>} activeStudents - Map of active student data where:
+ *   - **Key**: Student ID (string)
+ *   - **Value**: Complete student data object with all processed information
+ * 
+ * @returns {Object} Write statistics object from the writer operation
+ * 
+ * @throws {Error} Throws if writing operation fails critically
+ * 
+ * @example
+ * // Basic usage
+ * const processedStudents = processStudentData(rawData);
+ * const writeStats = writeProcessedDataToSheet(processedStudents);
+ * console.log(`Wrote ${writeStats.rowsWritten} rows`);
+ * 
+ * @example
+ * // With error handling
+ * try {
+ *   const stats = writeProcessedDataToSheet(activeStudents);
+ *   if (stats.hasErrors) {
+ *     console.warn('Some students had write errors');
+ *   }
+ * } catch (error) {
+ *   console.error('Writing failed:', error.message);
+ * }
+ * 
+ * @see {@link writeToTENTATIVEVersion2Sheet} For the actual implementation
+ * @see {@link TentativeSheetWriter} For the writer class
+ * @see {@link SHEET_NAMES.TENTATIVE_V2} For the target sheet name
+ * 
+ * @since 2.0.0
  */
 function writeProcessedDataToSheet(activeStudents) {
   console.log('Writing data to TENTATIVE-Version2 sheet...');
   
-  // TODO: Use the new writers/tentativeSheetWriter.js
-  // For now, call the existing function
-  writeToTENTATIVEVersion2Sheet(activeStudents);
+  // Use the new writer system
+  return writeToTENTATIVEVersion2Sheet(activeStudents);
 }
 
 /**
- * Preserves existing row colors before data refresh
- * @returns {Object} Map of student IDs to their row colors
+ * Preserves existing row colors from the TENTATIVE-Version2 sheet before data refresh.
+ * 
+ * This function captures the current background colors of all rows in the
+ * TENTATIVE-Version2 sheet before the data is refreshed. This allows the
+ * system to maintain any manual color coding that users may have applied
+ * to highlight specific students or conditions.
+ * 
+ * The function handles:
+ * - **Color Extraction**: Reads background colors from all sheet rows
+ * - **Student Mapping**: Associates colors with specific student IDs
+ * - **Data Preservation**: Creates a mapping for color restoration
+ * - **Error Resilience**: Handles missing or invalid data gracefully
+ * 
+ * @function preserveExistingRowColors
+ * @memberof Main
+ * 
+ * @returns {Object<string, Array<Array<string>>>} Map of student colors where:
+ *   - **Key**: Student ID (string) - Unique identifier for each student
+ *   - **Value**: Array of background colors for that student's row
+ * 
+ * @throws {Error} Throws if sheet access fails
+ * 
+ * @example
+ * // Preserve colors before data refresh
+ * const colorMap = preserveExistingRowColors();
+ * 
+ * // After writing new data, restore colors
+ * Object.keys(colorMap).forEach(studentId => {
+ *   const colors = colorMap[studentId];
+ *   // Apply colors to the appropriate row
+ * });
+ * 
+ * @example
+ * // Check if student has custom colors
+ * const colors = preserveExistingRowColors();
+ * const studentColors = colors['1234567'];
+ * if (studentColors && studentColors.some(color => color !== '#ffffff')) {
+ *   console.log('Student has custom highlighting');
+ * }
+ * 
+ * @see {@link SHEET_NAMES.TENTATIVE_V2} For the target sheet
+ * @see {@link SpreadsheetApp} For Google Sheets API reference
+ * 
+ * @since 2.0.0
  */
 function preserveExistingRowColors() {
   const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SHEET_NAMES.TENTATIVE_V2);

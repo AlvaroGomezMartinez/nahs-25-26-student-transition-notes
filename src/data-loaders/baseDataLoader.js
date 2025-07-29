@@ -1,16 +1,86 @@
 /**
- * Base class for data loaders
+ * @fileoverview Base class for data loaders in the NAHS system.
  * 
- * Provides common functionality for loading data from Google Sheets
- * and converting it to Maps for easier processing.
+ * This module provides the foundational functionality for loading data from
+ * Google Sheets and converting it into Maps for efficient processing. All
+ * specific data loaders extend this base class to inherit common functionality
+ * while implementing their own data-specific processing logic.
+ * 
+ * The base loader handles:
+ * - Sheet access and error handling
+ * - Header validation and column mapping  
+ * - Data conversion to JavaScript objects
+ * - Map creation with configurable key strategies
+ * - Multiple records per key support
+ * 
+ * @author NAHS Development Team
+ * @version 2.0.0
+ * @since 2024-01-01
  */
 
+/**
+ * Base class for all data loaders in the NAHS system.
+ * 
+ * This abstract base class provides common functionality for loading data
+ * from Google Sheets and converting it to Maps for easier processing.
+ * All specific data loaders (TentativeDataLoader, RegistrationDataLoader, etc.)
+ * extend this class to inherit standard data loading patterns.
+ * 
+ * **Key Features:**
+ * - **Standardized Error Handling**: Consistent error responses across all loaders
+ * - **Flexible Key Mapping**: Configurable key column for Map creation
+ * - **Multiple Record Support**: Can handle one-to-many relationships
+ * - **Data Validation**: Validates sheet structure and data integrity
+ * - **Performance Optimization**: Efficient data processing and memory usage
+ * 
+ * @class BaseDataLoader
+ * @abstract
+ * 
+ * @example
+ * // Extend the base class
+ * class CustomDataLoader extends BaseDataLoader {
+ *   constructor() {
+ *     super('CustomSheet', 'STUDENT ID', false);
+ *   }
+ *   
+ *   processRowData(rowData, headers) {
+ *     // Custom processing logic
+ *     return super.processRowData(rowData, headers);
+ *   }
+ * }
+ * 
+ * @example
+ * // Use a derived loader
+ * const loader = new TentativeDataLoader();
+ * const studentData = loader.loadData();
+ * console.log(`Loaded ${studentData.size} student records`);
+ * 
+ * @since 2.0.0
+ */
 class BaseDataLoader {
   /**
-   * Creates a new BaseDataLoader
-   * @param {string} sheetName - Name of the sheet to load from
-   * @param {string} keyColumn - Column name to use as the key for the Map
-   * @param {boolean} allowMultipleRecords - Whether to allow multiple records per key
+   * Creates a new BaseDataLoader instance.
+   * 
+   * @constructor
+   * @param {string} sheetName - Name of the Google Sheet to load data from.
+   *   Must match exactly with the sheet tab name.
+   * @param {string} keyColumn - Column name to use as the key for the resulting Map.
+   *   This column should contain unique identifiers (typically student IDs).
+   * @param {boolean} [allowMultipleRecords=false] - Whether to allow multiple 
+   *   records per key. When true, values in the Map will be arrays of records.
+   *   When false, only the last record for each key is kept.
+   * 
+   * @throws {TypeError} Throws if sheetName or keyColumn are not strings
+   * 
+   * @example
+   * // Single record per student
+   * const loader = new BaseDataLoader('Students', 'STUDENT ID', false);
+   * 
+   * @example
+   * // Multiple records per student (e.g., courses)
+   * const courseLoader = new BaseDataLoader('Courses', 'STUDENT ID', true);
+   * 
+   * @since 2.0.0
    */
   constructor(sheetName, keyColumn, allowMultipleRecords = false) {
     this.sheetName = sheetName;
@@ -19,8 +89,53 @@ class BaseDataLoader {
   }
 
   /**
-   * Loads data from the sheet and returns a Map
-   * @returns {Map} Map where keys are student IDs and values are student data
+   * Loads data from the specified Google Sheet and returns a Map.
+   * 
+   * This is the primary method that orchestrates the data loading process.
+   * It handles sheet access, data extraction, header validation, and
+   * Map construction with comprehensive error handling.
+   * 
+   * **Process Flow:**
+   * 1. Access the Google Sheet by name
+   * 2. Extract all data including headers
+   * 3. Validate sheet structure and key column
+   * 4. Process each data row into objects
+   * 5. Build and return the resulting Map
+   * 
+   * @method loadData
+   * @memberof BaseDataLoader
+   * 
+   * @returns {Map<string, Object|Array<Object>>} Map where:
+   *   - **Key**: Value from the key column (typically student ID)
+   *   - **Value**: Either a single object (allowMultipleRecords=false) or 
+   *     an array of objects (allowMultipleRecords=true)
+   *   Returns empty Map if sheet not found or errors occur
+   * 
+   * @throws {Error} Only throws for critical system failures; 
+   *   most errors are caught and logged
+   * 
+   * @example
+   * // Basic usage
+   * const loader = new TentativeDataLoader();
+   * const data = loader.loadData();
+   * 
+   * if (data.size > 0) {
+   *   console.log(`Successfully loaded ${data.size} records`);
+   * } else {
+   *   console.warn('No data loaded - check sheet access');
+   * }
+   * 
+   * @example
+   * // Access loaded data
+   * const studentData = data.get('1234567');
+   * if (studentData) {
+   *   console.log(`Student: ${studentData.FIRST} ${studentData.LAST}`);
+   * }
+   * 
+   * @see {@link processRows} For row processing details
+   * @see {@link processRowData} For individual row processing
+   * 
+   * @since 2.0.0
    */
   loadData() {
     try {

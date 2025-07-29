@@ -1,14 +1,62 @@
 /**
- * Utility functions for date operations
+ * @fileoverview Utility functions for date operations in the NAHS system.
  * 
- * Centralizes all date-related functionality to ensure consistency
- * and easier maintenance.
+ * This module centralizes all date-related functionality to ensure consistency
+ * across the system and provide a single source of truth for date formatting,
+ * validation, and business logic operations.
+ * 
+ * All functions handle edge cases such as:
+ * - Invalid date inputs
+ * - Timezone considerations  
+ * - Leap year calculations
+ * - Holiday and weekend detection
+ * 
+ * @author NAHS Development Team
+ * @version 2.0.0
+ * @since 2024-01-01
  */
 
 /**
- * Formats a date to MM/DD/YYYY format
- * @param {Date|string} date - The date to format
- * @returns {string|null} Formatted date string or null if invalid
+ * Formats a date to MM/DD/YYYY format with proper error handling.
+ * 
+ * This function converts various date inputs (Date objects, date strings, 
+ * timestamps) into a standardized MM/DD/YYYY string format commonly used
+ * throughout the NAHS system for display and storage purposes.
+ * 
+ * @function formatDateToMMDDYYYY
+ * @memberof DateUtils
+ * 
+ * @param {Date|string|number} date - The date to format. Accepts:
+ *   - Date object
+ *   - ISO date string (e.g., "2024-01-15T10:30:00Z")
+ *   - Date string (e.g., "January 15, 2024")
+ *   - Unix timestamp (number)
+ * 
+ * @returns {string|null} Formatted date string in MM/DD/YYYY format, 
+ *   or null if the input date is invalid
+ * 
+ * @example
+ * // Date object
+ * formatDateToMMDDYYYY(new Date(2024, 0, 15)); // "01/15/2024"
+ * 
+ * @example
+ * // ISO string
+ * formatDateToMMDDYYYY("2024-01-15T10:30:00Z"); // "01/15/2024"
+ * 
+ * @example
+ * // Invalid date
+ * formatDateToMMDDYYYY("invalid date"); // null
+ * 
+ * @example
+ * // Error handling
+ * const formatted = formatDateToMMDDYYYY(userInput);
+ * if (formatted === null) {
+ *   console.error('Invalid date provided');
+ * } else {
+ *   console.log(`Formatted date: ${formatted}`);
+ * }
+ * 
+ * @since 2.0.0
  */
 function formatDateToMMDDYYYY(date) {
   const d = new Date(date);
@@ -20,9 +68,39 @@ function formatDateToMMDDYYYY(date) {
 }
 
 /**
- * Checks if a date falls on a weekend
- * @param {Date} date - The date to check
- * @returns {boolean} True if weekend, false otherwise
+ * Determines if a given date falls on a weekend (Saturday or Sunday).
+ * 
+ * This function is commonly used in business logic to exclude weekends
+ * from calculations such as school days, attendance tracking, and
+ * deadline computations.
+ * 
+ * @function isWeekend
+ * @memberof DateUtils
+ * 
+ * @param {Date} date - The date to check. Must be a valid Date object.
+ * 
+ * @returns {boolean} True if the date is Saturday (6) or Sunday (0), false otherwise
+ * 
+ * @throws {TypeError} Throws if date parameter is not a Date object
+ * 
+ * @example
+ * // Saturday
+ * isWeekend(new Date(2024, 0, 13)); // true (Saturday)
+ * 
+ * @example  
+ * // Weekday
+ * isWeekend(new Date(2024, 0, 15)); // false (Monday)
+ * 
+ * @example
+ * // Use in business logic
+ * if (!isWeekend(targetDate)) {
+ *   addToSchoolDayCount(targetDate);
+ * }
+ * 
+ * @see {@link isHoliday} For checking school holidays
+ * @see {@link isSchoolDay} For combined weekend/holiday checking
+ * 
+ * @since 2.0.0
  */
 function isWeekend(date) {
   const day = date.getDay();
@@ -30,10 +108,41 @@ function isWeekend(date) {
 }
 
 /**
- * Checks if a date is a holiday
- * @param {Date} date - The date to check
- * @param {Array} holidays - Array of holiday date strings
- * @returns {boolean} True if holiday, false otherwise
+ * Determines if a given date is a school holiday.
+ * 
+ * This function checks if a date matches any of the predefined school
+ * holidays. It's used for attendance calculations, deadline adjustments,
+ * and determining valid school days for various system operations.
+ * 
+ * @function isHoliday
+ * @memberof DateUtils
+ * 
+ * @param {Date} date - The date to check against the holiday list
+ * @param {Array<string>} holidays - Array of holiday date strings in YYYY-MM-DD format
+ * 
+ * @returns {boolean} True if the date is found in the holidays array, false otherwise
+ * 
+ * @example
+ * // Check single date
+ * const holidays = ['2024-12-25', '2024-01-01', '2024-07-04'];
+ * isHoliday(new Date(2024, 11, 25), holidays); // true (Christmas)
+ * 
+ * @example
+ * // Use with school day calculations
+ * if (isHoliday(date, schoolHolidays)) {
+ *   console.log('School is closed on this date');
+ * }
+ * 
+ * @example
+ * // Combined with weekend check
+ * function isSchoolDay(date, holidays) {
+ *   return !isWeekend(date) && !isHoliday(date, holidays);
+ * }
+ * 
+ * @see {@link formatDateForHolidays} For the date formatting used in comparison
+ * @see {@link isWeekend} For weekend checking
+ * 
+ * @since 2.0.0
  */
 function isHoliday(date, holidays) {
   const formattedDate = formatDateForHolidays(date);
@@ -41,9 +150,32 @@ function isHoliday(date, holidays) {
 }
 
 /**
- * Formats a date for holiday comparison (YYYY-MM-DD)
- * @param {Date} date - The date to format
- * @returns {string} Formatted date string
+ * Formats a date to YYYY-MM-DD format for holiday comparison.
+ * 
+ * This function provides the standardized date format used for holiday
+ * comparisons throughout the system. It ensures consistent formatting
+ * when checking dates against the holiday list.
+ * 
+ * @function formatDateForHolidays
+ * @memberof DateUtils
+ * @private
+ * 
+ * @param {Date} date - The date to format. Must be a valid Date object.
+ * 
+ * @returns {string} Formatted date string in YYYY-MM-DD format
+ * 
+ * @example
+ * // Format for holiday comparison
+ * formatDateForHolidays(new Date(2024, 0, 15)); // "2024-01-15"
+ * 
+ * @example
+ * // Internal usage in isHoliday function
+ * const formattedDate = formatDateForHolidays(date);
+ * return holidays.includes(formattedDate);
+ * 
+ * @see {@link isHoliday} Primary consumer of this function
+ * 
+ * @since 2.0.0
  */
 function formatDateForHolidays(date) {
   const year = date.getFullYear();
