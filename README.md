@@ -66,11 +66,21 @@ All configuration is centralized in `src/config/`:
 - System settings
 
 ### Data Loading
-The new structure uses a base class pattern:
+The new structure uses a base class pattern with specific loaders:
 ```javascript
-// Example of loading data (implementation in progress)
+// Using individual loaders
 const tentativeLoader = new TentativeDataLoader();
 const tentativeData = tentativeLoader.loadData();
+
+const registrationLoader = new RegistrationDataLoader();
+const registrationData = registrationLoader.loadData();
+
+// Or load all data at once
+const allData = loadAllStudentDataWithLoaders();
+
+// Backward compatible functions still work
+const scheduleData = schedulesSheet(); // Still works
+const contactData = loadContactData(); // Still works
 ```
 
 ## Migration Status
@@ -81,9 +91,11 @@ const tentativeData = tentativeLoader.loadData();
 - [x] Created utility functions
 - [x] Added base data loader class
 - [x] Created main entry point
+- [x] Implemented all specific data loader classes
+- [x] Created backward-compatible functions
+- [x] Updated main.js to use new data loaders
 
 ### 🚧 In Progress
-- [ ] Implement specific data loader classes
 - [ ] Break down the 701-line writeToTENTATIVEVersion2Sheet function
 - [ ] Create data processor classes
 - [ ] Implement sheet writer classes
@@ -107,11 +119,17 @@ const tentativeData = tentativeLoader.loadData();
 - Extract date functions to `src/utils/dateUtils.js`
 - Extract data functions to `src/utils/dataUtils.js`
 
-### Phase 3: Data Loaders (🚧 In Progress)
-- `loadTentativeData.js` → `src/data-loaders/tentativeDataLoader.js`
-- `loadRegistrationsData.js` → `src/data-loaders/registrationDataLoader.js`
-- `loadSchedules.js` → `src/data-loaders/scheduleDataLoader.js`
-- etc.
+### Phase 3: Data Loaders (✅ Complete)
+- [x] `loadTentativeData.js` → `src/data-loaders/tentativeDataLoader.js`
+- [x] `loadRegistrationsData.js` → `src/data-loaders/registrationDataLoader.js`
+- [x] `loadSchedules.js` → `src/data-loaders/scheduleDataLoader.js`
+- [x] `loadContactData.js` → `src/data-loaders/contactDataLoader.js`
+- [x] `loadEntryWithdrawalData.js` → `src/data-loaders/entryWithdrawalDataLoader.js`
+- [x] `loadFormResponses1Data.js` → `src/data-loaders/formResponsesDataLoader.js`
+- [x] `loadWithdrawnData.js` → `src/data-loaders/withdrawnDataLoader.js`
+- [x] `loadWDOther.js` → `src/data-loaders/wdOtherDataLoader.js`
+- [x] `loadStudentAttendanceData.js` → `src/data-loaders/attendanceDataLoader.js`
+- [x] Created `src/data-loaders/index.js` for centralized access
 
 ### Phase 4: Processors
 - Extract processing logic from main functions

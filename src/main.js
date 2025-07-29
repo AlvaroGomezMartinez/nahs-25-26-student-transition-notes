@@ -46,26 +46,14 @@ function loadTENTATIVEVersion2() {
 }
 
 /**
- * Loads data from all required sheets
+ * Loads data from all required sheets using the new data loader structure
  * @returns {Object} Object containing all loaded data maps
  */
 function loadAllStudentData() {
-  console.log('Loading data from all sheets...');
+  console.log('Loading data from all sheets using new data loaders...');
   
-  // TODO: Replace these with the new loader classes once they're implemented
-  // For now, using existing functions to maintain compatibility
-  
-  return {
-    tentativeData: getStudentsFromTENTATIVESheet(),
-    registrationsData: loadRegistrationsData(),
-    contactData: loadContactData(),
-    entryWithdrawalData: loadEntryWithdrawalData(),
-    schedulesData: schedulesSheet(),
-    formResponsesData: getStudentsFromFormResponses1Sheet(),
-    withdrawnData: getWithdrawnStudentsSheet(),
-    attendanceData: loadStudentAttendanceData(),
-    wdOtherData: getWDOtherSheet()
-  };
+  // Use the new centralized loader function
+  return loadAllStudentDataWithLoaders();
 }
 
 /**
