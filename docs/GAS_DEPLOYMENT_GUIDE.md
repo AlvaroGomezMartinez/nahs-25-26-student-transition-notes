@@ -10,17 +10,14 @@ Google Apps Script loads files alphabetically, which can cause dependency issues
 These files must be at the root level of your Google Apps Script project:
 
 ```
-00_bootstrap.js         - System initialization
-01_baseDataLoader.js    - Base class for all data loaders  
-02_baseDataProcessor.js - Base class for all data processors
-03_constants.js         - System constants (SHEET_NAMES, COLUMN_NAMES, etc.)
+00_bootstrap.js
+01_baseDataLoader.js
+02_baseDataProcessor.js
+03_constants.js
 ```
 
-### 2. Source Files (Load After Base Classes)
-All files in the `src/` folder structure:
-
+### 2. Application Files (Load After Dependencies)
 ```
-src/main.js
 src/config/...
 src/data-loaders/...
 src/data-processors/...
@@ -37,98 +34,114 @@ tests/unit/.../...
 
 ## Deployment Steps
 
-### Step 1: Copy Base Files to Root
-1. Copy `src/data-loaders/baseDataLoader.js` to `01_baseDataLoader.js`
-2. Copy `src/data-processors/baseDataProcessor.js` to `02_baseDataProcessor.js`
-3. Copy `src/config/constants.js` to `03_constants.js`
-4. Ensure `00_bootstrap.js` exists
+### Step 1: Verify Base Files at Root
 
-### Step 2: Upload to Google Apps Script
-1. Create a new Google Apps Script project
-2. Upload files in this order:
-   - First: `00_bootstrap.js`
-   - Second: `01_baseDataLoader.js`
-   - Third: `02_baseDataProcessor.js`
-   - Fourth: `03_constants.js`
-   - Then: All other files from `src/` folder
-   - Last: Test files
+The following base files have been moved to the root level with numbered prefixes:
 
-### Step 3: Verify Dependencies
-Run this in the Google Apps Script editor:
+1. `01_baseDataLoader.js` - Base data loader class (moved from `src/data-loaders/`)
+2. `02_baseDataProcessor.js` - Base data processor class (moved from `src/data-processors/`)
+3. `03_constants.js` - System constants (moved from `src/config/`)
+
+**Note**: These files have been moved (not copied) to prevent duplicate declarations that would cause `SyntaxError: Identifier 'X' has already been declared` errors.
+
+### Step 2: Initialize System
+
+Before running any functions or tests, call:
+
 ```javascript
 initializeNAHSSystem();
 ```
 
-You should see:
-```
-Initializing NAHS Student Transition Notes System...
-NAHS System initialized successfully
-Available base classes: {BaseDataLoader: true, BaseDataProcessor: true, ...}
-```
+This function (from `00_bootstrap.js`) verifies all dependencies are loaded and provides helpful error messages if anything is missing.
+
+### Step 3: Upload to Google Apps Script
+
+When uploading to Google Apps Script:
+
+1. Create a new Google Apps Script project
+2. Upload all files maintaining the folder structure
+3. Ensure the numbered files (00_, 01_, 02_, 03_) are at the root level
+4. Test the system by running `initializeNAHSSystem()`
 
 ## Troubleshooting
 
-### Error: "BaseDataLoader is not defined"
-**Solution**: Make sure `01_baseDataLoader.js` is uploaded and appears before any files that use it.
+### Common Issues
 
-### Error: "SHEET_NAMES is not defined"  
-**Solution**: Make sure `03_constants.js` is uploaded and appears before any files that use constants.
+#### "BaseDataLoader is not defined"
+- **Cause**: `01_baseDataLoader.js` not at root level or not loaded
+- **Solution**: Ensure `01_baseDataLoader.js` exists at root level
 
-### Error: "Cannot extend undefined"
-**Solution**: Check that base classes are loaded before derived classes. Use the numbered prefix system.
+#### "SHEET_NAMES has already been declared"
+- **Cause**: Both `src/config/constants.js` and `03_constants.js` exist
+- **Solution**: Remove `src/config/constants.js` (the root-level `03_constants.js` takes precedence)
 
-## File Structure in Google Apps Script IDE
+#### "BaseDataProcessor is not defined"
+- **Cause**: `02_baseDataProcessor.js` not at root level or not loaded
+- **Solution**: Ensure `02_baseDataProcessor.js` exists at root level
 
-Your files should appear in this order in the GAS IDE:
-```
-📄 00_bootstrap.js
-📄 01_baseDataLoader.js  
-📄 02_baseDataProcessor.js
-📄 03_constants.js
-📄 appsscript.json
-📄 borders.js
-📄 expectedWithdrawDate.js
-📄 holidayDates.js
-📄 importAPIData.js
-📁 src/
-  📄 main.js
-  📁 config/...
-  📁 data-loaders/...
-  📁 data-processors/...
-  📁 writers/...
-  📁 utils/...
-📄 reminderEmails.js
-📄 sql-likeFunctions.js
-📁 tests/
-  📁 unit/...
-```
+### Verification Commands
 
-## Running Tests
-
-1. Ensure all base files are uploaded first
-2. Run the test function:
-   ```javascript
-   doGet(); // This will initialize the system and run tests
-   ```
-
-## Notes
-
-- The numbered prefix system ensures proper loading order
-- Base files at root level are duplicates of those in `src/` - this is necessary for GAS
-- The bootstrap file provides initialization checking
-- Always test the initialization before running the main system
-
-## Alternative: Manual Dependency Checking
-
-If you still get dependency errors, add this to the top of any file that uses base classes:
+To check system status:
 
 ```javascript
-// Check dependencies before class definition
-if (typeof BaseDataLoader === 'undefined') {
-  throw new Error('BaseDataLoader must be loaded before this file');
+// Check if system is initialized
+if (typeof initializeNAHSSystem === 'function') {
+  initializeNAHSSystem();
+} else {
+  console.error('Bootstrap system not loaded');
 }
 
-class YourClass extends BaseDataLoader {
-  // ... your implementation
+// Check specific dependencies
+console.log('Available base classes:', {
+  BaseDataLoader: typeof BaseDataLoader !== 'undefined',
+  BaseDataProcessor: typeof BaseDataProcessor !== 'undefined',
+  SHEET_NAMES: typeof SHEET_NAMES !== 'undefined'
+});
+```
+
+## File Structure Summary
+
+```
+Root Level (Priority Loading):
+├── 00_bootstrap.js          # System initialization
+├── 01_baseDataLoader.js     # Base class for data loaders
+├── 02_baseDataProcessor.js  # Base class for data processors
+├── 03_constants.js          # System constants
+├── appsscript.json          # Google Apps Script config
+└── [legacy files...]        # Other existing files
+
+Source Code (Load After Dependencies):
+├── src/
+│   ├── config/              # Configuration files (constants moved to root)
+│   ├── data-loaders/        # Specific data loader implementations
+│   ├── data-processors/     # Specific data processor implementations
+│   ├── utils/               # Utility functions
+│   └── writers/             # Data writing functions
+└── tests/
+    └── unit/                # Unit tests
+```
+
+## Best Practices
+
+1. **Always initialize**: Call `initializeNAHSSystem()` before using the system
+2. **Check dependencies**: Use the bootstrap system to verify all required classes are loaded
+3. **Avoid duplicates**: Don't have the same class/constant defined in multiple files
+4. **Use numbered prefixes**: For any new base classes that other classes depend on
+5. **Test in GAS environment**: Google Apps Script behaves differently than local Node.js
+
+## Integration with Testing
+
+The test runner (`tests/unit/testRunner.js`) automatically calls `initializeNAHSSystem()` before running tests:
+
+```javascript
+function doGet() {
+  // Initialize system before running tests
+  if (typeof initializeNAHSSystem === 'function') {
+    initializeNAHSSystem();
+  }
+  
+  // Run tests...
 }
 ```
+
+This ensures all dependencies are properly loaded before any test execution begins.
