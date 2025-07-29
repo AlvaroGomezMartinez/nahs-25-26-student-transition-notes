@@ -6,7 +6,7 @@
  * project structure, documentation standards, and provides an overview
  * of all documented modules.
  * 
- * @author NAHS Development Team
+ * @author Alvaro Gomez
  * @version 2.0.0
  * @since 2024-01-01
  */

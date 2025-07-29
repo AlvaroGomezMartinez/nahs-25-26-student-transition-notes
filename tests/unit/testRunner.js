@@ -15,6 +15,13 @@ function doGet() {
   console.log("=== Initializing NAHS Unit Test Suite ===");
   
   try {
+    // First, initialize the NAHS system to ensure dependencies are loaded
+    if (typeof initializeNAHSSystem === 'function') {
+      initializeNAHSSystem();
+    } else {
+      console.error('Bootstrap system not available. Make sure 00_bootstrap.js is included.');
+    }
+    
     // Initialize QUnitGS2
     QUnitGS2.init();
     
