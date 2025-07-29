@@ -12,6 +12,23 @@ class TeacherInputProcessor extends BaseDataProcessor {
   }
 
   /**
+   * Processes teacher input data for a single student (main entry point)
+   * @param {string} studentId - The student ID
+   * @param {Object} studentData - Complete student data from all sources
+   * @returns {Object} Processed teacher input structure
+   */
+  processTeacherInput(studentId, studentData) {
+    const processingData = {
+      studentId,
+      formResponses: studentData["Form_Responses_1"],
+      scheduleData: studentData["Schedules"],
+      tentativeData: studentData["TENTATIVE"]
+    };
+
+    return this.process(processingData);
+  }
+
+  /**
    * Processes teacher input data for a single student
    * @param {Object} processingData - Data needed for processing
    * @returns {Object} Processed teacher input structure
@@ -31,11 +48,11 @@ class TeacherInputProcessor extends BaseDataProcessor {
 
     // Try to populate from form responses first (preferred method)
     if (formResponses && Array.isArray(formResponses) && formResponses.length > 0) {
-      this.populateFromFormResponses(teacherInput, formResponses, scheduleData);
+      this.populateFromFormResponses(teacherInput, formResponses, scheduleData, studentId);
     } else {
       // Fallback to schedule and tentative data
       this.log(`No form responses for student ${studentId}, using fallback method`);
-      this.populateFromScheduleAndTentative(teacherInput, scheduleData, tentativeData);
+      this.populateFromScheduleAndTentative(teacherInput, scheduleData, tentativeData, studentId);
     }
 
     return teacherInput;
@@ -291,5 +308,119 @@ class TeacherInputProcessor extends BaseDataProcessor {
       }
       return flat.concat(item);
     }, []);
+  }
+
+  /**
+   * Helper function to flatten arrays (general purpose)
+   * @param {Array} array - Array to flatten
+   * @returns {Array} Flattened array
+   */
+  flattenArray(array) {
+    if (!Array.isArray(array)) {
+      return [];
+    }
+    return array.reduce((flat, current) => flat.concat(current), []);
+  }
+
+  /**
+   * Converts numeric period to string format
+   * @param {number} period - Numeric period (1-8)
+   * @returns {string|null} String period format or null if invalid
+   */
+  periodToNumber(period) {
+    const periodMapping = {
+      1: "1st",
+      2: "2nd", 
+      3: "3rd",
+      4: "4th",
+      5: "5th",
+      6: "6th",
+      7: "7th",
+      8: "8th",
+      9: "Special Education",
+    };
+    return periodMapping[period] || null;
+  }
+
+  /**
+   * Populates teacher input from schedule data for a specific period
+   * @param {Object} teacherInput - Teacher input structure
+   * @param {string} period - Period string
+   * @param {Array} flatScheduleData - Flattened schedule data
+   * @param {string} studentId - Student ID for logging
+   */
+  populateFromScheduleData(teacherInput, period, flatScheduleData, studentId) {
+    // Find matching schedule entry for this period
+    for (let i = 0; i < flatScheduleData.length; i++) {
+      const scheduleEntry = flatScheduleData[i];
+      
+      if (scheduleEntry && scheduleEntry.hasOwnProperty("Per Beg")) {
+        const periodNumber = this.periodToNumber(scheduleEntry["Per Beg"]);
+        
+        if (periodNumber === period) {
+          teacherInput[period]["Teacher Name"] = 
+            scheduleEntry["Teacher Name"] || "";
+          teacherInput[period]["Course Title"] = 
+            scheduleEntry["Course Title"] || "";
+          teacherInput[period]["Case Manager"] = 
+            scheduleEntry["Teacher Name"] || "";
+          break;
+        }
+      }
+    }
+  }
+
+  /**
+   * Populates teacher input from tentative data
+   * @param {Object} teacherInput - Teacher input structure
+   * @param {Object} tentativeEntry - Tentative data entry
+   * @param {string} studentId - Student ID for logging
+   */
+  populateFromTentativeData(teacherInput, tentativeEntry, studentId) {
+    const periodMap = {
+      "1st": "1st Period",
+      "2nd": "2nd Period", 
+      "3rd": "3rd Period",
+      "4th": "4th Period",
+      "5th": "5th Period",
+      "6th": "6th Period",
+      "7th": "7th Period", 
+      "8th": "8th Period",
+    };
+
+    for (const period in teacherInput) {
+      if (teacherInput.hasOwnProperty(period) && periodMap.hasOwnProperty(period)) {
+        const periodPrefix = periodMap[period];
+
+        teacherInput[period]["Course Title"] = 
+          tentativeEntry[`${periodPrefix} - Course Title`] || "";
+        teacherInput[period]["Teacher Name"] = 
+          tentativeEntry[`${periodPrefix} - Teacher Name`] || "";
+        teacherInput[period]["Transfer Grade"] = 
+          tentativeEntry[`${periodPrefix} - Transfer Grade`] || "";
+        teacherInput[period]["Current Grade"] = 
+          tentativeEntry[`${periodPrefix} - Current Grade`] || "";
+        teacherInput[period]["How would you assess this student's academic growth?"] = 
+          tentativeEntry[`${periodPrefix} - How would you assess this student's academic growth?`] || "";
+        teacherInput[period]["Academic and Behavioral Progress Notes"] = 
+          tentativeEntry[`${periodPrefix} - Academic and Behavioral Progress Notes`] || "";
+      }
+    }
+
+    // Handle Special Education separately
+    if (teacherInput.hasOwnProperty("Special Education")) {
+      teacherInput["Special Education"]["Case Manager"] = 
+        tentativeEntry["Special Education - Case Manager"] || "";
+      teacherInput["Special Education"]["What accommodations seem to work well with this student to help them be successful?"] = 
+        tentativeEntry["Special Education - What accommodations seem to work well with this student to help them be successful?"] || "";
+      teacherInput["Special Education"]["What are the student's strengths, as far as behavior?"] = 
+        tentativeEntry["Special Education - What are the student's strengths, as far as behavior?"] || "";
+      teacherInput["Special Education"]["What are the student's needs, as far as behavior?"] = 
+        tentativeEntry["Special Education - What are the student's needs, as far as behavior?"] || "";
+      teacherInput["Special Education"]["What are the student's needs, as far as functional skills?"] = 
+        tentativeEntry["Special Education - What are the student's needs, as far as functional skills?"] || "";
+      teacherInput["Special Education"]["Please add any other comments or concerns here:"] = 
+        tentativeEntry["Special Education - Please add any other comments or concerns here:"] || "";
+    }
   }
 }

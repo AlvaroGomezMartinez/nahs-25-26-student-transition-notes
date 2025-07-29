@@ -1,48 +1,67 @@
 /**
- * Main entry point for the refactored NAHS Student Transition system
+ * Main entry point for the NAHS Student Transition Notes system.
+ * This function loads all student data, processes it, and writes it to the TENTATIVE-Version2 sheet.
  * 
- * This file replaces the original loadTENTATIVEVersion2.js with a cleaner,
- * more maintainable structure using the new folder organization.
- */
-
-/**
- * Main function to load and process student data for TENTATIVE-Version2 sheet
- * 
- * This is the primary entry point that orchestrates the entire data loading,
- * processing, and writing workflow.
+ * This replaces the original loadTENTATIVEVersion2 function with a cleaner,
+ * more maintainable architecture using data loaders, processors, and writers.
  */
 function loadTENTATIVEVersion2() {
   try {
-    console.log('Starting TENTATIVE-Version2 data load process...');
+    console.log('=== Starting NAHS Student Transition Notes Process ===');
+    const startTime = new Date();
+
+    // Phase 1: Load all student data using the new data loaders
+    console.log('Phase 1: Loading student data...');
+    const activeStudentDataMap = loadAllStudentDataWithLoaders();
     
-    // Store existing row colors before clearing sheet
-    const existingColors = preserveExistingRowColors();
+    if (!activeStudentDataMap || activeStudentDataMap.size === 0) {
+      console.warn('No student data loaded. Exiting process.');
+      return;
+    }
+
+    console.log(`Successfully loaded data for ${activeStudentDataMap.size} students`);
+
+    // Phase 2: Process the data using the new data processors
+    console.log('Phase 2: Processing student data...');
     
-    // Load all required data from various sheets
-    const rawData = loadAllStudentData();
+    // The data processors are now integrated into the writers
+    // This maintains the same data flow but with better organization
     
-    // Process and filter the data
-    const processedData = processStudentData(rawData);
+    // Phase 3: Write processed data to sheets using the new writers
+    console.log('Phase 3: Writing data to TENTATIVE-Version2 sheet...');
     
-    // Filter out withdrawn students
-    const activeStudents = filterActiveStudents(processedData);
+    // Use the new writer system
+    const writeStats = writeToTENTATIVEVersion2Sheet(activeStudentDataMap);
     
-    // Write processed data to the TENTATIVE-Version2 sheet
-    writeProcessedDataToSheet(activeStudents);
+    // Phase 4: Summary and completion
+    const endTime = new Date();
+    const processingTime = (endTime - startTime) / 1000;
     
-    // Restore row colors
-    restoreRowColors(existingColors);
+    console.log('=== Process Completed Successfully ===');
+    console.log(`Students processed: ${writeStats.studentsProcessed}`);
+    console.log(`Rows written: ${writeStats.rowsWritten}`);
+    console.log(`Processing time: ${processingTime} seconds`);
+    console.log(`Completed at: ${endTime.toLocaleString()}`);
     
-    // Ensure checkboxes are present in the correct column
-    ensureCheckboxesInColumnBX();
-    
-    console.log('TENTATIVE-Version2 data load completed successfully');
+    if (writeStats.hasErrors) {
+      console.warn('Some students had processing errors. Check the sheet for error rows.');
+    }
+
+    return writeStats;
     
   } catch (error) {
-    console.error('Error in loadTENTATIVEVersion2:', error);
-    // Consider sending an email notification or logging to external system
+    console.error('Critical error in loadTENTATIVEVersion2:', error);
     throw error;
   }
+}
+
+/**
+ * Backward compatibility function - maintains the original function name
+ * with the terrible variable name from the original code.
+ */
+function loadTENTATIVEVersion2_OriginalName() {
+  console.warn('Using deprecated function name. Consider updating to loadTENTATIVEVersion2');
+  return loadTENTATIVEVersion2();
 }
 
 /**
