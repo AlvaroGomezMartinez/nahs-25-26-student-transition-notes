@@ -4,6 +4,14 @@
  */
 
 /**
+ * Register date utility tests with QUnit.
+ * This function is called by the test runner to set up date utility tests.
+ */
+function registerDateUtilTests() {
+  test_DateUtils();
+}
+
+/**
  * Tests for the DateUtils class.
  */
 function test_DateUtils() {

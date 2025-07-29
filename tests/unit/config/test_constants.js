@@ -4,6 +4,14 @@
  */
 
 /**
+ * Register constants tests with QUnit.
+ * This function is called by the test runner to set up constants tests.
+ */
+function registerConstantTests() {
+  test_Constants();
+}
+
+/**
  * Tests for the constants.js configuration file.
  */
 function test_Constants() {

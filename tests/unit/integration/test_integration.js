@@ -4,6 +4,14 @@
  */
 
 /**
+ * Register integration tests with QUnit.
+ * This function is called by the test runner to set up integration tests.
+ */
+function registerIntegrationTests() {
+  test_MainEntryPoint();
+}
+
+/**
  * Tests for the main loadTENTATIVEVersion2 function.
  */
 function test_MainEntryPoint() {

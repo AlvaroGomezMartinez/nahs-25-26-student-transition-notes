@@ -4,6 +4,14 @@
  */
 
 /**
+ * Register base data loader tests with QUnit.
+ * This function is called by the test runner to set up base data loader tests.
+ */
+function registerBaseDataLoaderTests() {
+  test_BaseDataLoader();
+}
+
+/**
  * Tests for the BaseDataLoader class.
  */
 function test_BaseDataLoader() {
