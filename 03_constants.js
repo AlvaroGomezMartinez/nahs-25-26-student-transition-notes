@@ -342,3 +342,190 @@ const SYSTEM_CONFIG = {
   BATCH_SIZE: 100, // For processing large datasets
   MAX_RETRIES: 3 // For API calls
 };
+
+/**
+ * Configuration setup for external spreadsheets.
+ * 
+ * This function helps validate the external spreadsheet IDs that the system needs
+ * to access. It provides status and validation for each external sheet.
+ * 
+ * @function checkExternalConfiguration
+ * 
+ * @example
+ * // Run this function to check current external configuration
+ * checkExternalConfiguration();
+ * 
+ * @since 2.0.0
+ */
+function checkExternalConfiguration() {
+  console.log('=== External Spreadsheet Configuration Status ===');
+  console.log('');
+  console.log('Current Configuration:');
+  console.log('1. REGISTRATIONS_SOURCE:', EXTERNAL_SPREADSHEETS.REGISTRATIONS_SOURCE);
+  console.log('2. ATTENDANCE_SOURCE:', EXTERNAL_SPREADSHEETS.ATTENDANCE_SOURCE);
+  console.log('3. TRACKING_SOURCE:', EXTERNAL_SPREADSHEETS.TRACKING_SOURCE);
+  console.log('4. SCHEDULES_SOURCE:', EXTERNAL_SPREADSHEETS.SCHEDULES_SOURCE);
+  console.log('');
+  
+  // Test each external spreadsheet
+  console.log('Testing External Spreadsheet Access:');
+  console.log('');
+  
+  // Test Registrations
+  console.log('1. Testing Registrations access...');
+  try {
+    const regSpreadsheet = SpreadsheetApp.openById(EXTERNAL_SPREADSHEETS.REGISTRATIONS_SOURCE);
+    const regSheets = regSpreadsheet.getSheets().map(s => s.getName());
+    console.log('   ✅ Registrations spreadsheet accessible');
+    console.log('   Available sheets:', regSheets.join(', '));
+    
+    // Check for the specific sheet
+    const regSheet = regSpreadsheet.getSheetByName(SHEET_NAMES.REGISTRATIONS);
+    if (regSheet) {
+      console.log('   ✅ Sheet "' + SHEET_NAMES.REGISTRATIONS + '" found');
+    } else {
+      console.log('   ⚠️ Sheet "' + SHEET_NAMES.REGISTRATIONS + '" not found');
+    }
+  } catch (error) {
+    console.log('   ❌ Registrations spreadsheet not accessible:', error.message);
+  }
+  
+  console.log('');
+  
+  // Test Attendance
+  console.log('2. Testing Attendance access...');
+  try {
+    const attSpreadsheet = SpreadsheetApp.openById(EXTERNAL_SPREADSHEETS.ATTENDANCE_SOURCE);
+    const attSheets = attSpreadsheet.getSheets().map(s => s.getName());
+    console.log('   ✅ Attendance spreadsheet accessible');
+    console.log('   Available sheets:', attSheets.join(', '));
+    
+    // Check for the specific sheet
+    const attSheet = attSpreadsheet.getSheetByName(SHEET_NAMES.ATTENDANCE);
+    if (attSheet) {
+      console.log('   ✅ Sheet "' + SHEET_NAMES.ATTENDANCE + '" found');
+    } else {
+      console.log('   ⚠️ Sheet "' + SHEET_NAMES.ATTENDANCE + '" not found');
+    }
+  } catch (error) {
+    console.log('   ❌ Attendance spreadsheet not accessible:', error.message);
+  }
+  
+  console.log('');
+  
+  // Test Tracking
+  console.log('3. Testing Tracking access...');
+  try {
+    const trackSpreadsheet = SpreadsheetApp.openById(EXTERNAL_SPREADSHEETS.TRACKING_SOURCE);
+    const trackSheets = trackSpreadsheet.getSheets().map(s => s.getName());
+    console.log('   ✅ Tracking spreadsheet accessible');
+    console.log('   Available sheets:', trackSheets.join(', '));
+    
+    // Check for the specific sheet
+    const trackSheet = trackSpreadsheet.getSheetByName(SHEET_NAMES.TRACKING_SHEET);
+    if (trackSheet) {
+      console.log('   ✅ Sheet "' + SHEET_NAMES.TRACKING_SHEET + '" found');
+    } else {
+      console.log('   ⚠️ Sheet "' + SHEET_NAMES.TRACKING_SHEET + '" not found');
+    }
+  } catch (error) {
+    console.log('   ❌ Tracking spreadsheet not accessible:', error.message);
+  }
+  
+  console.log('');
+  console.log('=== Configuration Check Complete ===');
+}
+
+/**
+ * Validates access to all configured external spreadsheets and provides detailed feedback.
+ * 
+ * @function validateExternalAccess
+ * @returns {Object} Validation results for all external sheets
+ * 
+ * @example
+ * // Validate all external connections
+ * const results = validateExternalAccess();
+ * 
+ * @since 2.0.0
+ */
+function validateExternalAccess() {
+  console.log('=== Validating External Spreadsheet Access ===');
+  console.log('');
+  
+  const results = {
+    registrations: { accessible: false, sheetExists: false, error: null },
+    attendance: { accessible: false, sheetExists: false, error: null },
+    tracking: { accessible: false, sheetExists: false, error: null },
+    schedules: { accessible: false, sheetExists: false, error: null },
+    summary: { allAccessible: false, totalAccessible: 0 }
+  };
+  
+  const tests = [
+    {
+      name: 'Registrations',
+      key: 'registrations',
+      spreadsheetId: EXTERNAL_SPREADSHEETS.REGISTRATIONS_SOURCE,
+      sheetName: SHEET_NAMES.REGISTRATIONS
+    },
+    {
+      name: 'Attendance', 
+      key: 'attendance',
+      spreadsheetId: EXTERNAL_SPREADSHEETS.ATTENDANCE_SOURCE,
+      sheetName: SHEET_NAMES.ATTENDANCE
+    },
+    {
+      name: 'Tracking',
+      key: 'tracking', 
+      spreadsheetId: EXTERNAL_SPREADSHEETS.TRACKING_SOURCE,
+      sheetName: SHEET_NAMES.TRACKING_SHEET
+    },
+    {
+      name: 'Schedules',
+      key: 'schedules',
+      spreadsheetId: EXTERNAL_SPREADSHEETS.SCHEDULES_SOURCE,
+      sheetName: SHEET_NAMES.SCHEDULES
+    }
+  ];
+  
+  tests.forEach((test, index) => {
+    console.log(`${index + 1}. Testing ${test.name} access...`);
+    
+    try {
+      const spreadsheet = SpreadsheetApp.openById(test.spreadsheetId);
+      results[test.key].accessible = true;
+      
+      const sheet = spreadsheet.getSheetByName(test.sheetName);
+      if (sheet) {
+        results[test.key].sheetExists = true;
+        console.log(`   ✅ ${test.name}: Fully accessible`);
+        results.summary.totalAccessible++;
+      } else {
+        results[test.key].error = `Sheet '${test.sheetName}' not found`;
+        console.log(`   ⚠️ ${test.name}: Spreadsheet accessible, but sheet '${test.sheetName}' not found`);
+        
+        // Show available sheets
+        const availableSheets = spreadsheet.getSheets().map(s => s.getName());
+        console.log(`   Available sheets: ${availableSheets.join(', ')}`);
+      }
+    } catch (error) {
+      results[test.key].error = error.message;
+      console.log(`   ❌ ${test.name}: Not accessible - ${error.message}`);
+    }
+  });
+  
+  // Summary
+  console.log('');
+  console.log('=== Validation Summary ===');
+  results.summary.allAccessible = results.summary.totalAccessible === tests.length;
+  console.log(`Fully accessible external sheets: ${results.summary.totalAccessible}/${tests.length}`);
+  
+  if (results.summary.allAccessible) {
+    console.log('✅ All external spreadsheets are properly configured and accessible!');
+    console.log('You can now run loadTENTATIVEVersion2() successfully.');
+  } else {
+    console.log('⚠️ Some external spreadsheets need attention.');
+    console.log('Check the sheet names in the external spreadsheets match the expected names.');
+  }
+  
+  return results;
+}
