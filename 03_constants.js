@@ -327,7 +327,7 @@ const TEACHER_EMAIL_MAPPINGS = {
   'gabriela.chavarria-medina@nisd.net': { 'proper name': 'Chavarria, Gabriela' },
   'janice.flores@nisd.net': { 'proper name': 'Flores, Janice' },
   'jessica-1.vela@nisd.net': { 'proper name': 'Vela, Jessica' },
-  'jessica.pladelcastillo@nisd.net': { 'proper name': 'Pladelcastillo, Jessica' },
+  'jessica.poladelcastillo@nisd.net': { 'proper name': 'Poladelcastillo, Jessica' },
   'joshua.lacour@nisd.net': { 'proper name': 'Lacour, Joshua' },
   'lauren.flores@nisd.net': { 'proper name': 'Flores, Lauren' },
   'loretta.owens@nisd.net': { 'proper name': 'Owens, Loretta' },
