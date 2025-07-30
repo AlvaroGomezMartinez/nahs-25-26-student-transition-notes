@@ -271,7 +271,23 @@ function test_AttendanceDataLoader() {
     QUnit.test("AttendanceDataLoader should be properly configured", function(assert) {
       const loader = new AttendanceDataLoader();
       assert.ok(loader instanceof AttendanceDataLoader, "Should create instance");
-      assert.equal(loader.sheetName, SHEET_NAMES.ALT_HS_ATTENDANCE_ENROLLMENT_COUNT, "Should use correct sheet");
+      assert.equal(loader.sheetName, SHEET_NAMES.ATTENDANCE, "Should use correct sheet");
     });
   });
+}
+
+/**
+ * Register data loader tests with QUnit.
+ * This function is called by the test runner to set up data loader tests.
+ */
+function registerDataLoaderTests() {
+  test_TentativeDataLoader();
+  test_RegistrationDataLoader();
+  test_ScheduleDataLoader();
+  test_FormResponsesDataLoader();
+  test_ContactDataLoader();
+  test_EntryWithdrawalDataLoader();
+  test_WithdrawnDataLoader();
+  test_WdOtherDataLoader();
+  test_AttendanceDataLoader();
 }

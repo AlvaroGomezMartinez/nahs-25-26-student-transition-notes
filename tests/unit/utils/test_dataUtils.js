@@ -211,3 +211,11 @@ function test_DataUtils() {
     });
   });
 }
+
+/**
+ * Register data utility tests with QUnit.
+ * This function is called by the test runner to set up data utility tests.
+ */
+function registerDataUtilTests() {
+  test_DataUtils();
+}

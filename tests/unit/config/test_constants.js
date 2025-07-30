@@ -22,18 +22,18 @@ function test_Constants() {
       assert.ok(typeof SHEET_NAMES === 'object', "SHEET_NAMES should be an object");
       assert.notEqual(SHEET_NAMES, null, "SHEET_NAMES should not be null");
       
-      // Test required sheet names (using actual property names from your constants)
+      // Test required sheet names (using actual property names from constants)
       const requiredSheets = [
-        'TENTATIVE_V2',           // Your actual property name
+        'TENTATIVE_V2',
         'TENTATIVE',
-        'REGISTRATIONS',          // Your actual property name (not REGISTRATIONS_SY_24_25)
+        'REGISTRATIONS',
         'SCHEDULES',
         'CONTACT_INFO',
         'ENTRY_WITHDRAWAL',
         'FORM_RESPONSES_1',
         'WITHDRAWN',
         'WD_OTHER',
-        'ATTENDANCE'              // Your actual property name (not ALT_HS_ATTENDANCE_ENROLLMENT_COUNT)
+        'ATTENDANCE'
       ];
       
       requiredSheets.forEach(sheetName => {
@@ -52,16 +52,15 @@ function test_Constants() {
       assert.ok(typeof COLUMN_NAMES === 'object', "COLUMN_NAMES should be an object");
       assert.notEqual(COLUMN_NAMES, null, "COLUMN_NAMES should not be null");
       
-      // Test some key column names (using actual property names from your constants)
+      // Test key column names (using actual property names from constants)
       const requiredColumns = [
         'STUDENT_ID',
-        'STUDENT_FIRST_NAME',     // Your actual property name (not STUDENT_NAME)
-        'STUDENT_LAST_NAME',      // Your actual property name (not LAST_NAME)
-        'STUDENT_NAME_FULL',      // Your actual property name
+        'STUDENT_FIRST_NAME',
+        'STUDENT_LAST_NAME',
+        'STUDENT_NAME_FULL',
         'GRADE',
         'ENTRY_DATE',
         'TEACHER_NAME'
-        // Note: Removed COURSE_TITLE as it's not in your constants
       ];
       
       requiredColumns.forEach(columnName => {
@@ -122,12 +121,12 @@ function test_Constants() {
 
     QUnit.test("Constants should be immutable", function(assert) {
       // Test that we can't accidentally modify constants
-      const originalSheetName = SHEET_NAMES.TENTATIVE_VERSION2;
+      const originalSheetName = SHEET_NAMES.TENTATIVE_V2;
       
       try {
-        SHEET_NAMES.TENTATIVE_VERSION2 = "MODIFIED";
+        SHEET_NAMES.TENTATIVE_V2 = "MODIFIED";
         // If we get here, the constant was modified (which shouldn't happen in a proper setup)
-        assert.notEqual(SHEET_NAMES.TENTATIVE_VERSION2, "MODIFIED", 
+        assert.notEqual(SHEET_NAMES.TENTATIVE_V2, "MODIFIED", 
           "Constants should be protected from modification");
       } catch (error) {
         // This is expected if constants are properly protected
@@ -135,8 +134,8 @@ function test_Constants() {
       }
       
       // Restore original value if it was modified
-      if (SHEET_NAMES.TENTATIVE_VERSION2 === "MODIFIED") {
-        SHEET_NAMES.TENTATIVE_VERSION2 = originalSheetName;
+      if (SHEET_NAMES.TENTATIVE_V2 === "MODIFIED") {
+        SHEET_NAMES.TENTATIVE_V2 = originalSheetName;
       }
     });
 

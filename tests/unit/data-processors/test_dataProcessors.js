@@ -349,3 +349,15 @@ function test_TeacherInputProcessor() {
     });
   });
 }
+
+/**
+ * Register data processor tests with QUnit.
+ * This function is called by the test runner to set up data processor tests.
+ */
+function registerDataProcessorTests() {
+  test_BaseDataProcessor();
+  test_StudentDataMerger();
+  test_StudentFilterProcessor();
+  test_ScheduleProcessor();
+  test_TeacherInputProcessor();
+}

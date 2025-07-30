@@ -220,3 +220,11 @@ function test_ValidationUtils() {
     });
   });
 }
+
+/**
+ * Register validation utility tests with QUnit.
+ * This function is called by the test runner to set up validation utility tests.
+ */
+function registerValidationUtilTests() {
+  test_ValidationUtils();
+}

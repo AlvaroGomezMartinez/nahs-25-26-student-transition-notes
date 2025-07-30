@@ -421,3 +421,14 @@ function test_SheetWriterFactory() {
     });
   });
 }
+
+/**
+ * Register writer tests with QUnit.
+ * This function is called by the test runner to set up writer tests.
+ */
+function registerWriterTests() {
+  test_BaseSheetWriter();
+  test_TentativeSheetWriter();
+  test_TentativeRowBuilder();
+  test_SheetWriterFactory();
+}

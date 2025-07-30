@@ -167,6 +167,15 @@ The console test runner (`tests/consoleTestRunner.js`) provides:
 - System dependency verification
 - Individual test module execution
 
+For faster testing that avoids timeout issues, use the lightweight test runner (`tests/lightweightTestRunner.js`):
+```javascript
+// Run essential tests only (core functionality)
+runEssentialTestsInConsole();
+
+// Run all tests except slow constants tests
+runFastTestsInConsole();
+```
+
 ### Web Interface
 The test runner provides a web interface accessible via the Google Apps Script web app URL. The interface includes:
 - Real-time test execution progress
@@ -393,6 +402,69 @@ runDateUtilTestsOnly()
 ```
 
 This function is available in `tests/individualTestRunners.js` and provides focused output for date utility testing.
+
+#### Missing Test Registration Functions
+**Problem**: Several test modules existed but were missing their `register*Tests()` functions, causing them to not be included in full test runs.
+
+**Solution**: Added registration functions to all test modules:
+
+```javascript
+// Added to test_dataUtils.js
+function registerDataUtilTests() {
+  test_DataUtils();
+}
+
+// Added to test_validationUtils.js  
+function registerValidationUtilTests() {
+  test_ValidationUtils();
+}
+
+// Added to test_dataLoaders.js
+function registerDataLoaderTests() {
+  test_TentativeDataLoader();
+  test_RegistrationDataLoader();
+  // ... other loaders
+}
+
+// Added to test_dataProcessors.js
+function registerDataProcessorTests() {
+  test_BaseDataProcessor();
+  test_StudentDataMerger();
+  // ... other processors
+}
+
+// Added to test_writers.js
+function registerWriterTests() {
+  test_BaseSheetWriter();
+  test_TentativeSheetWriter();
+  // ... other writers
+}
+```
+
+**Files Updated**:
+- `tests/unit/utils/test_dataUtils.js`
+- `tests/unit/utils/test_validationUtils.js`
+- `tests/unit/data-loaders/test_dataLoaders.js`
+- `tests/unit/data-processors/test_dataProcessors.js`
+- `tests/unit/writers/test_writers.js`
+
+#### Constants Test Performance Issues
+**Problem**: Constants tests were taking 10+ seconds each and causing execution timeouts.
+
+**Solution**: Fixed property name mismatches and created lightweight test runner alternatives:
+
+1. **Fixed Property Names**: Updated `test_constants.js` to use correct property names that match the actual constants file
+2. **Created Lightweight Runner**: Added `tests/lightweightTestRunner.js` with options to skip slow tests
+3. **Optimized Tests**: Streamlined constants validation to reduce execution time
+
+**New Testing Options**:
+```javascript
+// Fast testing without slow constants tests
+runFastTestsInConsole();
+
+// Essential tests only (core functionality)
+runEssentialTestsInConsole();
+```
 
 ## Next Steps
 
