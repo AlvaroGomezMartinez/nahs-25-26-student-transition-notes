@@ -176,10 +176,16 @@ function quickSystemCheck() {
     
     // Check constants content
     try {
-      if (SHEET_NAMES.TENTATIVE_VERSION2) {
+      // Check for actual property names (TENTATIVE_V2, not TENTATIVE_VERSION2)
+      if (SHEET_NAMES.TENTATIVE_V2 && SHEET_NAMES.TENTATIVE && COLUMN_NAMES.STUDENT_ID) {
         console.log("✅ SHEET_NAMES content: Available");
+        console.log(`   Key sheets: TENTATIVE_V2="${SHEET_NAMES.TENTATIVE_V2}", TENTATIVE="${SHEET_NAMES.TENTATIVE}"`);
+        console.log(`   Key columns: STUDENT_ID="${COLUMN_NAMES.STUDENT_ID}"`);
       } else {
         console.log("❌ SHEET_NAMES content: Missing expected properties");
+        console.log(`   TENTATIVE_V2: ${SHEET_NAMES.TENTATIVE_V2 ? 'Found' : 'Missing'}`);
+        console.log(`   TENTATIVE: ${SHEET_NAMES.TENTATIVE ? 'Found' : 'Missing'}`);
+        console.log(`   STUDENT_ID: ${COLUMN_NAMES.STUDENT_ID ? 'Found' : 'Missing'}`);
         allPassed = false;
       }
     } catch (error) {
