@@ -162,10 +162,11 @@ class BaseDataLoader {
       }
 
       const headers = data[0];
-      const keyColumnIndex = headers.indexOf(this.keyColumn);
+      const keyColumnIndex = this.findKeyColumnIndex(headers);
       
       if (keyColumnIndex === -1) {
         console.error(`Key column '${this.keyColumn}' not found in sheet '${this.sheetName}'`);
+        console.error(`Available columns: ${headers.join(', ')}`);
         return new Map();
       }
 
@@ -175,6 +176,46 @@ class BaseDataLoader {
       console.error(`Error loading data from sheet '${this.sheetName}' in ${location}:`, error);
       return new Map();
     }
+  }
+
+  /**
+   * Finds the key column index, considering alternative column names
+   * @param {Array} headers - Column headers
+   * @returns {number} Column index or -1 if not found
+   */
+  findKeyColumnIndex(headers) {
+    // First try the exact match
+    let keyColumnIndex = headers.indexOf(this.keyColumn);
+    
+    if (keyColumnIndex !== -1) {
+      return keyColumnIndex;
+    }
+    
+    // If looking for student ID, try alternatives
+    if (this.keyColumn === COLUMN_NAMES.STUDENT_ID) {
+      // Try 'Student Id' (lowercase 'd')
+      keyColumnIndex = headers.indexOf(COLUMN_NAMES.STUDENT_ID_ALT);
+      if (keyColumnIndex !== -1) {
+        console.log(`Using alternative student ID column: '${COLUMN_NAMES.STUDENT_ID_ALT}' in sheet '${this.sheetName}'`);
+        return keyColumnIndex;
+      }
+      
+      // Try 'STU ID' (attendance format)
+      keyColumnIndex = headers.indexOf(COLUMN_NAMES.STUDENT_ID_STU);
+      if (keyColumnIndex !== -1) {
+        console.log(`Using attendance student ID column: '${COLUMN_NAMES.STUDENT_ID_STU}' in sheet '${this.sheetName}'`);
+        return keyColumnIndex;
+      }
+      
+      // Try just "Student ID" without the ALL CAPS
+      keyColumnIndex = headers.indexOf("Student ID");
+      if (keyColumnIndex !== -1) {
+        console.log(`Using standard student ID column: 'Student ID' in sheet '${this.sheetName}'`);
+        return keyColumnIndex;
+      }
+    }
+    
+    return -1;
   }
 
   /**
@@ -223,9 +264,35 @@ class BaseDataLoader {
   extractKey(cellValue) {
     // For student ID columns, try to extract numeric ID
     if (this.keyColumn === COLUMN_NAMES.STUDENT_ID) {
-      return extractStudentId(cellValue);
+      return this.extractStudentIdFromValue(cellValue);
     }
     return cellValue;
+  }
+
+  /**
+   * Helper method to extract student ID from various formats
+   * @param {*} value - The cell value that might contain a student ID
+   * @returns {string|null} The extracted student ID or null if not found
+   */
+  extractStudentIdFromValue(value) {
+    if (!value) return null;
+    
+    // Convert to string
+    const strValue = String(value).trim();
+    
+    // If it's already a number or numeric string, return it
+    if (/^\d+$/.test(strValue)) {
+      return strValue;
+    }
+    
+    // Try to extract from embedded format like "Abbott, Amanda (123456) Grade: 11"
+    const embeddedMatch = strValue.match(/\((\d+)\)/);
+    if (embeddedMatch) {
+      return embeddedMatch[1];
+    }
+    
+    // If no extraction worked, return original value
+    return strValue;
   }
 
   /**

@@ -242,8 +242,26 @@ class StudentDataMerger extends BaseDataProcessor {
           TENTATIVE: studentArray
         });
       });
+      this.log(`Created base map with ${baseMap.size} students from tentative data`);
     } else {
-      this.log('No tentative data available, using empty base map', 'warn');
+      this.log('No tentative data available, creating base map from registration data', 'warn');
+      
+      // If no tentative data, create base map from registration data
+      if (dataSources.registrationsData && dataSources.registrationsData.size > 0) {
+        dataSources.registrationsData.forEach((registrationArray, studentId) => {
+          baseMap.set(studentId, {
+            // Create minimal student record
+            STUDENT_ID: studentId,
+            FIRST: '',
+            LAST: '',
+            GRADE: '',
+            // Will be populated by registration merge
+          });
+        });
+        this.log(`Created base map with ${baseMap.size} students from registration data`);
+      } else {
+        this.log('No registration data available either, using empty base map', 'warn');
+      }
     }
 
     return baseMap;

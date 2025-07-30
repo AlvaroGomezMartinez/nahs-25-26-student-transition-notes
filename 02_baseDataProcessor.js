@@ -67,6 +67,16 @@ class BaseDataProcessor {
       return defaultValue;
     }
 
+    // If defaultValue is an array, caller expects array data (like schedules)
+    if (Array.isArray(defaultValue)) {
+      return Array.isArray(value) ? value : [value];
+    }
+
+    // If the value is an array and we want the first element (common pattern for single records)
+    if (Array.isArray(value) && value.length > 0) {
+      return value[0];
+    }
+
     return value;
   }
 

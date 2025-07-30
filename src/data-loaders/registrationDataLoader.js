@@ -1,19 +1,20 @@
 /**
  * Registration Data Loader
  * 
- * Loads data from the Registrations SY 24.25 sheet and converts it to a Map
- * for easier processing. This sheet is located in an external spreadsheet.
+ * Loads data from the Form Responses 1 sheet and converts it to a Map
+ * for easier processing. This sheet has regular student IDs in column D.
  */
 
 class RegistrationDataLoader extends BaseDataLoader {
   constructor() {
     // Use external spreadsheet ID for registration data
+    // The Student ID column contains the actual student IDs
     const externalSpreadsheetId = EXTERNAL_SPREADSHEETS.REGISTRATIONS_SOURCE;
     super(SHEET_NAMES.REGISTRATIONS, COLUMN_NAMES.STUDENT_ID, false, externalSpreadsheetId);
   }
 
   /**
-   * Loads registration data from the external Registrations sheet
+   * Loads registration data from the external Form Responses sheet
    * This replaces the original loadRegistrationsData function
    * @returns {Map} Map where keys are student IDs and values are registration data
    */

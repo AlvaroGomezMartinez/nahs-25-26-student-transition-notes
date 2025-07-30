@@ -8,7 +8,8 @@ class AttendanceDataLoader extends BaseDataLoader {
   constructor() {
     // Use external spreadsheet ID for attendance data
     const externalSpreadsheetId = EXTERNAL_SPREADSHEETS.ATTENDANCE_SOURCE;
-    super(SHEET_NAMES.ATTENDANCE, COLUMN_NAMES.STUDENT_ID, false, externalSpreadsheetId);
+    // Use STUDENT_ID_STU variant since attendance sheet uses "STU ID" column
+    super(SHEET_NAMES.ATTENDANCE, COLUMN_NAMES.STUDENT_ID_STU, false, externalSpreadsheetId);
   }
 
   /**

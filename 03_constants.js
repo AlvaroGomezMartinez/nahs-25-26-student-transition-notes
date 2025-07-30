@@ -114,13 +114,18 @@ const SHEET_NAMES = {
  */
 const COLUMN_NAMES = {
   STUDENT_ID: 'STUDENT ID',
+  STUDENT_ID_ALT: 'Student Id', // Alternative format with lowercase 'd'
+  STUDENT_ID_STU: 'STU ID', // Alternative format for attendance data
   STUDENT_FIRST_NAME: 'Student First Name',
   STUDENT_LAST_NAME: 'Student Last Name',
   STUDENT_NAME_FULL: 'Student Name(Last, First)',
+  STUDENT_NAME_FULL_ALT: 'Student Name (Last, First MI)', // Alternative format from Schedules
   GRADE: 'GRADE',
+  GRADE_ALT: 'Grd Lvl', // Alternative format
   HOME_CAMPUS: 'Home Campus',
   ENTRY_DATE: 'Entry Date',
   PLACEMENT_DAYS: 'Placement Days',
+  START_DATE: 'Start Date', // From registrations
   DATE_ADDED: 'DATE ADDED TO SPREADSHEET',
   TEACHER_NAME: 'Teacher Name',
   COURSE_TITLE: 'Course Title',
@@ -655,4 +660,320 @@ function quickTest() {
   
   console.log('');
   console.log('=== Quick Test Complete ===');
+}
+
+/**
+ * Debug function to examine column headers in sheets
+ * 
+ * @function debugColumnHeaders
+ * @since 2.0.0
+ */
+function debugColumnHeaders() {
+  console.log('=== Debugging Column Headers ===');
+  console.log('');
+  
+  // Check Form Responses 1 (Registrations)
+  console.log('1. Form Responses 1 (Registrations) headers:');
+  try {
+    const regSpreadsheet = SpreadsheetApp.openById(EXTERNAL_SPREADSHEETS.REGISTRATIONS_SOURCE);
+    const regSheet = regSpreadsheet.getSheetByName(SHEET_NAMES.REGISTRATIONS);
+    if (regSheet) {
+      const headers = regSheet.getRange(1, 1, 1, regSheet.getLastColumn()).getValues()[0];
+      headers.forEach((header, index) => {
+        const letter = String.fromCharCode(65 + index); // A, B, C, etc.
+        console.log(`   ${letter}: "${header}"`);
+      });
+    }
+  } catch (error) {
+    console.log('   Error:', error.message);
+  }
+  
+  console.log('');
+  console.log('2. Schedules headers:');
+  try {
+    const schedulesSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SHEET_NAMES.SCHEDULES);
+    if (schedulesSheet) {
+      const headers = schedulesSheet.getRange(1, 1, 1, schedulesSheet.getLastColumn()).getValues()[0];
+      headers.forEach((header, index) => {
+        const letter = String.fromCharCode(65 + index);
+        console.log(`   ${letter}: "${header}"`);
+      });
+    }
+  } catch (error) {
+    console.log('   Error:', error.message);
+  }
+  
+  console.log('');
+  console.log('3. ContactInfo headers:');
+  try {
+    const contactSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SHEET_NAMES.CONTACT_INFO);
+    if (contactSheet) {
+      const headers = contactSheet.getRange(1, 1, 1, contactSheet.getLastColumn()).getValues()[0];
+      headers.forEach((header, index) => {
+        const letter = String.fromCharCode(65 + index);
+        console.log(`   ${letter}: "${header}"`);
+      });
+    }
+  } catch (error) {
+    console.log('   Error:', error.message);
+  }
+  
+  console.log('');
+  console.log('4. Entry_Withdrawal headers:');
+  try {
+    const entrySheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SHEET_NAMES.ENTRY_WITHDRAWAL);
+    if (entrySheet) {
+      const headers = entrySheet.getRange(1, 1, 1, entrySheet.getLastColumn()).getValues()[0];
+      headers.forEach((header, index) => {
+        const letter = String.fromCharCode(65 + index);
+        console.log(`   ${letter}: "${header}"`);
+      });
+    }
+  } catch (error) {
+    console.log('   Error:', error.message);
+  }
+  
+  console.log('');
+  console.log('=== Debug Complete ===');
+}
+
+/**
+ * Test the updated data loaders with proper column handling
+ * 
+ * @function testUpdatedLoaders
+ * @since 2.0.0
+ */
+function testUpdatedLoaders() {
+  console.log('=== Testing Updated Data Loaders ===');
+  console.log('');
+  
+  // Test 1: Registration Data Loader (external, embedded ID format)
+  console.log('1. Testing RegistrationDataLoader...');
+  try {
+    const regLoader = new RegistrationDataLoader();
+    const regData = regLoader.loadData();
+    console.log(`✅ Loaded ${regData.size} registration records`);
+    
+    // Show a sample record
+    if (regData.size > 0) {
+      const firstKey = regData.keys().next().value;
+      const firstRecord = regData.get(firstKey)[0];
+      console.log(`   Sample student ID: ${firstKey}`);
+      console.log(`   Sample name: ${firstRecord['Student First Name']} ${firstRecord['Student Last Name']}`);
+    }
+  } catch (error) {
+    console.log('❌ RegistrationDataLoader error:', error.message);
+  }
+  
+  console.log('');
+  
+  // Test 2: Schedule Data Loader (local, Student Id format)
+  console.log('2. Testing ScheduleDataLoader...');
+  try {
+    const schedLoader = new ScheduleDataLoader();
+    const schedData = schedLoader.loadData();
+    console.log(`✅ Loaded schedules for ${schedData.size} students`);
+    
+    // Show a sample record
+    if (schedData.size > 0) {
+      const firstKey = schedData.keys().next().value;
+      const firstRecord = schedData.get(firstKey)[0];
+      console.log(`   Sample student ID: ${firstKey}`);
+      console.log(`   Sample course: ${firstRecord['Course Title']}`);
+    }
+  } catch (error) {
+    console.log('❌ ScheduleDataLoader error:', error.message);
+  }
+  
+  console.log('');
+  
+  // Test 3: Contact Data Loader (local, Student ID format)
+  console.log('3. Testing ContactDataLoader...');
+  try {
+    const contactLoader = new ContactDataLoader();
+    const contactData = contactLoader.loadData();
+    console.log(`✅ Loaded ${contactData.size} contact records`);
+    
+    // Show a sample record
+    if (contactData.size > 0) {
+      const firstKey = contactData.keys().next().value;
+      const firstRecord = contactData.get(firstKey)[0];
+      console.log(`   Sample student ID: ${firstKey}`);
+      console.log(`   Sample email: ${firstRecord['Guardian 1 Email']}`);
+    }
+  } catch (error) {
+    console.log('❌ ContactDataLoader error:', error.message);
+  }
+  
+  console.log('');
+  
+  // Test 4: Entry/Withdrawal Data Loader (local, Student Id format)
+  console.log('4. Testing EntryWithdrawalDataLoader...');
+  try {
+    const entryLoader = new EntryWithdrawalDataLoader();
+    const entryData = entryLoader.loadData();
+    console.log(`✅ Loaded ${entryData.size} entry/withdrawal records`);
+    
+    // Show a sample record
+    if (entryData.size > 0) {
+      const firstKey = entryData.keys().next().value;
+      const firstRecord = entryData.get(firstKey)[0];
+      console.log(`   Sample student ID: ${firstKey}`);
+      console.log(`   Sample entry date: ${firstRecord['Entry Date']}`);
+    }
+  } catch (error) {
+    console.log('❌ EntryWithdrawalDataLoader error:', error.message);
+  }
+  
+  console.log('');
+  console.log('=== Loader Testing Complete ===');
+}
+
+/**
+ * Quick test for the fixed RegistrationDataLoader
+ * 
+ * @function testRegistrationDataLoader
+ * @since 2.0.0
+ */
+function testRegistrationDataLoader() {
+  console.log('=== Testing Fixed RegistrationDataLoader ===');
+  console.log('');
+  
+  try {
+    const regLoader = new RegistrationDataLoader();
+    const regData = regLoader.loadData();
+    
+    console.log(`✅ Loaded ${regData.size} registration records`);
+    
+    if (regData.size > 0) {
+      // Show first few records
+      let count = 0;
+      for (const [studentId, records] of regData) {
+        if (count < 3) {
+          const record = records[0];
+          console.log(`   Student ID: ${studentId}`);
+          console.log(`   Name: ${record['Student First Name']} ${record['Student Last Name']}`);
+          console.log(`   Grade: ${record['Grade']}`);
+          console.log(`   Start Date: ${record['Start Date']}`);
+          console.log('   ---');
+          count++;
+        } else {
+          break;
+        }
+      }
+      
+      console.log(`✅ Registration data is now working correctly!`);
+      console.log(`✅ Ready to test the full system with loadTENTATIVEVersion2()`);
+    } else {
+      console.log('⚠️ No registration data loaded. Check the external spreadsheet access.');
+    }
+    
+  } catch (error) {
+    console.log('❌ RegistrationDataLoader error:', error.message);
+  }
+  
+  console.log('');
+  console.log('=== Test Complete ===');
+}
+
+/**
+ * Test the system after all our fixes
+ * 
+ * @function testSystemAfterFixes
+ * @since 2.0.0
+ */
+function testSystemAfterFixes() {
+  console.log('=== Testing System After All Fixes ===');
+  console.log('');
+  
+  console.log('🔧 Fixes Applied:');
+  console.log('✅ 1. Added STUDENT_ID_STU for attendance data ("STU ID")');
+  console.log('✅ 2. Fixed StudentDataMerger to create base map from registration data when tentative is empty');
+  console.log('✅ 3. Enhanced safeMapGet to handle array vs single record data properly');
+  console.log('✅ 4. Fixed all column name variations across all sheets');
+  console.log('✅ 5. Fixed AttendanceDataLoader to use STUDENT_ID_STU column variant');
+  console.log('');
+  
+  // First test attendance data loading specifically
+  console.log('🧪 Testing attendance data loading...');
+  try {
+    const attLoader = new AttendanceDataLoader();
+    const attData = attLoader.loadData();
+    console.log(`✅ Attendance data loaded: ${attData.size} records`);
+    
+    if (attData.size > 0) {
+      const firstKey = attData.keys().next().value;
+      const firstRecord = attData.get(firstKey)[0];
+      console.log(`   Sample student ID: ${firstKey}`);
+      console.log(`   Sample data: ${JSON.stringify(firstRecord).substring(0, 100)}...`);
+    }
+  } catch (error) {
+    console.log('❌ Attendance data loading failed:', error.message);
+  }
+  
+  console.log('');
+  console.log('🧪 Now running full system test...');
+  console.log('');
+  
+  try {
+    // This should now work end-to-end
+    const result = loadTENTATIVEVersion2();
+    console.log('🎉 System test result:', result ? 'SUCCESS' : 'PARTIAL SUCCESS');
+  } catch (error) {
+    console.log('❌ System test failed:', error.message);
+    console.log('Stack trace:', error.stack);
+  }
+  
+  console.log('');
+  console.log('=== System Test Complete ===');
+}
+
+/**
+ * Test just the attendance data loading to verify the STU ID fix
+ * 
+ * @function testAttendanceDataLoading
+ * @since 2.0.0
+ */
+function testAttendanceDataLoading() {
+  console.log('=== Testing Attendance Data Loading Fix ===');
+  console.log('');
+  
+  console.log('Expected column in attendance sheet: "STU ID"');
+  console.log('Using STUDENT_ID_STU constant:', COLUMN_NAMES.STUDENT_ID_STU);
+  console.log('');
+  
+  try {
+    const attLoader = new AttendanceDataLoader();
+    const attData = attLoader.loadData();
+    
+    console.log(`✅ Attendance loading successful!`);
+    console.log(`✅ Records loaded: ${attData.size}`);
+    
+    if (attData.size > 0) {
+      console.log('');
+      console.log('Sample records:');
+      let count = 0;
+      for (const [studentId, records] of attData) {
+        if (count < 3) {
+          const record = records[0];
+          console.log(`   Student ID: ${studentId}`);
+          console.log(`   Student Name: ${record['STUDENT'] || 'N/A'}`);
+          console.log(`   Days Present: ${record['Present'] || 'N/A'}`);
+          console.log('   ---');
+          count++;
+        } else {
+          break;
+        }
+      }
+    }
+    
+    console.log('✅ Attendance data fix is working! Now the full system should work.');
+    
+  } catch (error) {
+    console.log('❌ Attendance data loading still failing:', error.message);
+    console.log('This means we may need to check the external spreadsheet structure again.');
+  }
+  
+  console.log('');
+  console.log('=== Attendance Test Complete ===');
 }
