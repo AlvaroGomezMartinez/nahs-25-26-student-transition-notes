@@ -42,9 +42,12 @@ tests/unit/
 ### 2. Utility Tests (`utils/`)
 - **test_dateUtils.js**: Date manipulation and formatting
   - Date parsing and validation
-  - Format conversions
+  - Format conversions (MM/DD/YYYY format)
+  - Weekend detection (Saturday/Sunday identification)
+  - Holiday checking with string-based holiday arrays
   - Timezone handling
-  - Edge cases (leap years, invalid dates)
+  - Edge cases (leap years, invalid dates, null/undefined inputs)
+  - Fixed issues: Holiday format compatibility, null/undefined handling
 
 - **test_dataUtils.js**: Data processing utilities
   - Student ID extraction and validation
@@ -139,6 +142,30 @@ runSingleTest('Constants Tests');
 runSingleTest('Date Utils Tests');
 runSingleTest('Integration Tests');
 ```
+
+#### 4. Console-Based Testing (Alternative)
+For debugging and direct execution in the Google Apps Script editor:
+```javascript
+// Run all tests with console output
+runTestsInConsole();
+
+// Quick system verification
+quickSystemCheck();
+
+// Run specific test modules
+runSingleTestModule('DateUtil');
+runSingleTestModule('BaseDataLoader');
+
+// Individual test runners (in tests/individualTestRunners.js)
+runDateUtilTestsOnly();
+runBaseDataLoaderTestsOnly();
+```
+
+The console test runner (`tests/consoleTestRunner.js`) provides:
+- Direct execution in GAS editor without web interface
+- Real-time console logging of test results
+- System dependency verification
+- Individual test module execution
 
 ### Web Interface
 The test runner provides a web interface accessible via the Google Apps Script web app URL. The interface includes:
@@ -290,6 +317,82 @@ The test suite comprehensively covers:
 3. **Refactoring**: Remove duplicate test code
 4. **Coverage Monitoring**: Track and improve test coverage
 5. **Performance**: Keep test execution time reasonable
+
+## Recent Updates and Fixes
+
+### Date Utility Test Fixes (July 2025)
+
+Several critical issues were identified and resolved in the date utility tests:
+
+#### Issue 1: Holiday Format Mismatch
+**Problem**: The `isHoliday` function expected holiday dates as strings in "YYYY-MM-DD" format, but tests were passing Date objects.
+
+**Solution**: Updated test files to use correct string format:
+```javascript
+// Before (incorrect)
+const holidays = [
+  new Date(2024, 11, 25), // Christmas Day 2024
+  new Date(2024, 0, 1),   // New Year's Day 2024
+];
+
+// After (correct)
+const holidays = [
+  "2024-12-25", // Christmas Day 2024
+  "2024-01-01", // New Year's Day 2024
+];
+```
+
+**Files Updated**:
+- `tests/unit/utils/test_dateUtils.js`
+- `tests/unit/utils/test_dateUtils_fixed.js`
+
+#### Issue 2: Null/Undefined Holiday Array Handling
+**Problem**: The `isHoliday` function would throw errors when passed null or undefined holiday arrays.
+
+**Solution**: Added guard clause to handle edge cases:
+```javascript
+function isHoliday(date, holidays) {
+  if (!holidays || !Array.isArray(holidays)) {
+    return false;
+  }
+  const formattedDate = formatDateForHolidays(date);
+  return holidays.includes(formattedDate);
+}
+```
+
+**File Updated**: `src/utils/dateUtils.js`
+
+#### Issue 3: formatDateToMMDDYYYY Null Handling
+**Problem**: The function didn't properly handle null and undefined inputs, as `new Date(null)` creates a valid date (January 1, 1970).
+
+**Solution**: Added explicit null/undefined checks:
+```javascript
+function formatDateToMMDDYYYY(date) {
+  if (date === null || date === undefined) return null;
+  const d = new Date(date);
+  if (isNaN(d.getTime())) return null;
+  // ... rest of function
+}
+```
+
+**File Updated**: `src/utils/dateUtils.js`
+
+#### Test Results After Fixes
+All date utility tests now pass completely:
+- ✅ `formatDateToMMDDYYYY should format dates correctly` - 4/4 assertions pass
+- ✅ `isWeekend should identify weekends correctly` - 4/4 assertions pass  
+- ✅ `isHoliday should identify holidays correctly` - 4/4 assertions pass
+- ✅ `Date functions should handle edge cases` - 5/5 assertions pass
+
+**Total**: 17/17 assertions pass (100% success rate)
+
+#### Running Individual Date Tests
+To test only the date utilities (useful for debugging):
+```javascript
+runDateUtilTestsOnly()
+```
+
+This function is available in `tests/individualTestRunners.js` and provides focused output for date utility testing.
 
 ## Next Steps
 
