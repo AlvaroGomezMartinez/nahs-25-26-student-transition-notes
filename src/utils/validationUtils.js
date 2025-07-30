@@ -257,3 +257,103 @@ function validateAndCleanStudentId(studentId) {
   
   return null;
 }
+
+/**
+ * Utility class for validation operations in the NAHS system.
+ * 
+ * This class wraps the standalone validation utility functions to provide
+ * a consistent object-oriented interface for validation operations.
+ * 
+ * @class ValidationUtils
+ * @memberof Utils
+ * 
+ * @example
+ * const validationUtils = new ValidationUtils();
+ * const result = validationUtils.validateStudentData(studentData, studentId);
+ * 
+ * @since 2.0.0
+ */
+class ValidationUtils {
+  
+  /**
+   * Creates a new ValidationUtils instance.
+   * @constructor
+   */
+  constructor() {
+    // No initialization needed - all methods are wrappers around standalone functions
+  }
+
+  /**
+   * Validates student data completeness and integrity.
+   * @param {Object} studentData - Student data object to validate
+   * @param {number} studentId - Student ID for logging
+   * @returns {Object} Validation result with details
+   */
+  validateStudentData(studentData, studentId) {
+    return validateStudentData(studentData, studentId);
+  }
+
+  /**
+   * Validates entry/withdrawal data structure.
+   * @param {Array} entryWithdrawalData - Entry/withdrawal data array
+   * @returns {Object} Validation result
+   */
+  validateEntryWithdrawalData(entryWithdrawalData) {
+    return validateEntryWithdrawalData(entryWithdrawalData);
+  }
+
+  /**
+   * Validates teacher input data.
+   * @param {Array} teacherInputData - Teacher input data array
+   * @returns {Object} Validation result
+   */
+  validateTeacherInputData(teacherInputData) {
+    return validateTeacherInputData(teacherInputData);
+  }
+
+  /**
+   * Validates required fields in an object.
+   * @param {Object} data - Data object to validate
+   * @param {Array<string>} requiredFields - Array of required field names
+   * @returns {Object} Validation result
+   */
+  validateRequiredFields(data, requiredFields) {
+    return validateRequiredFields(data, requiredFields);
+  }
+
+  /**
+   * Validates email format.
+   * @param {string} email - Email address to validate
+   * @returns {boolean} True if valid email format
+   */
+  validateEmail(email) {
+    return validateEmail(email);
+  }
+
+  /**
+   * Validates student ID format.
+   * @param {string|number} studentId - Student ID to validate
+   * @returns {boolean} True if valid student ID
+   */
+  validateStudentId(studentId) {
+    return validateStudentId(studentId);
+  }
+
+  /**
+   * Validates grade value.
+   * @param {string|number} grade - Grade to validate
+   * @returns {boolean} True if valid grade
+   */
+  validateGrade(grade) {
+    return validateGrade(grade);
+  }
+
+  /**
+   * Extracts student ID from text.
+   * @param {string} text - Text that may contain a student ID
+   * @returns {number|null} Extracted student ID or null
+   */
+  extractStudentIdFromText(text) {
+    return extractStudentIdFromText(text);
+  }
+}

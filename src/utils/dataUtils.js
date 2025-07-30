@@ -163,3 +163,85 @@ function removeEmptyValues(arr) {
   if (!Array.isArray(arr)) return [];
   return arr.filter(item => item !== null && item !== undefined && item !== '');
 }
+
+/**
+ * Utility class for data operations in the NAHS system.
+ * 
+ * This class wraps the standalone data utility functions to provide
+ * a consistent object-oriented interface for data operations.
+ * 
+ * @class DataUtils
+ * @memberof Utils
+ * 
+ * @example
+ * const dataUtils = new DataUtils();
+ * const studentId = dataUtils.extractStudentId("John Doe (123456)");
+ * 
+ * @since 2.0.0
+ */
+class DataUtils {
+  
+  /**
+   * Creates a new DataUtils instance.
+   * @constructor
+   */
+  constructor() {
+    // No initialization needed - all methods are wrappers around standalone functions
+  }
+
+  /**
+   * Safely extracts a student ID from various formats.
+   * @param {string|number} input - The input containing student ID
+   * @returns {number|null} The extracted student ID or null if not found
+   */
+  extractStudentId(input) {
+    return extractStudentId(input);
+  }
+
+  /**
+   * Sanitizes data by removing unwanted characters and normalizing format.
+   * @param {string} data - Data to sanitize
+   * @returns {string} Sanitized data
+   */
+  sanitizeData(data) {
+    return sanitizeData(data);
+  }
+
+  /**
+   * Normalizes a student name to consistent format.
+   * @param {string} name - Name to normalize
+   * @returns {string} Normalized name
+   */
+  normalizeStudentName(name) {
+    return normalizeStudentName(name);
+  }
+
+  /**
+   * Safely gets a nested property from an object.
+   * @param {Object} obj - Object to search
+   * @param {string} path - Dot notation path (e.g., 'user.profile.name')
+   * @param {*} defaultValue - Default value if path not found
+   * @returns {*} Value at path or default value
+   */
+  getNestedProperty(obj, path, defaultValue) {
+    return getNestedProperty(obj, path, defaultValue);
+  }
+
+  /**
+   * Creates a deep clone of an object.
+   * @param {*} obj - Object to clone
+   * @returns {*} Deep cloned object
+   */
+  deepClone(obj) {
+    return deepClone(obj);
+  }
+
+  /**
+   * Removes empty or null values from an array.
+   * @param {Array} arr - Array to clean
+   * @returns {Array} Cleaned array
+   */
+  removeEmptyValues(arr) {
+    return removeEmptyValues(arr);
+  }
+}

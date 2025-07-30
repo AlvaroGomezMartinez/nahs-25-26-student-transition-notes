@@ -271,3 +271,110 @@ function isValidDate(date) {
   const d = new Date(date);
   return !isNaN(d.getTime());
 }
+
+/**
+ * Utility class for date operations in the NAHS system.
+ * 
+ * This class wraps the standalone date utility functions to provide
+ * a consistent object-oriented interface for date operations.
+ * 
+ * @class DateUtils
+ * @memberof Utils
+ * 
+ * @example
+ * const dateUtils = new DateUtils();
+ * const formatted = dateUtils.formatToMMDDYYYY(new Date());
+ * 
+ * @since 2.0.0
+ */
+class DateUtils {
+  
+  /**
+   * Creates a new DateUtils instance.
+   * @constructor
+   */
+  constructor() {
+    // No initialization needed - all methods are wrappers around standalone functions
+  }
+
+  /**
+   * Formats a date to MM/DD/YYYY format.
+   * @param {Date|string|number} date - The date to format
+   * @returns {string|null} Formatted date string or null if invalid
+   */
+  formatToMMDDYYYY(date) {
+    return formatDateToMMDDYYYY(date);
+  }
+
+  /**
+   * Determines if a given date falls on a weekend.
+   * @param {Date} date - The date to check
+   * @returns {boolean} True if weekend, false otherwise
+   */
+  isWeekend(date) {
+    return isWeekend(date);
+  }
+
+  /**
+   * Determines if a given date is a holiday.
+   * @param {Date} date - The date to check
+   * @param {Array<string>} holidays - Array of holiday date strings in YYYY-MM-DD format
+   * @returns {boolean} True if holiday, false otherwise
+   */
+  isHoliday(date, holidays) {
+    return isHoliday(date, holidays);
+  }
+
+  /**
+   * Adds work days to a date, excluding weekends and holidays.
+   * @param {Date} startDate - The starting date
+   * @param {number} numWorkdays - Number of work days to add
+   * @param {Array<string>} holidays - Array of holiday date strings
+   * @returns {Date} The calculated end date
+   */
+  addWorkdays(startDate, numWorkdays, holidays) {
+    return addWorkdays(startDate, numWorkdays, holidays);
+  }
+
+  /**
+   * Validates if a date is valid.
+   * @param {Date|string} date - The date to validate
+   * @returns {boolean} True if valid, false otherwise
+   */
+  isValidDate(date) {
+    return isValidDate(date);
+  }
+
+  /**
+   * Calculates the projected exit date based on placement days.
+   * @param {Date} startDate - The start date
+   * @param {number} placementDays - Number of placement days
+   * @param {Array<string>} holidays - Array of holiday date strings
+   * @returns {Date} The projected exit date
+   */
+  calculateProjectedExit(startDate, placementDays, holidays) {
+    return calculateProjectedExit(startDate, placementDays, holidays);
+  }
+
+  /**
+   * Calculates days remaining in placement.
+   * @param {Date} startDate - The start date
+   * @param {number} placementDays - Total placement days
+   * @param {Array<string>} holidays - Array of holiday date strings
+   * @returns {number} Days remaining
+   */
+  calculateDaysLeft(startDate, placementDays, holidays) {
+    return calculateDaysLeft(startDate, placementDays, holidays);
+  }
+
+  /**
+   * Calculates business days between two dates.
+   * @param {Date} startDate - Start date
+   * @param {Date} endDate - End date
+   * @param {Array<string>} holidays - Array of holiday date strings
+   * @returns {number} Number of business days
+   */
+  calculateBusinessDays(startDate, endDate, holidays) {
+    return calculateBusinessDays(startDate, endDate, holidays);
+  }
+}

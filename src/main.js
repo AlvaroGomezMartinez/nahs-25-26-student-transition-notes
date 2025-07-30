@@ -14,8 +14,7 @@
  * Main entry point for the NAHS Student Transition Notes system.
  * 
  * This function serves as the primary orchestrator for the complete data processing
- * workflow. It replaces the original 701-line monolithic function with a clean,
- * modular architecture that separates concerns into data loaders, processors, and writers.
+ * workflow. It uses a clean, modular architecture that separates concerns into data loaders, processors, and writers.
  * 
  * The process follows these phases:
  * 1. **Data Loading**: Uses specialized loaders to extract data from multiple Google Sheets
@@ -61,22 +60,53 @@ function loadTENTATIVEVersion2() {
     console.log('=== Starting NAHS Student Transition Notes Process ===');
     const startTime = new Date();
 
+    // Phase 0: Validate system configuration
+    console.log('Phase 0: Validating system configuration...');
+    const configValidation = validateSystemConfiguration();
+    
+    if (!configValidation.isValid) {
+      console.error('❌ System configuration is invalid. Cannot proceed.');
+      console.error('Critical errors:');
+      configValidation.errors.forEach(error => console.error(`  - ${error}`));
+      
+      if (configValidation.suggestions.length > 0) {
+        console.info('💡 Suggestions to fix issues:');
+        configValidation.suggestions.forEach(suggestion => console.info(`  - ${suggestion}`));
+      }
+      
+      return {
+        studentsProcessed: 0,
+        rowsWritten: 0,
+        hasErrors: true,
+        errors: configValidation.errors,
+        suggestions: configValidation.suggestions
+      };
+    }
+    
+    if (configValidation.warnings.length > 0) {
+      console.warn('⚠️ Configuration warnings detected (proceeding anyway):');
+      configValidation.warnings.forEach(warning => console.warn(`  - ${warning}`));
+    }
+
     // Phase 1: Load all student data using the new data loaders
     console.log('Phase 1: Loading student data...');
-    const activeStudentDataMap = loadAllStudentDataWithLoaders();
+    const rawData = loadAllStudentDataWithLoaders();
     
-    if (!activeStudentDataMap || activeStudentDataMap.size === 0) {
+    if (!rawData || Object.keys(rawData).length === 0) {
       console.warn('No student data loaded. Exiting process.');
       return;
     }
 
-    console.log(`Successfully loaded data for ${activeStudentDataMap.size} students`);
-
     // Phase 2: Process the data using the new data processors
     console.log('Phase 2: Processing student data...');
+    const activeStudentDataMap = processAllStudentData(rawData);
     
-    // The data processors are now integrated into the writers
-    // This maintains the same data flow but with better organization
+    if (!activeStudentDataMap || activeStudentDataMap.size === 0) {
+      console.warn('No active students after processing. Exiting process.');
+      return;
+    }
+
+    console.log(`Successfully processed data for ${activeStudentDataMap.size} students`);
     
     // Phase 3: Write processed data to sheets using the new writers
     console.log('Phase 3: Writing data to TENTATIVE-Version2 sheet...');
@@ -407,6 +437,207 @@ function preserveExistingRowColors() {
   }
   
   return studentColors;
+}
+
+/**
+ * Runs system diagnostics and configuration validation.
+ * Use this function to check system health before running the main process.
+ * 
+ * @function runSystemDiagnostics
+ * @memberof Main
+ * 
+ * @returns {Object} Comprehensive diagnostic results
+ * 
+ * @example
+ * // Run diagnostics to check system health
+ * const diagnostics = runSystemDiagnostics();
+ * console.log(diagnostics.configurationReport);
+ * 
+ * @since 2.0.0
+ */
+function runSystemDiagnostics() {
+  try {
+    console.log('=== Running NAHS System Diagnostics ===');
+    
+    // Check system initialization
+    let systemInitialized = false;
+    try {
+      if (typeof initializeNAHSSystem === 'function') {
+        initializeNAHSSystem();
+        systemInitialized = true;
+        console.log('✅ System initialization: SUCCESS');
+      } else {
+        console.error('❌ System initialization: FAILED - initializeNAHSSystem not found');
+      }
+    } catch (error) {
+      console.error('❌ System initialization: ERROR -', error.message);
+    }
+
+    // Validate configuration
+    const configValidation = validateSystemConfiguration();
+    
+    // Generate comprehensive report
+    const configReport = generateConfigurationReport();
+    
+    // Check dependencies
+    const dependencies = {
+      DateUtils: typeof DateUtils !== 'undefined',
+      ValidationUtils: typeof ValidationUtils !== 'undefined',
+      DataUtils: typeof DataUtils !== 'undefined',
+      BaseDataLoader: typeof BaseDataLoader !== 'undefined',
+      BaseDataProcessor: typeof BaseDataProcessor !== 'undefined',
+      SHEET_NAMES: typeof SHEET_NAMES !== 'undefined',
+      COLUMN_NAMES: typeof COLUMN_NAMES !== 'undefined'
+    };
+
+    let allDependenciesAvailable = true;
+    console.log('\n=== Dependency Check ===');
+    Object.entries(dependencies).forEach(([name, available]) => {
+      if (available) {
+        console.log(`✅ ${name}: Available`);
+      } else {
+        console.error(`❌ ${name}: Missing`);
+        allDependenciesAvailable = false;
+      }
+    });
+
+    const diagnosticResult = {
+      systemInitialized,
+      configurationValid: configValidation.isValid,
+      allDependenciesAvailable,
+      configurationReport: configReport,
+      configValidation,
+      dependencies,
+      overallHealth: systemInitialized && configValidation.isValid && allDependenciesAvailable
+    };
+
+    console.log('\n=== Diagnostic Summary ===');
+    console.log(`Overall System Health: ${diagnosticResult.overallHealth ? '✅ HEALTHY' : '❌ UNHEALTHY'}`);
+    console.log(`System Initialized: ${systemInitialized ? '✅' : '❌'}`);
+    console.log(`Configuration Valid: ${configValidation.isValid ? '✅' : '❌'}`);
+    console.log(`Dependencies Available: ${allDependenciesAvailable ? '✅' : '❌'}`);
+
+    if (!diagnosticResult.overallHealth) {
+      console.error('\n❌ System is not ready for operation. Please address the issues above.');
+    } else {
+      console.log('\n🎉 System is ready for operation!');
+    }
+
+    return diagnosticResult;
+
+  } catch (error) {
+    console.error('Error running system diagnostics:', error);
+    return {
+      systemInitialized: false,
+      configurationValid: false,
+      allDependenciesAvailable: false,
+      configurationReport: `Error: ${error.message}`,
+      overallHealth: false,
+      error: error.message
+    };
+  }
+}
+
+/**
+ * Diagnostic function to check actual sheet names and column headers.
+ * Use this to identify sheet and column name mismatches.
+ * 
+ * @function diagnoseSpreadsheetStructure
+ * @memberof Main
+ * 
+ * @returns {Object} Structure information about the spreadsheet
+ * 
+ * @example
+ * // Run this to see actual sheet and column names
+ * const structure = diagnoseSpreadsheetStructure();
+ * console.log(structure);
+ * 
+ * @since 2.0.0
+ */
+function diagnoseSpreadsheetStructure() {
+  try {
+    console.log('=== Diagnosing Spreadsheet Structure ===');
+    
+    const spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
+    const sheets = spreadsheet.getSheets();
+    const structure = {
+      spreadsheetName: spreadsheet.getName(),
+      sheetCount: sheets.length,
+      sheets: {},
+      expectedSheets: SHEET_NAMES,
+      missingSheets: [],
+      unexpectedSheets: []
+    };
+    
+    // Get actual sheet names and their columns
+    sheets.forEach(sheet => {
+      const sheetName = sheet.getName();
+      const lastRow = sheet.getLastRow();
+      const lastCol = sheet.getLastColumn();
+      
+      let headers = [];
+      if (lastRow > 0 && lastCol > 0) {
+        try {
+          headers = sheet.getRange(1, 1, 1, lastCol).getValues()[0];
+        } catch (e) {
+          headers = [`Error reading headers: ${e.message}`];
+        }
+      }
+      
+      structure.sheets[sheetName] = {
+        rowCount: lastRow,
+        colCount: lastCol,
+        headers: headers,
+        hasStudentIdColumn: headers.includes(COLUMN_NAMES.STUDENT_ID)
+      };
+    });
+    
+    // Check for expected sheets
+    Object.values(SHEET_NAMES).forEach(expectedSheetName => {
+      if (!structure.sheets[expectedSheetName]) {
+        structure.missingSheets.push(expectedSheetName);
+      }
+    });
+    
+    // Check for unexpected sheets
+    Object.keys(structure.sheets).forEach(actualSheetName => {
+      if (!Object.values(SHEET_NAMES).includes(actualSheetName)) {
+        structure.unexpectedSheets.push(actualSheetName);
+      }
+    });
+    
+    // Log findings
+    console.log(`Spreadsheet: ${structure.spreadsheetName}`);
+    console.log(`Total sheets: ${structure.sheetCount}`);
+    
+    if (structure.missingSheets.length > 0) {
+      console.warn(`Missing expected sheets: ${structure.missingSheets.join(', ')}`);
+    }
+    
+    if (structure.unexpectedSheets.length > 0) {
+      console.info(`Additional sheets found: ${structure.unexpectedSheets.join(', ')}`);
+    }
+    
+    // Check each expected sheet
+    Object.entries(SHEET_NAMES).forEach(([key, sheetName]) => {
+      const sheetInfo = structure.sheets[sheetName];
+      if (sheetInfo) {
+        console.log(`✅ ${key}: "${sheetName}" - ${sheetInfo.rowCount} rows, ${sheetInfo.colCount} cols`);
+        if (!sheetInfo.hasStudentIdColumn) {
+          console.warn(`   ⚠️ Missing '${COLUMN_NAMES.STUDENT_ID}' column`);
+          console.info(`   Available columns: ${sheetInfo.headers.join(', ')}`);
+        }
+      } else {
+        console.error(`❌ ${key}: "${sheetName}" - NOT FOUND`);
+      }
+    });
+    
+    return structure;
+    
+  } catch (error) {
+    console.error('Error diagnosing spreadsheet structure:', error);
+    throw error;
+  }
 }
 
 /**
