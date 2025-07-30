@@ -53,15 +53,15 @@
 const SHEET_NAMES = {
   TENTATIVE_V2: 'TENTATIVE-Version2',
   TENTATIVE: 'TENTATIVE',
-  REGISTRATIONS: 'Registrations SY 24.25',
+  REGISTRATIONS: 'Form Responses 1', // Updated to match actual sheet name
   SCHEDULES: 'Schedules',
   FORM_RESPONSES_1: 'Form Responses 1',
   CONTACT_INFO: 'ContactInfo',
   ENTRY_WITHDRAWAL: 'Entry_Withdrawal',
   WITHDRAWN: 'Withdrawn',
   WD_OTHER: 'W/D Other',
-  ATTENDANCE: 'Alt HS Attendance & Enrollment Count',
-  TRACKING_SHEET: 'Sheet1'
+  ATTENDANCE: 'Alt_HS_Attendance_Enrollment_Count', // Updated to match actual sheet name (with underscores)
+  TRACKING_SHEET: 'NAHS Students' // Updated to match actual sheet name
 };
 
 /**
@@ -528,4 +528,131 @@ function validateExternalAccess() {
   }
   
   return results;
+}
+
+/**
+ * Simple test function to validate external sheet access
+ * 
+ * This function tests the basic functionality of accessing external spreadsheets
+ * and provides immediate feedback.
+ * 
+ * @function testExternalSheets
+ * @since 2.0.0
+ */
+function testExternalSheets() {
+  console.log('=== Testing External Sheet Access ===');
+  console.log('');
+  
+  // Test registrations
+  console.log('Testing Registrations spreadsheet...');
+  console.log('Spreadsheet ID:', EXTERNAL_SPREADSHEETS.REGISTRATIONS_SOURCE);
+  console.log('Looking for sheet:', SHEET_NAMES.REGISTRATIONS);
+  
+  try {
+    const regSpreadsheet = SpreadsheetApp.openById(EXTERNAL_SPREADSHEETS.REGISTRATIONS_SOURCE);
+    console.log('✅ Successfully opened registrations spreadsheet');
+    
+    const sheets = regSpreadsheet.getSheets().map(s => s.getName());
+    console.log('Available sheets:', sheets.join(', '));
+    
+    const targetSheet = regSpreadsheet.getSheetByName(SHEET_NAMES.REGISTRATIONS);
+    if (targetSheet) {
+      console.log('✅ Found target sheet:', SHEET_NAMES.REGISTRATIONS);
+    } else {
+      console.log('❌ Target sheet not found:', SHEET_NAMES.REGISTRATIONS);
+    }
+  } catch (error) {
+    console.log('❌ Error accessing registrations spreadsheet:', error.message);
+  }
+  
+  console.log('');
+  console.log('Testing Attendance spreadsheet...');
+  console.log('Spreadsheet ID:', EXTERNAL_SPREADSHEETS.ATTENDANCE_SOURCE);
+  console.log('Looking for sheet:', SHEET_NAMES.ATTENDANCE);
+  
+  try {
+    const attSpreadsheet = SpreadsheetApp.openById(EXTERNAL_SPREADSHEETS.ATTENDANCE_SOURCE);
+    console.log('✅ Successfully opened attendance spreadsheet');
+    
+    const sheets = attSpreadsheet.getSheets().map(s => s.getName());
+    console.log('Available sheets:', sheets.join(', '));
+    
+    const targetSheet = attSpreadsheet.getSheetByName(SHEET_NAMES.ATTENDANCE);
+    if (targetSheet) {
+      console.log('✅ Found target sheet:', SHEET_NAMES.ATTENDANCE);
+    } else {
+      console.log('❌ Target sheet not found:', SHEET_NAMES.ATTENDANCE);
+    }
+  } catch (error) {
+    console.log('❌ Error accessing attendance spreadsheet:', error.message);
+  }
+  
+  console.log('');
+  console.log('Testing Tracking spreadsheet...');
+  console.log('Spreadsheet ID:', EXTERNAL_SPREADSHEETS.TRACKING_SOURCE);
+  console.log('Looking for sheet:', SHEET_NAMES.TRACKING_SHEET);
+  
+  try {
+    const trackSpreadsheet = SpreadsheetApp.openById(EXTERNAL_SPREADSHEETS.TRACKING_SOURCE);
+    console.log('✅ Successfully opened tracking spreadsheet');
+    
+    const sheets = trackSpreadsheet.getSheets().map(s => s.getName());
+    console.log('Available sheets:', sheets.join(', '));
+    
+    const targetSheet = trackSpreadsheet.getSheetByName(SHEET_NAMES.TRACKING_SHEET);
+    if (targetSheet) {
+      console.log('✅ Found target sheet:', SHEET_NAMES.TRACKING_SHEET);
+    } else {
+      console.log('❌ Target sheet not found:', SHEET_NAMES.TRACKING_SHEET);
+    }
+  } catch (error) {
+    console.log('❌ Error accessing tracking spreadsheet:', error.message);
+  }
+  
+  console.log('');
+  console.log('=== Test Complete ===');
+}
+
+/**
+ * Quick validation after fixing sheet names
+ * 
+ * @function quickTest
+ * @since 2.0.0
+ */
+function quickTest() {
+  console.log('=== Quick Validation Test ===');
+  console.log('');
+  
+  console.log('Testing updated sheet names...');
+  console.log('');
+  
+  // Test registrations
+  try {
+    const regSpreadsheet = SpreadsheetApp.openById(EXTERNAL_SPREADSHEETS.REGISTRATIONS_SOURCE);
+    const regSheet = regSpreadsheet.getSheetByName(SHEET_NAMES.REGISTRATIONS);
+    console.log('✅ Registrations:', regSheet ? 'FOUND' : 'NOT FOUND');
+  } catch (error) {
+    console.log('❌ Registrations: ERROR -', error.message);
+  }
+  
+  // Test attendance  
+  try {
+    const attSpreadsheet = SpreadsheetApp.openById(EXTERNAL_SPREADSHEETS.ATTENDANCE_SOURCE);
+    const attSheet = attSpreadsheet.getSheetByName(SHEET_NAMES.ATTENDANCE);
+    console.log('✅ Attendance:', attSheet ? 'FOUND' : 'NOT FOUND');
+  } catch (error) {
+    console.log('❌ Attendance: ERROR -', error.message);
+  }
+  
+  // Test tracking
+  try {
+    const trackSpreadsheet = SpreadsheetApp.openById(EXTERNAL_SPREADSHEETS.TRACKING_SOURCE);
+    const trackSheet = trackSpreadsheet.getSheetByName(SHEET_NAMES.TRACKING_SHEET);
+    console.log('✅ Tracking:', trackSheet ? 'FOUND' : 'NOT FOUND');
+  } catch (error) {
+    console.log('❌ Tracking: ERROR -', error.message);
+  }
+  
+  console.log('');
+  console.log('=== Quick Test Complete ===');
 }
