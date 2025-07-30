@@ -57,10 +57,10 @@ function test_DateUtils() {
     });
 
     QUnit.test("isHoliday should identify holidays correctly", function(assert) {
-      // Test with a sample holiday list
+      // Test with a sample holiday list (strings in YYYY-MM-DD format)
       const holidays = [
-        new Date(2024, 11, 25), // Christmas Day 2024
-        new Date(2024, 0, 1),   // New Year's Day 2024
+        "2024-12-25", // Christmas Day 2024
+        "2024-01-01",   // New Year's Day 2024
       ];
 
       // Test Christmas Day

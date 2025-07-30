@@ -145,6 +145,9 @@ function isWeekend(date) {
  * @since 2.0.0
  */
 function isHoliday(date, holidays) {
+  if (!holidays || !Array.isArray(holidays)) {
+    return false;
+  }
   const formattedDate = formatDateForHolidays(date);
   return holidays.includes(formattedDate);
 }
