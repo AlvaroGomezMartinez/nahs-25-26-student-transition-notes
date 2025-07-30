@@ -69,23 +69,27 @@ class BaseDataLoader {
    * @param {boolean} [allowMultipleRecords=false] - Whether to allow multiple 
    *   records per key. When true, values in the Map will be arrays of records.
    *   When false, only the last record for each key is kept.
+   * @param {string} [externalSpreadsheetId=null] - Optional external spreadsheet ID.
+   *   If provided, the loader will access the sheet from this external spreadsheet
+   *   instead of the current active spreadsheet.
    * 
    * @throws {TypeError} Throws if sheetName or keyColumn are not strings
    * 
    * @example
-   * // Single record per student
+   * // Single record per student from current spreadsheet
    * const loader = new BaseDataLoader('Students', 'STUDENT ID', false);
    * 
    * @example
-   * // Multiple records per student (e.g., courses)
-   * const courseLoader = new BaseDataLoader('Courses', 'STUDENT ID', true);
+   * // Multiple records per student from external spreadsheet (e.g., courses)
+   * const courseLoader = new BaseDataLoader('Courses', 'STUDENT ID', true, 'external_sheet_id');
    * 
    * @since 2.0.0
    */
-  constructor(sheetName, keyColumn, allowMultipleRecords = false) {
+  constructor(sheetName, keyColumn, allowMultipleRecords = false, externalSpreadsheetId = null) {
     this.sheetName = sheetName;
     this.keyColumn = keyColumn;
     this.allowMultipleRecords = allowMultipleRecords;
+    this.externalSpreadsheetId = externalSpreadsheetId;
   }
 
   /**
@@ -139,9 +143,15 @@ class BaseDataLoader {
    */
   loadData() {
     try {
-      const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(this.sheetName);
+      // Determine which spreadsheet to use
+      const spreadsheet = this.externalSpreadsheetId 
+        ? SpreadsheetApp.openById(this.externalSpreadsheetId)
+        : SpreadsheetApp.getActiveSpreadsheet();
+        
+      const sheet = spreadsheet.getSheetByName(this.sheetName);
       if (!sheet) {
-        console.error(`Sheet '${this.sheetName}' not found`);
+        const location = this.externalSpreadsheetId ? 'external spreadsheet' : 'current spreadsheet';
+        console.error(`Sheet '${this.sheetName}' not found in ${location}`);
         return new Map();
       }
 
@@ -161,7 +171,8 @@ class BaseDataLoader {
 
       return this.processRows(data, headers, keyColumnIndex);
     } catch (error) {
-      console.error(`Error loading data from sheet '${this.sheetName}':`, error);
+      const location = this.externalSpreadsheetId ? 'external spreadsheet' : 'current spreadsheet';
+      console.error(`Error loading data from sheet '${this.sheetName}' in ${location}:`, error);
       return new Map();
     }
   }

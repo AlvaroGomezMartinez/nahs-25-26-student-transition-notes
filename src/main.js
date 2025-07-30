@@ -519,6 +519,22 @@ function runSystemDiagnostics() {
 
     if (!diagnosticResult.overallHealth) {
       console.error('\n❌ System is not ready for operation. Please address the issues above.');
+      
+      // Check if the main issue is external configuration
+      const hasExternalSheetErrors = configValidation.errors.some(error => 
+        error.includes('Registrations SY 24.25') || 
+        error.includes('Alt HS Attendance & Enrollment Count') || 
+        error.includes('Sheet1')
+      );
+      
+      if (hasExternalSheetErrors) {
+        console.log('\n📋 External Configuration Needed:');
+        console.log('The missing sheets are located in external spreadsheets.');
+        console.log('Run these functions to configure external access:');
+        console.log('1. setupExternalConfiguration() - Get configuration instructions');
+        console.log('2. validateExternalAccess() - Test external connections');
+        console.log('3. checkExternalConfiguration() - View current status');
+      }
     } else {
       console.log('\n🎉 System is ready for operation!');
     }

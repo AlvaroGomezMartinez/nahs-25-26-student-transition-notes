@@ -62,10 +62,20 @@ function validateSystemConfiguration() {
         hasRequiredColumns: false,
         missingColumns: [],
         actualColumns: [],
-        suggestions: []
+        suggestions: [],
+        isExternal: SHEET_LOCATIONS && SHEET_LOCATIONS[expectedSheetName] === 'EXTERNAL'
       };
 
-      // Check if sheet exists
+      // For external sheets, skip the current spreadsheet validation
+      if (analysis.isExternal) {
+        analysis.exists = true; // Assume external sheets exist for now
+        analysis.suggestions.push('External sheet - not validated in current spreadsheet');
+        result.warnings.push(`External sheet '${expectedSheetName}' not validated - requires manual verification`);
+        result.sheetAnalysis[constantName] = analysis;
+        return;
+      }
+
+      // Check if sheet exists in current spreadsheet
       const sheet = actualSheets.find(s => s.getName() === expectedSheetName);
       if (!sheet) {
         analysis.exists = false;

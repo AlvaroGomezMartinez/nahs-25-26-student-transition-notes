@@ -227,6 +227,9 @@ const DEFAULT_VALUES = {
  * @enum {string}
  * 
  * @property {string} SCHEDULES_SOURCE - Google Spreadsheet ID for external schedules data
+ * @property {string} REGISTRATIONS_SOURCE - Google Spreadsheet ID for external registrations data
+ * @property {string} ATTENDANCE_SOURCE - Google Spreadsheet ID for external attendance data
+ * @property {string} TRACKING_SOURCE - Google Spreadsheet ID for external tracking data
  * 
  * @example
  * // Access external spreadsheet
@@ -244,7 +247,37 @@ const DEFAULT_VALUES = {
  * @since 2.0.0
  */
 const EXTERNAL_SPREADSHEETS = {
-  SCHEDULES_SOURCE: '14-nvlNOLWebnJJOQNZPnglWx0OuE5U-_xEbXGodND6E'
+  SCHEDULES_SOURCE: "14-nvlNOLWebnJJOQNZPnglWx0OuE5U-_xEbXGodND6E",
+  REGISTRATIONS_SOURCE: "1kAWRpWO4xDtRShLB5YtTtWxTbVg800fuU2RvAlYhrfA", // "Form Responses 1"
+  ATTENDANCE_SOURCE: "1uCQ_Z4QLbHq89tutZ4Wen0TREwS8qEx2j7MmzUgXOaY", // "Alt_HS_Attendance_Enrollment_Count"
+  TRACKING_SOURCE: "1giJmMGPcDsmp4IOnV4hlGTgXbxQwv2SxM9DuzNehh90", // "NAHS Students"
+};
+
+/**
+ * Configuration mapping for which sheets are external vs local.
+ * This helps the system know where to look for each sheet.
+ * 
+ * @namespace SHEET_LOCATIONS
+ * @readonly
+ * @enum {string}
+ * 
+ * @property {string} LOCAL - Sheet is in the current spreadsheet
+ * @property {string} EXTERNAL - Sheet is in an external spreadsheet
+ * 
+ * @since 2.0.0
+ */
+const SHEET_LOCATIONS = {
+  [SHEET_NAMES.TENTATIVE_V2]: 'LOCAL',
+  [SHEET_NAMES.TENTATIVE]: 'LOCAL', 
+  [SHEET_NAMES.REGISTRATIONS]: 'EXTERNAL',
+  [SHEET_NAMES.SCHEDULES]: 'LOCAL', // Imported via importAPIData
+  [SHEET_NAMES.FORM_RESPONSES_1]: 'LOCAL',
+  [SHEET_NAMES.CONTACT_INFO]: 'LOCAL', // Imported via importAPIData  
+  [SHEET_NAMES.ENTRY_WITHDRAWAL]: 'LOCAL', // Imported via importAPIData
+  [SHEET_NAMES.WITHDRAWN]: 'LOCAL',
+  [SHEET_NAMES.WD_OTHER]: 'LOCAL',
+  [SHEET_NAMES.ATTENDANCE]: 'EXTERNAL',
+  [SHEET_NAMES.TRACKING_SHEET]: 'EXTERNAL'
 };
 
 /**

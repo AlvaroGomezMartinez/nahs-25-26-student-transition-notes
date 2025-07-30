@@ -2,25 +2,27 @@
  * Registration Data Loader
  * 
  * Loads data from the Registrations SY 24.25 sheet and converts it to a Map
- * for easier processing.
+ * for easier processing. This sheet is located in an external spreadsheet.
  */
 
-class RegistrationDataLoader extends BaseDataLoader {
+class RegistrationDataLoader extends ExternalDataLoader {
   constructor() {
     super(SHEET_NAMES.REGISTRATIONS, COLUMN_NAMES.STUDENT_ID, false);
   }
 
   /**
-   * Loads registration data from the Registrations sheet
+   * Loads registration data from the external Registrations sheet
    * This replaces the original loadRegistrationsData function
    * @returns {Map} Map where keys are student IDs and values are registration data
    */
   loadData() {
     try {
-      console.log('Loading registration data...');
+      console.log('Loading registration data from external spreadsheet...');
       return super.loadData();
     } catch (error) {
       console.error('Error loading registration data:', error);
+      console.error('Note: Registration data is expected to be in an external spreadsheet');
+      console.error('Please verify the EXTERNAL_SPREADSHEETS.REGISTRATIONS_SOURCE configuration');
       return new Map();
     }
   }
