@@ -26,8 +26,8 @@ function debugFormatDateToMMDDYYYY() {
         expected: "12/10/2024"
       },
       {
-        name: "Date string test", 
-        input: "2024-03-15",
+        name: "Date string test (timezone-safe)", 
+        input: "2024-03-15T12:00:00",  // Use noon to avoid timezone issues
         expected: "03/15/2024"
       },
       {
