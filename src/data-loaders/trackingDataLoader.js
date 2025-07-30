@@ -5,9 +5,11 @@
  * for easier processing. This sheet is located in an external spreadsheet.
  */
 
-class TrackingDataLoader extends ExternalDataLoader {
+class TrackingDataLoader extends BaseDataLoader {
   constructor() {
-    super(SHEET_NAMES.TRACKING_SHEET, COLUMN_NAMES.STUDENT_ID, false);
+    // Use external spreadsheet ID for tracking data
+    const externalSpreadsheetId = EXTERNAL_SPREADSHEETS.TRACKING_SOURCE;
+    super(SHEET_NAMES.TRACKING_SHEET, COLUMN_NAMES.STUDENT_ID, false, externalSpreadsheetId);
   }
 
   /**
@@ -17,6 +19,7 @@ class TrackingDataLoader extends ExternalDataLoader {
   loadData() {
     try {
       console.log('Loading tracking data from external spreadsheet...');
+      console.log('External spreadsheet ID:', EXTERNAL_SPREADSHEETS.TRACKING_SOURCE);
       return super.loadData();
     } catch (error) {
       console.error('Error loading tracking data:', error);

@@ -4,9 +4,11 @@
  * Loads attendance and enrollment data for students from external spreadsheet
  */
 
-class AttendanceDataLoader extends ExternalDataLoader {
+class AttendanceDataLoader extends BaseDataLoader {
   constructor() {
-    super(SHEET_NAMES.ATTENDANCE, COLUMN_NAMES.STUDENT_ID, false);
+    // Use external spreadsheet ID for attendance data
+    const externalSpreadsheetId = EXTERNAL_SPREADSHEETS.ATTENDANCE_SOURCE;
+    super(SHEET_NAMES.ATTENDANCE, COLUMN_NAMES.STUDENT_ID, false, externalSpreadsheetId);
   }
 
   /**
@@ -17,6 +19,7 @@ class AttendanceDataLoader extends ExternalDataLoader {
   loadData() {
     try {
       console.log('Loading student attendance data from external spreadsheet...');
+      console.log('External spreadsheet ID:', EXTERNAL_SPREADSHEETS.ATTENDANCE_SOURCE);
       return super.loadData();
     } catch (error) {
       console.error('Error loading student attendance data:', error);

@@ -5,9 +5,11 @@
  * for easier processing. This sheet is located in an external spreadsheet.
  */
 
-class RegistrationDataLoader extends ExternalDataLoader {
+class RegistrationDataLoader extends BaseDataLoader {
   constructor() {
-    super(SHEET_NAMES.REGISTRATIONS, COLUMN_NAMES.STUDENT_ID, false);
+    // Use external spreadsheet ID for registration data
+    const externalSpreadsheetId = EXTERNAL_SPREADSHEETS.REGISTRATIONS_SOURCE;
+    super(SHEET_NAMES.REGISTRATIONS, COLUMN_NAMES.STUDENT_ID, false, externalSpreadsheetId);
   }
 
   /**
@@ -18,6 +20,7 @@ class RegistrationDataLoader extends ExternalDataLoader {
   loadData() {
     try {
       console.log('Loading registration data from external spreadsheet...');
+      console.log('External spreadsheet ID:', EXTERNAL_SPREADSHEETS.REGISTRATIONS_SOURCE);
       return super.loadData();
     } catch (error) {
       console.error('Error loading registration data:', error);
