@@ -4,7 +4,7 @@
  */
 class TentativeSheetWriter extends BaseSheetWriter {
   constructor() {
-    super(SHEET_NAMES.TENTATIVE_VERSION2);
+    super(SHEET_NAMES.TENTATIVE_V2);
     this.rowBuilder = new TentativeRowBuilder();
     this.studentDataMerger = new StudentDataMerger();
     this.teacherInputProcessor = new TeacherInputProcessor();
