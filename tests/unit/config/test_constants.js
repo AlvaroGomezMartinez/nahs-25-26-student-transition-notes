@@ -22,18 +22,18 @@ function test_Constants() {
       assert.ok(typeof SHEET_NAMES === 'object', "SHEET_NAMES should be an object");
       assert.notEqual(SHEET_NAMES, null, "SHEET_NAMES should not be null");
       
-      // Test required sheet names
+      // Test required sheet names (using actual property names from your constants)
       const requiredSheets = [
-        'TENTATIVE_VERSION2',
+        'TENTATIVE_V2',           // Your actual property name
         'TENTATIVE',
-        'REGISTRATIONS_SY_24_25',
+        'REGISTRATIONS',          // Your actual property name (not REGISTRATIONS_SY_24_25)
         'SCHEDULES',
         'CONTACT_INFO',
         'ENTRY_WITHDRAWAL',
         'FORM_RESPONSES_1',
         'WITHDRAWN',
         'WD_OTHER',
-        'ALT_HS_ATTENDANCE_ENROLLMENT_COUNT'
+        'ATTENDANCE'              // Your actual property name (not ALT_HS_ATTENDANCE_ENROLLMENT_COUNT)
       ];
       
       requiredSheets.forEach(sheetName => {
@@ -52,16 +52,16 @@ function test_Constants() {
       assert.ok(typeof COLUMN_NAMES === 'object', "COLUMN_NAMES should be an object");
       assert.notEqual(COLUMN_NAMES, null, "COLUMN_NAMES should not be null");
       
-      // Test some key column names
+      // Test some key column names (using actual property names from your constants)
       const requiredColumns = [
         'STUDENT_ID',
-        'STUDENT_NAME',
-        'FIRST_NAME',
-        'LAST_NAME',
+        'STUDENT_FIRST_NAME',     // Your actual property name (not STUDENT_NAME)
+        'STUDENT_LAST_NAME',      // Your actual property name (not LAST_NAME)
+        'STUDENT_NAME_FULL',      // Your actual property name
         'GRADE',
         'ENTRY_DATE',
-        'TEACHER_NAME',
-        'COURSE_TITLE'
+        'TEACHER_NAME'
+        // Note: Removed COURSE_TITLE as it's not in your constants
       ];
       
       requiredColumns.forEach(columnName => {
@@ -96,12 +96,11 @@ function test_Constants() {
     QUnit.test("DEFAULT_VALUES constant should be properly defined", function(assert) {
       assert.ok(typeof DEFAULT_VALUES === 'object', "DEFAULT_VALUES should be an object");
       
-      // Test some expected default values
+      // Test some expected default values (using actual property names from your constants)
       const expectedDefaults = [
         'EMPTY_STRING',
-        'EMPTY_ARRAY',
-        'DEFAULT_GRADE',
-        'DEFAULT_DATE'
+        'UNKNOWN_TEACHER',               // Your actual property name (not EMPTY_ARRAY)
+        'MISSING_DATA_PLACEHOLDER'       // Your actual property name (not DEFAULT_GRADE or DEFAULT_DATE)
       ];
       
       expectedDefaults.forEach(defaultName => {
