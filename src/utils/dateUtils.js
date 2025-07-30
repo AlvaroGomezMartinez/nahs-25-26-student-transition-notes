@@ -59,6 +59,7 @@
  * @since 2.0.0
  */
 function formatDateToMMDDYYYY(date) {
+  if (date === null || date === undefined) return null;
   const d = new Date(date);
   if (isNaN(d.getTime())) return null; // Check for invalid date
   const year = d.getFullYear();
