@@ -53,15 +53,15 @@
 const SHEET_NAMES = {
   TENTATIVE_V2: 'TENTATIVE-Version2',
   TENTATIVE: 'TENTATIVE',
-  REGISTRATIONS: 'Form Responses 1', // Updated to match actual sheet name
+  REGISTRATIONS: 'Form Responses 1',
   SCHEDULES: 'Schedules',
   FORM_RESPONSES_1: 'Form Responses 1',
   CONTACT_INFO: 'ContactInfo',
   ENTRY_WITHDRAWAL: 'Entry_Withdrawal',
   WITHDRAWN: 'Withdrawn',
   WD_OTHER: 'W/D Other',
-  ATTENDANCE: 'Alt_HS_Attendance_Enrollment_Count', // Updated to match actual sheet name (with underscores)
-  TRACKING_SHEET: 'NAHS Students' // Updated to match actual sheet name
+  ATTENDANCE: 'Alt_HS_Attendance_Enrollment_Count',
+  TRACKING_SHEET: 'NAHS Students'
 };
 
 /**
