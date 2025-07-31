@@ -227,7 +227,7 @@ class StudentDataMerger extends BaseDataProcessor {
   }
 
   /**
-   * Creates the base student map from tentative data
+   * Creates the base student map from tentative data - FIXED TO USE ENTRY_WITHDRAWAL NAMES
    * @param {Object} dataSources - All data sources
    * @returns {Map} Base student map
    */
@@ -237,30 +237,177 @@ class StudentDataMerger extends BaseDataProcessor {
     const baseMap = new Map();
     
     if (dataSources.tentativeData && dataSources.tentativeData.size > 0) {
-      dataSources.tentativeData.forEach((studentArray, studentId) => {
+      this.log(`Processing ${dataSources.tentativeData.size} students from TENTATIVE-Version2`);
+      
+      dataSources.tentativeData.forEach((studentRecord, studentId) => {
+        // Handle array format (which is what we have)
+        let processedRecord;
+        if (Array.isArray(studentRecord)) {
+          processedRecord = studentRecord[0] || {};
+        } else {
+          processedRecord = studentRecord || {};
+        }
+        
+        // ✅ FIXED: Get names from Entry_Withdrawal data if TENTATIVE names are empty
+        let firstName = processedRecord.FIRST || '';
+        let lastName = processedRecord.LAST || '';
+        let grade = processedRecord.GRADE || '';
+        
+        // If TENTATIVE has empty names, try to get them from Entry_Withdrawal data
+        if ((!firstName || firstName === '') && dataSources.entryWithdrawalData) {
+          const entryData = dataSources.entryWithdrawalData.get(studentId);
+          if (entryData) {
+            const entryRecord = Array.isArray(entryData) ? entryData[0] : entryData;
+            
+            // Try different possible name column variations in Entry_Withdrawal
+            firstName = entryRecord['Student First Name'] || 
+                       entryRecord['First Name'] || 
+                       entryRecord['FIRST'] || 
+                       entryRecord['First'] || '';
+            
+            lastName = entryRecord['Student Last Name'] || 
+                      entryRecord['Last Name'] || 
+                      entryRecord['LAST'] || 
+                      entryRecord['Last'] || '';
+            
+            // Also try to extract from full name if available
+            if ((!firstName || !lastName) && entryRecord['Student Name(Last, First)']) {
+              const fullName = entryRecord['Student Name(Last, First)'];
+              const nameParts = fullName.split(',');
+              if (nameParts.length >= 2) {
+                lastName = nameParts[0].trim();
+                firstName = nameParts[1].trim();
+              }
+            }
+            
+            // Get grade if missing
+            if (!grade || grade === '') {
+              grade = entryRecord['Grade'] || 
+                     entryRecord['GRADE'] || 
+                     entryRecord['Grd Lvl'] || '';
+            }
+            
+            this.log(`Student ${studentId}: Got names from Entry_Withdrawal - ${firstName} ${lastName} (Grade: ${grade})`);
+          }
+        }
+        
+        // ✅ FINAL FALLBACK: If still no names, try registration data as last resort
+        if ((!firstName || firstName === '') && dataSources.registrationsData) {
+          const registrationData = dataSources.registrationsData.get(studentId);
+          if (registrationData) {
+            const regRecord = Array.isArray(registrationData) ? registrationData[0] : registrationData;
+            firstName = firstName || regRecord['Student First Name'] || '';
+            lastName = lastName || regRecord['Student Last Name'] || '';
+            if (!grade || grade === '') {
+              grade = regRecord['Grd Lvl'] || regRecord['GRADE'] || '';
+            }
+            this.log(`Student ${studentId}: Used registration fallback - ${firstName} ${lastName}`);
+          }
+        }
+        
+        // ✅ Create enhanced student data with populated names
+        const studentData = {
+          // Preserve original TENTATIVE data structure
+          ...processedRecord,
+          // Ensure essential fields are populated
+          STUDENT_ID: studentId,
+          FIRST: firstName,
+          LAST: lastName,
+          GRADE: grade,
+          // Extract other important fields from TENTATIVE
+          HOME_CAMPUS: processedRecord['REGULAR CAMPUS'] || '',
+          ENTRY_DATE: processedRecord['FIRST DAY OF AEP'] || ''
+        };
+        
+        this.log(`Final student data for ${studentId}: ${studentData.FIRST} ${studentData.LAST} (Grade: ${studentData.GRADE})`);
+        
         baseMap.set(studentId, {
-          TENTATIVE: studentArray
+          TENTATIVE: [studentData], // Store the enhanced data
+          Registrations_SY_24_25: [],
+          ContactInfo: [],
+          Schedules: [],
+          Form_Responses_1: [],
+          Entry_Withdrawal: [],
+          Alt_HS_Attendance_Enrollment_Count: [],
+          Withdrawn: [],
+          WD_Other: []
         });
       });
+      
       this.log(`Created base map with ${baseMap.size} students from tentative data`);
     } else {
-      this.log('No tentative data available, creating base map from registration data', 'warn');
+      // Fallback logic if no tentative data - prioritize Entry_Withdrawal over registration
+      this.log('No tentative data available, creating base map from Entry_Withdrawal data', 'warn');
       
-      // If no tentative data, create base map from registration data
-      if (dataSources.registrationsData && dataSources.registrationsData.size > 0) {
-        dataSources.registrationsData.forEach((registrationArray, studentId) => {
+      if (dataSources.entryWithdrawalData && dataSources.entryWithdrawalData.size > 0) {
+        dataSources.entryWithdrawalData.forEach((entryRecord, studentId) => {
+          const entryData = Array.isArray(entryRecord) ? entryRecord[0] : entryRecord;
+          
+          // Extract names from Entry_Withdrawal
+          let firstName = entryData['Student First Name'] || 
+                         entryData['First Name'] || 
+                         entryData['FIRST'] || '';
+          let lastName = entryData['Student Last Name'] || 
+                        entryData['Last Name'] || 
+                        entryData['LAST'] || '';
+          
+          // Try to extract from full name if individual names not available
+          if ((!firstName || !lastName) && entryData['Student Name(Last, First)']) {
+            const fullName = entryData['Student Name(Last, First)'];
+            const nameParts = fullName.split(',');
+            if (nameParts.length >= 2) {
+              lastName = nameParts[0].trim();
+              firstName = nameParts[1].trim();
+            }
+          }
+          
           baseMap.set(studentId, {
-            // Create minimal student record
-            STUDENT_ID: studentId,
-            FIRST: '',
-            LAST: '',
-            GRADE: '',
-            // Will be populated by registration merge
+            TENTATIVE: [{
+              STUDENT_ID: studentId,
+              FIRST: firstName,
+              LAST: lastName,
+              GRADE: entryData['Grade'] || entryData['GRADE'] || '',
+              HOME_CAMPUS: entryData['Home Campus'] || '',
+              ENTRY_DATE: entryData['Entry Date'] || '',
+            }],
+            Registrations_SY_24_25: [],
+            ContactInfo: [],
+            Schedules: [],
+            Form_Responses_1: [],
+            Entry_Withdrawal: Array.isArray(entryRecord) ? entryRecord : [entryRecord],
+            Alt_HS_Attendance_Enrollment_Count: [],
+            Withdrawn: [],
+            WD_Other: []
           });
         });
-        this.log(`Created base map with ${baseMap.size} students from registration data`);
-      } else {
-        this.log('No registration data available either, using empty base map', 'warn');
+        this.log(`Created base map with ${baseMap.size} students from Entry_Withdrawal data`);
+      } else if (dataSources.registrationsData && dataSources.registrationsData.size > 0) {
+        // Final fallback to registration data
+        this.log('No Entry_Withdrawal data available, using registration data as final fallback', 'warn');
+        
+        dataSources.registrationsData.forEach((registrationRecord, studentId) => {
+          const regData = Array.isArray(registrationRecord) ? registrationRecord[0] : registrationRecord;
+          
+          baseMap.set(studentId, {
+            TENTATIVE: [{
+              STUDENT_ID: studentId,
+              FIRST: regData['Student First Name'] || '',
+              LAST: regData['Student Last Name'] || '',
+              GRADE: regData['Grd Lvl'] || regData['GRADE'] || '',
+              HOME_CAMPUS: regData['Home Campus'] || '',
+              ENTRY_DATE: regData['Start Date'] || '',
+            }],
+            Registrations_SY_24_25: Array.isArray(registrationRecord) ? registrationRecord : [registrationRecord],
+            ContactInfo: [],
+            Schedules: [],
+            Form_Responses_1: [],
+            Entry_Withdrawal: [],
+            Alt_HS_Attendance_Enrollment_Count: [],
+            Withdrawn: [],
+            WD_Other: []
+          });
+        });
+        this.log(`Created base map with ${baseMap.size} students from registration data (final fallback)`);
       }
     }
 
@@ -268,10 +415,7 @@ class StudentDataMerger extends BaseDataProcessor {
   }
 
   /**
-   * Merges registration data with existing student data
-   * @param {Map} existingData - Existing student data map
-   * @param {Map} registrationData - Registration data map
-   * @returns {Map} Updated student data map
+   * Merges registration data with existing student data - FIXED VERSION
    */
   mergeRegistrationData(existingData, registrationData) {
     this.log('Merging registration data...');
@@ -279,11 +423,12 @@ class StudentDataMerger extends BaseDataProcessor {
     const updatedMap = new Map();
     
     existingData.forEach((studentData, studentId) => {
-      const registrationInfo = this.safeMapGet(registrationData, studentId);
+      const registrationInfo = this.safeMapGet(registrationData, studentId, []);
       
       updatedMap.set(studentId, {
         ...studentData,
-        Registrations_SY_24_25: registrationInfo
+        Registrations_SY_24_25: Array.isArray(registrationInfo) ? registrationInfo : 
+          (registrationInfo ? [registrationInfo] : [])
       });
     });
 
@@ -291,10 +436,7 @@ class StudentDataMerger extends BaseDataProcessor {
   }
 
   /**
-   * Merges contact data with existing student data
-   * @param {Map} existingData - Existing student data map
-   * @param {Map} contactData - Contact data map
-   * @returns {Map} Updated student data map
+   * Merges contact data with existing student data - FIXED VERSION
    */
   mergeContactData(existingData, contactData) {
     this.log('Merging contact data...');
@@ -302,11 +444,12 @@ class StudentDataMerger extends BaseDataProcessor {
     const updatedMap = new Map();
     
     existingData.forEach((studentData, studentId) => {
-      const contactInfo = this.safeMapGet(contactData, studentId);
+      const contactInfo = this.safeMapGet(contactData, studentId, []);
       
       updatedMap.set(studentId, {
         ...studentData,
-        ContactInfo: contactInfo
+        ContactInfo: Array.isArray(contactInfo) ? contactInfo :
+          (contactInfo ? [contactInfo] : [])
       });
     });
 
@@ -424,4 +567,6 @@ class StudentDataMerger extends BaseDataProcessor {
 
     return updatedMap;
   }
+
+  
 }

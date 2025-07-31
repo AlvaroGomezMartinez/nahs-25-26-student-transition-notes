@@ -872,3 +872,40 @@ function testCompleteSystemAfterAllFixes() {
   console.log('');
   console.log('=== Final System Test Complete ===');
 }
+
+// For debugging
+function debugTentativeStructure() {
+  console.log('=== Debugging TENTATIVE-Version2 Data Structure ===');
+  
+  try {
+    const loader = new TentativeDataLoader();
+    const tentativeData = loader.loadData();
+    
+    console.log(`Loaded ${tentativeData.size} students from TENTATIVE-Version2`);
+    
+    // Check first 3 students to see the data structure
+    let count = 0;
+    tentativeData.forEach((studentRecord, studentId) => {
+      if (count < 3) {
+        console.log(`\n--- Student ${studentId} ---`);
+        console.log('Type:', typeof studentRecord);
+        console.log('Is Array:', Array.isArray(studentRecord));
+        
+        if (Array.isArray(studentRecord)) {
+          console.log('Array length:', studentRecord.length);
+          if (studentRecord.length > 0) {
+            console.log('First element:', studentRecord[0]);
+            console.log('First element keys:', Object.keys(studentRecord[0] || {}));
+          }
+        } else {
+          console.log('Object keys:', Object.keys(studentRecord || {}));
+          console.log('Full object:', studentRecord);
+        }
+        count++;
+      }
+    });
+    
+  } catch (error) {
+    console.error('Error debugging tentative structure:', error);
+  }
+}
