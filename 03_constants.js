@@ -53,7 +53,7 @@
 const SHEET_NAMES = {
   TENTATIVE_V2: 'TENTATIVE-Version2',
   TENTATIVE: 'TENTATIVE',
-  REGISTRATIONS: 'Form Responses 1',
+  REGISTRATIONS: 'Form Responses 2',
   SCHEDULES: 'Schedules',
   FORM_RESPONSES_1: 'Form Responses 1',
   CONTACT_INFO: 'ContactInfo',
@@ -253,7 +253,7 @@ const DEFAULT_VALUES = {
  */
 const EXTERNAL_SPREADSHEETS = {
   SCHEDULES_SOURCE: "14-nvlNOLWebnJJOQNZPnglWx0OuE5U-_xEbXGodND6E",
-  REGISTRATIONS_SOURCE: "1kAWRpWO4xDtRShLB5YtTtWxTbVg800fuU2RvAlYhrfA", // "Form Responses 1"
+  REGISTRATIONS_SOURCE: "1T-t8wxYXGgLnPGhipX5gHEL17-PGX-cF-1j5jYELsAY", // "Form Responses 2"
   ATTENDANCE_SOURCE: "1uCQ_Z4QLbHq89tutZ4Wen0TREwS8qEx2j7MmzUgXOaY", // "Alt_HS_Attendance_Enrollment_Count"
   TRACKING_SOURCE: "1giJmMGPcDsmp4IOnV4hlGTgXbxQwv2SxM9DuzNehh90", // "NAHS Students"
 };
