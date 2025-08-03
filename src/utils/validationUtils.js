@@ -1,15 +1,55 @@
 /**
- * Validation utilities for data integrity checks
+ * @fileoverview Validation Utilities for the NAHS system.
  * 
- * Provides validation functions to ensure data quality
- * throughout the processing pipeline.
+ * This module provides comprehensive validation functions to ensure data
+ * integrity and quality throughout the NAHS Student Transition Notes processing
+ * pipeline. It includes validation for student data, sheet structures, column
+ * mappings, and data completeness checks across all system components.
+ * 
+ * The validation utilities help maintain data quality and provide detailed
+ * error reporting for troubleshooting and system reliability.
+ * 
+ * @author NAHS Development Team
+ * @version 2.0.0
+ * @since 2024-01-01
+ * @memberof Utils
  */
 
 /**
- * Validates student data completeness and integrity
- * @param {Object} studentData - Student data object to validate
- * @param {number} studentId - Student ID for logging
- * @returns {Object} Validation result with details
+ * Validates student data completeness and integrity.
+ * 
+ * This function performs comprehensive validation of student data objects
+ * to ensure all required sections are present, data types are correct,
+ * and cross-references are valid. It provides detailed error reporting
+ * for troubleshooting data quality issues.
+ * 
+ * @function validateStudentData
+ * @memberof Utils.ValidationUtils
+ * 
+ * @param {Object} studentData - Student data object containing all loaded data sections
+ * @param {string|number} studentId - Student ID for error reporting and logging
+ * @returns {Object} Validation result object containing:
+ *   - **isValid**: Boolean indicating overall validation success
+ *   - **errors**: Array of critical errors that prevent processing
+ *   - **warnings**: Array of non-critical issues for attention
+ *   - **studentId**: Student ID for reference
+ * 
+ * @example
+ * // Validate student data before processing
+ * const studentData = loadAllStudentData().get('123456');
+ * const validation = validateStudentData(studentData, '123456');
+ * if (!validation.isValid) {
+ *   console.error(`Student ${validation.studentId} validation failed:`, validation.errors);
+ * }
+ * 
+ * @example
+ * // Handle validation warnings
+ * const result = validateStudentData(studentData, studentId);
+ * if (result.warnings.length > 0) {
+ *   console.warn(`Data quality issues for student ${studentId}:`, result.warnings);
+ * }
+ * 
+ * @since 2.0.0
  */
 function validateStudentData(studentData, studentId) {
   const validation = {

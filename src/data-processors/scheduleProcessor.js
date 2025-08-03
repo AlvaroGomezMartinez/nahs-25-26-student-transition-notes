@@ -1,10 +1,56 @@
 /**
- * Schedule Processor
+ * @fileoverview Schedule Processor for the NAHS system.
  * 
- * Handles schedule-specific processing including filtering active courses,
- * mapping periods, and processing teacher assignments.
+ * This module provides specialized functionality for processing student schedule
+ * data including filtering active courses, mapping period assignments, and
+ * processing teacher information. It transforms raw schedule data into formats
+ * suitable for transition tracking and academic planning.
+ * 
+ * The processor handles complex schedule logic including course status validation,
+ * period conflict resolution, and teacher assignment processing.
+ * 
+ * @author NAHS Development Team
+ * @version 2.0.0
+ * @since 2024-01-01
+ * @memberof DataProcessors
  */
 
+/**
+ * Processes student schedule data for transition tracking.
+ * 
+ * This specialized processor handles the complex logic required to transform
+ * raw schedule data into actionable information for student transitions. It
+ * filters active courses, maps period assignments, processes teacher data,
+ * and validates schedule integrity for accurate transition planning.
+ * 
+ * **Key Features:**
+ * - **Active Course Filtering**: Identifies currently enrolled courses
+ * - **Period Mapping**: Organizes courses by class periods
+ * - **Teacher Processing**: Handles instructor assignments and contact info
+ * - **Schedule Validation**: Ensures data integrity and identifies conflicts
+ * - **Transition Integration**: Prepares schedule data for transition decisions
+ * 
+ * @class ScheduleProcessor
+ * @extends BaseDataProcessor
+ * @memberof DataProcessors
+ * 
+ * @example
+ * // Process student schedules
+ * const processor = new ScheduleProcessor();
+ * const rawScheduleData = scheduleLoader.loadData();
+ * const processedSchedules = processor.process(rawScheduleData);
+ * 
+ * @example
+ * // Access processed schedule information
+ * const processor = new ScheduleProcessor();
+ * const processed = processor.process(scheduleData);
+ * const studentSchedule = processed.get('123456');
+ * if (studentSchedule) {
+ *   console.log(`Student has ${studentSchedule.length} active courses`);
+ * }
+ * 
+ * @since 2.0.0
+ */
 class ScheduleProcessor extends BaseDataProcessor {
   constructor() {
     super('ScheduleProcessor');

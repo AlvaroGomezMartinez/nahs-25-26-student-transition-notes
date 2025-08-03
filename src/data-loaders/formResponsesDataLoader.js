@@ -1,9 +1,59 @@
 /**
- * Form Responses Data Loader
+ * @fileoverview Form Responses Data Loader for the NAHS system.
  * 
- * Loads teacher form responses and maps them with teacher email data
+ * This module provides specialized functionality for loading teacher form
+ * responses from the Form Responses 1 sheet and mapping them with teacher
+ * email data. It handles the complex teacher input processing required for
+ * comprehensive student transition tracking and teacher feedback integration.
+ * 
+ * The form responses contain critical teacher input about student performance,
+ * behavior, and transition recommendations that inform decision-making.
+ * 
+ * @author NAHS Development Team
+ * @version 2.0.0
+ * @since 2024-01-01
+ * @memberof DataLoaders
  */
 
+/**
+ * Loads teacher form responses with email mapping integration.
+ * 
+ * This specialized data loader handles teacher form responses from the Form
+ * Responses 1 sheet, including the complex teacher email mapping required
+ * to associate responses with specific teachers. It supports multiple responses
+ * per student and provides comprehensive teacher feedback data for transitions.
+ * 
+ * **Key Features:**
+ * - **Teacher Response Loading**: Captures all teacher form submissions  
+ * - **Email Mapping**: Associates responses with specific teacher email addresses
+ * - **Multiple Records**: Supports multiple teacher responses per student
+ * - **Response Validation**: Ensures data integrity and completeness
+ * - **Feedback Integration**: Provides teacher input for transition decisions
+ * 
+ * @class FormResponsesDataLoader
+ * @extends BaseDataLoader
+ * @memberof DataLoaders
+ * 
+ * @example
+ * // Load teacher form responses
+ * const loader = new FormResponsesDataLoader();
+ * const responseData = loader.loadData();
+ * console.log(`Loaded responses for ${responseData.size} students`);
+ * 
+ * @example
+ * // Process teacher feedback for specific student
+ * const loader = new FormResponsesDataLoader();
+ * const data = loader.loadData();
+ * const studentResponses = data.get('123456');
+ * if (studentResponses && Array.isArray(studentResponses)) {
+ *   studentResponses.forEach(response => {
+ *     console.log(`Teacher: ${response.TEACHER_EMAIL}`);
+ *     console.log(`Feedback: ${response.TEACHER_COMMENTS}`);
+ *   });
+ * }
+ * 
+ * @since 2.0.0
+ */
 class FormResponsesDataLoader extends BaseDataLoader {
   constructor() {
     super(SHEET_NAMES.FORM_RESPONSES_1, COLUMN_NAMES.STUDENT_ID, true);

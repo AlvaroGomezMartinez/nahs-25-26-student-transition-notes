@@ -1,14 +1,47 @@
 /**
- * Utility functions for data manipulation and validation
+ * @fileoverview Data Utility Functions for the NAHS system.
  * 
- * Common helper functions used throughout the application
- * for data processing and validation.
+ * This module provides essential utility functions for data manipulation,
+ * validation, and processing throughout the NAHS Student Transition Notes
+ * system. It includes functions for student ID extraction, data structure
+ * manipulation, and common data operations used across multiple components.
+ * 
+ * These utilities ensure consistent data handling patterns and provide
+ * reliable helper functions for complex data processing workflows.
+ * 
+ * @author NAHS Development Team
+ * @version 2.0.0
+ * @since 2024-01-01
+ * @memberof Utils
  */
 
 /**
- * Safely extracts a student ID from various formats
- * @param {string|number} input - The input containing student ID
- * @returns {number|null} The extracted student ID or null if not found
+ * Safely extracts a student ID from various input formats.
+ * 
+ * This utility handles the different ways student IDs appear throughout
+ * the system, including numeric values, strings, and formatted text
+ * like "Student Name (123456)". It provides consistent ID extraction
+ * across all data sources and ensures reliable student identification.
+ * 
+ * @function extractStudentId
+ * @memberof Utils.DataUtils
+ * 
+ * @param {string|number} input - The input containing student ID in various formats
+ * @returns {number|null} The extracted student ID as a number, or null if not found
+ * 
+ * @example
+ * // Extract from formatted string
+ * const id1 = extractStudentId("John Doe (123456)");
+ * console.log(id1); // 123456
+ * 
+ * @example
+ * // Handle different input types
+ * const id2 = extractStudentId(123456);     // 123456
+ * const id3 = extractStudentId("123456");   // 123456  
+ * const id4 = extractStudentId("invalid");  // null
+ * const id5 = extractStudentId("");         // null
+ * 
+ * @since 2.0.0
  */
 function extractStudentId(input) {
   if (typeof input === 'number') {
@@ -191,8 +224,30 @@ class DataUtils {
 
   /**
    * Safely extracts a student ID from various formats.
-   * @param {string|number} input - The input containing student ID
-   * @returns {number|null} The extracted student ID or null if not found
+   * 
+   * This utility handles the different ways student IDs appear throughout
+   * the system, including numeric values, strings, and formatted text
+   * like "Student Name (123456)". It provides consistent ID extraction
+   * across all data sources.
+   * 
+   * @function extractStudentId
+   * @memberof Utils.DataUtils
+   * 
+   * @param {string|number} input - The input containing student ID in various formats
+   * @returns {number|null} The extracted student ID as a number, or null if not found
+   * 
+   * @example
+   * // Extract from formatted string
+   * const id1 = extractStudentId("John Doe (123456)");
+   * console.log(id1); // 123456
+   * 
+   * @example
+   * // Handle different input types
+   * const id2 = extractStudentId(123456);     // 123456
+   * const id3 = extractStudentId("123456");   // 123456
+   * const id4 = extractStudentId("invalid");  // null
+   * 
+   * @since 2.0.0
    */
   extractStudentId(input) {
     return extractStudentId(input);

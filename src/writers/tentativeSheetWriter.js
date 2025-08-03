@@ -1,8 +1,75 @@
 /**
- * Handles writing data to the TENTATIVE-Version2 sheet.
- * This class replaces the massive 701-line writeToTENTATIVEVersion2Sheet function.
+ * @fileoverview Tentative Sheet Writer for the NAHS system.
+ * 
+ * This module provides specialized functionality for writing processed student
+ * data to the TENTATIVE-Version2 sheet. It replaces the original 701-line
+ * writeToTENTATIVEVersion2Sheet function with a modular, maintainable approach
+ * that handles data formatting, sheet writing, and color preservation.
+ * 
+ * The writer coordinates with multiple processors to merge data from various
+ * sources, format it properly, and write it efficiently to the output sheet.
+ * 
+ * @author NAHS Development Team
+ * @version 2.0.0
+ * @since 2024-01-01
+ * @memberof Writers
+ */
+
+/**
+ * Handles writing processed student data to the TENTATIVE-Version2 sheet.
+ * 
+ * This class replaces the original massive 701-line writeToTENTATIVEVersion2Sheet
+ * function with a modular, maintainable approach. It coordinates data merging,
+ * row building, and sheet writing while preserving user workflow colors and
+ * handling error conditions gracefully.
+ * 
+ * **Key Features:**
+ * - **Data Integration**: Merges data from multiple sources into cohesive output
+ * - **Efficient Writing**: Batch operations for optimal Google Sheets performance
+ * - **Color Preservation**: Maintains user workflow tracking through row colors
+ * - **Error Recovery**: Graceful handling of data and writing issues
+ * - **Modular Design**: Uses specialized builders and processors
+ * 
+ * @class TentativeSheetWriter
+ * @extends BaseSheetWriter
+ * @memberof Writers
+ * 
+ * @example
+ * // Basic usage for writing student data
+ * const writer = new TentativeSheetWriter();
+ * const studentDataMap = loadAllStudentData();
+ * writer.writeStudentData(studentDataMap);
+ * 
+ * @example
+ * // Advanced usage with error handling
+ * const writer = new TentativeSheetWriter();
+ * try {
+ *   const result = writer.writeStudentData(processedData);
+ *   console.log(`Successfully wrote ${result.rowsWritten} student records`);
+ * } catch (error) {
+ *   console.error('Failed to write student data:', error.message);
+ * }
+ * 
+ * @since 2.0.0
  */
 class TentativeSheetWriter extends BaseSheetWriter {
+  /**
+   * Creates a new TentativeSheetWriter instance.
+   * 
+   * Initializes the writer with all necessary components including the row builder,
+   * student data merger, and teacher input processor. Sets up the target sheet
+   * as TENTATIVE-Version2 and prepares for coordinated data writing operations.
+   * 
+   * @constructor
+   * @memberof TentativeSheetWriter
+   * 
+   * @example
+   * // Create writer instance
+   * const writer = new TentativeSheetWriter();
+   * // All components are initialized and ready for data writing
+   * 
+   * @since 2.0.0
+   */
   constructor() {
     super(SHEET_NAMES.TENTATIVE_V2);
     this.rowBuilder = new TentativeRowBuilder();

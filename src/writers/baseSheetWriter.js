@@ -1,8 +1,73 @@
 /**
- * Base class for all sheet writers.
- * Provides common functionality for writing data to Google Sheets.
+ * @fileoverview Base Sheet Writer for the NAHS system.
+ * 
+ * This module provides the foundational functionality for all sheet writers
+ * in the NAHS system. It handles common Google Sheets operations including
+ * sheet access, data clearing, batch writing, and error handling patterns
+ * that are shared across all specialized writer implementations.
+ * 
+ * All specific sheet writers extend this base class to inherit standard
+ * writing patterns while implementing their own data-specific logic.
+ * 
+ * @author NAHS Development Team
+ * @version 2.0.0
+ * @since 2024-01-01
+ * @memberof Writers
+ */
+
+/**
+ * Base class for all sheet writers in the NAHS system.
+ * 
+ * This abstract base class provides common functionality for writing data
+ * to Google Sheets including sheet access, error handling, batch operations,
+ * and data validation. All specific writers (TentativeSheetWriter, etc.)
+ * extend this class to inherit standard writing patterns.
+ * 
+ * **Key Features:**
+ * - **Sheet Management**: Handles sheet access and validation
+ * - **Batch Operations**: Efficient data writing with batch processing
+ * - **Error Handling**: Standardized error reporting and recovery
+ * - **Data Validation**: Ensures data integrity before writing
+ * - **Performance Optimization**: Minimizes Google Sheets API calls
+ * 
+ * @class BaseSheetWriter
+ * @abstract
+ * @memberof Writers
+ * 
+ * @example
+ * // Extend the base class
+ * class CustomSheetWriter extends BaseSheetWriter {
+ *   constructor() {
+ *     super('CustomSheet');
+ *   }
+ *   
+ *   writeCustomData(data) {
+ *     const sheet = this.getSheet();
+ *     // Custom writing logic
+ *   }
+ * }
+ * 
+ * @since 2.0.0
  */
 class BaseSheetWriter {
+  /**
+   * Creates a new BaseSheetWriter instance.
+   * 
+   * Initializes the writer with the target sheet name and prepares for
+   * sheet operations. The sheet instance is lazy-loaded when first accessed
+   * to optimize performance and handle potential access issues gracefully.
+   * 
+   * @constructor
+   * @memberof BaseSheetWriter
+   * 
+   * @param {string} sheetName - The name of the Google Sheet to write to
+   * 
+   * @example
+   * // Create a writer for specific sheet
+   * const writer = new BaseSheetWriter('MySheet');
+   * 
+   * @since 2.0.0
+   */
   constructor(sheetName) {
     this.sheetName = sheetName;
     this.sheet = null;

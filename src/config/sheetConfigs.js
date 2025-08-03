@@ -1,12 +1,43 @@
 /**
- * Sheet configuration mappings for different data sources
+ * @fileoverview Sheet Configuration Mappings for the NAHS system.
  * 
- * This file defines the structure and column mappings for each sheet
- * used in the student transition system.
+ * This module defines the structure and column mappings for each Google Sheet
+ * used in the student transition system. It provides configuration objects
+ * that specify sheet names, required columns, key columns, and output formats
+ * for consistent data handling across all components.
+ * 
+ * These configurations ensure proper data validation, column mapping, and
+ * output formatting for all sheet-based operations in the system.
+ * 
+ * @author NAHS Development Team
+ * @version 2.0.0
+ * @since 2024-01-01
+ * @memberof Config
  */
 
 /**
- * Configuration for the TENTATIVE-Version2 sheet
+ * Configuration object for the TENTATIVE-Version2 sheet.
+ * 
+ * Defines the structure, required columns, and output format for the primary
+ * student transition tracking sheet. This configuration ensures consistent
+ * data handling and proper validation for the main workflow sheet.
+ * 
+ * @constant {Object} TENTATIVE_SHEET_CONFIG
+ * @memberof Config.SheetConfigs
+ * 
+ * @property {string} name - The sheet name identifier
+ * @property {string} keyColumn - Primary key column for data mapping
+ * @property {Array<string>} requiredColumns - Columns that must be present
+ * @property {Array<string>} outputColumnOrder - Order for data output operations
+ * 
+ * @example
+ * // Use configuration for validation
+ * const config = TENTATIVE_SHEET_CONFIG;
+ * if (sheetHeaders.includes(config.keyColumn)) {
+ *   console.log('Key column found:', config.keyColumn);
+ * }
+ * 
+ * @since 2.0.0
  */
 const TENTATIVE_SHEET_CONFIG = {
   name: SHEET_NAMES.TENTATIVE_V2,

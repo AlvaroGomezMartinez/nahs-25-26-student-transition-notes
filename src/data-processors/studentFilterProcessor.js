@@ -1,11 +1,59 @@
 /**
- * Student Filter Processor
+ * @fileoverview Student Filter Processor for the NAHS system.
  * 
- * Handles filtering operations to remove withdrawn students and
- * apply other business logic filters. This replaces the complex
- * filtering logic from the original system.
+ * This module provides specialized functionality for filtering student data
+ * based on withdrawal status, special categories, and business logic rules.
+ * It handles the complex filtering operations required to identify active
+ * students eligible for transition processing while excluding withdrawn
+ * or special status students appropriately.
+ * 
+ * The processor replaces complex filtering logic from the original system
+ * with a clean, maintainable approach for student eligibility determination.
+ * 
+ * @author NAHS Development Team
+ * @version 2.0.0
+ * @since 2024-01-01
+ * @memberof DataProcessors
  */
 
+/**
+ * Processes student filtering operations for active student identification.
+ * 
+ * This specialized processor handles complex filtering logic to identify
+ * students eligible for transition processing. It applies business rules
+ * for withdrawn students, special categories, and entry/withdrawal status
+ * to produce accurate active student lists for processing.
+ * 
+ * **Key Features:**
+ * - **Withdrawal Filtering**: Excludes withdrawn students from active processing
+ * - **Special Category Handling**: Applies appropriate rules for W/D Other students
+ * - **Status Validation**: Ensures student eligibility based on entry/withdrawal data
+ * - **Business Rule Application**: Implements complex filtering business logic
+ * - **Data Integrity**: Maintains filtering audit trails and validation logs
+ * 
+ * @class StudentFilterProcessor
+ * @extends BaseDataProcessor
+ * @memberof DataProcessors
+ * 
+ * @example
+ * // Filter students for active processing
+ * const processor = new StudentFilterProcessor();
+ * const filterData = {
+ *   studentData: allStudentData,
+ *   withdrawnData: withdrawnStudents,
+ *   wdOtherData: wdOtherStudents,
+ *   entryWithdrawalData: entryWithdrawalRecords
+ * };
+ * const activeStudents = processor.process(filterData);
+ * 
+ * @example
+ * // Process with validation
+ * const processor = new StudentFilterProcessor();
+ * const result = processor.process(filterData);
+ * console.log(`Filtered to ${result.size} active students from ${filterData.studentData.size} total`);
+ * 
+ * @since 2.0.0
+ */
 class StudentFilterProcessor extends BaseDataProcessor {
   constructor() {
     super('StudentFilterProcessor');

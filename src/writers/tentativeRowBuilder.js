@@ -1,6 +1,56 @@
 /**
- * Builds rows of data for the TENTATIVE-Version2 sheet.
- * Handles the complex logic of extracting and formatting data from various sources.
+ * @fileoverview Tentative Row Builder for the NAHS system.
+ * 
+ * This module provides specialized functionality for building complete data rows
+ * for the TENTATIVE-Version2 sheet. It handles the complex logic of extracting
+ * and formatting data from multiple sources, calculating derived fields, and
+ * assembling the final row data structure for sheet writing operations.
+ * 
+ * The row builder coordinates data from tentative records, registrations,
+ * contacts, schedules, and teacher inputs to create comprehensive student records.
+ * 
+ * @author NAHS Development Team
+ * @version 2.0.0
+ * @since 2024-01-01
+ * @memberof Writers
+ */
+
+/**
+ * Builds complete data rows for the TENTATIVE-Version2 sheet.
+ * 
+ * This specialized class handles the complex logic of extracting and formatting
+ * data from multiple sources to create comprehensive student data rows. It
+ * coordinates data merging, field calculation, and formatting to produce
+ * the final row structure required for the TENTATIVE-Version2 sheet.
+ * 
+ * **Key Features:**
+ * - **Multi-Source Data Integration**: Combines data from tentative, registration, contact, and schedule sources
+ * - **Derived Field Calculation**: Computes estimated exit dates, educational factors, and status indicators
+ * - **Data Validation**: Ensures data integrity and handles missing or invalid data gracefully
+ * - **Format Standardization**: Applies consistent formatting for dates, names, and other fields
+ * - **Teacher Input Integration**: Incorporates processed teacher feedback and recommendations
+ * 
+ * @class TentativeRowBuilder
+ * @memberof Writers
+ * 
+ * @example
+ * // Build a student data row
+ * const builder = new TentativeRowBuilder();
+ * const studentData = mergedStudentData.get('123456');
+ * const teacherInput = processedTeacherInput.get('123456');
+ * const rowData = builder.buildStudentRow('123456', studentData, teacherInput);
+ * 
+ * @example
+ * // Process multiple students
+ * const builder = new TentativeRowBuilder();
+ * const outputRows = [];
+ * studentDataMap.forEach((data, studentId) => {
+ *   const teacherData = teacherInputMap.get(studentId) || {};
+ *   const row = builder.buildStudentRow(studentId, data, teacherData);
+ *   outputRows.push(row);
+ * });
+ * 
+ * @since 2.0.0
  */
 class TentativeRowBuilder {
   constructor() {

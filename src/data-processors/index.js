@@ -1,23 +1,80 @@
 /**
- * Data Processors Index
+ * @fileoverview Data Processors Index and Factory for the NAHS system.
  * 
- * Centralizes all data processor exports and provides factory functions
- * for creating processor instances.
+ * This module serves as the central registry and factory for all data processor
+ * classes in the NAHS system. It provides documentation of available processors,
+ * factory methods for creating processor instances, and utilities for coordinated
+ * data processing operations across the entire student data pipeline.
+ * 
+ * The processors handle complex business logic transformations, data merging,
+ * filtering, and validation required for comprehensive transition tracking.
+ * 
+ * @author NAHS Development Team
+ * @version 2.0.0
+ * @since 2024-01-01
+ * @memberof DataProcessors
  */
 
 /**
- * Available Data Processor Classes:
+ * Registry of available Data Processor Classes in the NAHS system.
  * 
- * - BaseDataProcessor: Base class for all data processors
- * - StudentDataMerger: Merges data from multiple sources
- * - StudentFilterProcessor: Filters out withdrawn/inactive students
- * - ScheduleProcessor: Processes schedule data and course information
- * - TeacherInputProcessor: Processes teacher form responses and input
+ * This documentation serves as a reference for all available data processors,
+ * their purposes, and their usage patterns. Each processor extends BaseDataProcessor
+ * and provides specialized functionality for specific data transformation needs.
+ * 
+ * **Available Data Processor Classes:**
+ * - **BaseDataProcessor**: Abstract base class with common processing functionality
+ * - **StudentDataMerger**: Merges student data from multiple sources into unified records
+ * - **StudentFilterProcessor**: Filters out withdrawn/inactive students based on business rules
+ * - **ScheduleProcessor**: Processes schedule data, course information, and period mappings
+ * - **TeacherInputProcessor**: Processes complex teacher form responses and feedback integration
+ * 
+ * @namespace DataProcessorRegistry
+ * @memberof DataProcessors
+ * 
+ * @example
+ * // Create specific processor instances
+ * const merger = new StudentDataMerger();
+ * const filter = new StudentFilterProcessor();
+ * const scheduleProcessor = new ScheduleProcessor();
+ * 
+ * @example
+ * // Use factory for coordinated processing
+ * const processors = createAllDataProcessors();
+ * const mergedData = processors.merger.process(studentData);
+ * const filteredData = processors.filter.process(filterCriteria);
+ * 
+ * @since 2.0.0
  */
 
 /**
- * Factory function to create all data processors
- * @returns {Object} Object containing all processor instances
+ * Factory function to create all data processor instances.
+ * 
+ * This factory provides a convenient way to create all data processor
+ * instances needed for complete student data processing. It ensures
+ * consistent processor initialization and provides a clean interface
+ * for accessing the full processing pipeline.
+ * 
+ * @function createAllDataProcessors
+ * @memberof DataProcessors
+ * 
+ * @returns {Object} Object containing all processor instances:
+ *   - **merger**: StudentDataMerger instance for data integration
+ *   - **filter**: StudentFilterProcessor instance for student filtering
+ *   - **schedule**: ScheduleProcessor instance for schedule processing
+ *   - **teacherInput**: TeacherInputProcessor instance for teacher feedback processing
+ * 
+ * @example
+ * // Create complete processor suite
+ * const processors = createAllDataProcessors();
+ * 
+ * // Use processors in sequence
+ * const mergedData = processors.merger.process(rawStudentData);
+ * const activeStudents = processors.filter.process(filterData);
+ * const processedSchedules = processors.schedule.process(scheduleData);
+ * const teacherFeedback = processors.teacherInput.processTeacherInput(studentId, studentData);
+ * 
+ * @since 2.0.0
  */
 function createAllDataProcessors() {
   return {

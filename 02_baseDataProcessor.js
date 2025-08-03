@@ -1,13 +1,73 @@
 /**
- * Base Data Processor
+ * @fileoverview Base Data Processor for the NAHS system.
  * 
- * Provides common functionality for data processing operations
+ * This module provides the foundational functionality for all data processors
+ * in the NAHS system. It handles common processing operations including logging,
+ * validation, error handling, and data transformation patterns that are shared
+ * across all specialized processor implementations.
+ * 
+ * All specific data processors extend this base class to inherit standard
+ * processing patterns while implementing their own data-specific logic.
+ * 
+ * @author NAHS Development Team
+ * @version 2.0.0
+ * @since 2024-01-01
+ * @memberof DataProcessors
  */
 
+/**
+ * Base class for all data processors in the NAHS system.
+ * 
+ * This abstract base class provides common functionality for data processing
+ * operations including logging, validation, error handling, and performance
+ * monitoring. All specific processors (StudentDataMerger, ScheduleProcessor, etc.)
+ * extend this class to inherit standard processing patterns.
+ * 
+ * **Key Features:**
+ * - **Standardized Logging**: Consistent logging with timestamps and processor identification
+ * - **Input Validation**: Common validation patterns for data integrity
+ * - **Error Handling**: Standardized error reporting and recovery patterns
+ * - **Performance Monitoring**: Processing time tracking and metrics
+ * - **Abstract Processing**: Template method pattern for consistent processing flows
+ * 
+ * @class BaseDataProcessor
+ * @abstract
+ * @memberof DataProcessors
+ * 
+ * @example
+ * // Extend the base class
+ * class CustomProcessor extends BaseDataProcessor {
+ *   constructor() {
+ *     super('CustomProcessor');
+ *   }
+ *   
+ *   process(data) {
+ *     this.log('Starting custom processing...');
+ *     // Custom processing logic
+ *     return processedData;
+ *   }
+ * }
+ * 
+ * @since 2.0.0
+ */
 class BaseDataProcessor {
   /**
-   * Creates a new BaseDataProcessor
-   * @param {string} processorName - Name of the processor for logging
+   * Creates a new BaseDataProcessor instance.
+   * 
+   * Initializes the processor with a specific name for logging and identification
+   * purposes. The processor name is used throughout the processing lifecycle
+   * for consistent logging, error reporting, and performance monitoring.
+   * 
+   * @constructor
+   * @memberof BaseDataProcessor
+   * 
+   * @param {string} processorName - Name of the processor for logging and identification
+   * 
+   * @example
+   * // Create a processor instance
+   * const processor = new BaseDataProcessor('MyProcessor');
+   * 
+   * @since 2.0.0
    */
   constructor(processorName) {
     this.processorName = processorName;

@@ -1,11 +1,55 @@
 /**
- * Teacher Input Processor
+ * @fileoverview Teacher Input Processor for the NAHS system.
  * 
- * Handles the complex teacher input processing logic from form responses
- * and schedules. This replaces the nested teacher input functions from
- * the original writeToTENTATIVEVersion2 function.
+ * This module provides specialized functionality for processing complex teacher
+ * input data from form responses and schedule information. It handles the intricate
+ * logic required to merge teacher feedback, schedule data, and student information
+ * into coherent teacher input structures for transition decision-making.
+ * 
+ * The processor replaces nested teacher input functions from the original monolithic
+ * approach with a clean, maintainable class-based architecture.
+ * 
+ * @author NAHS Development Team
+ * @version 2.0.0
+ * @since 2024-01-01
+ * @memberof DataProcessors
  */
 
+/**
+ * Processes teacher input data for student transition tracking.
+ * 
+ * This specialized processor handles the complex logic required to transform
+ * raw teacher form responses and schedule data into structured teacher input
+ * information. It coordinates teacher feedback, schedule assignments, and
+ * recommendation processing for comprehensive transition decision support.
+ * 
+ * **Key Features:**
+ * - **Form Response Processing**: Transforms teacher form submissions into structured data
+ * - **Schedule Integration**: Correlates teacher input with student schedule information
+ * - **Multi-Teacher Coordination**: Handles multiple teacher responses per student
+ * - **Recommendation Synthesis**: Processes teacher recommendations and feedback
+ * - **Data Validation**: Ensures teacher input data integrity and completeness
+ * 
+ * @class TeacherInputProcessor
+ * @extends BaseDataProcessor
+ * @memberof DataProcessors
+ * 
+ * @example
+ * // Process teacher input for a student
+ * const processor = new TeacherInputProcessor();
+ * const studentData = mergedStudentData.get('123456');
+ * const teacherInput = processor.processTeacherInput('123456', studentData);
+ * 
+ * @example
+ * // Process teacher input with validation
+ * const processor = new TeacherInputProcessor();
+ * const result = processor.processTeacherInput(studentId, studentData);
+ * if (result && result.teacherRecommendations) {
+ *   console.log(`Found ${result.teacherRecommendations.length} teacher recommendations`);
+ * }
+ * 
+ * @since 2.0.0
+ */
 class TeacherInputProcessor extends BaseDataProcessor {
   constructor() {
     super('TeacherInputProcessor');

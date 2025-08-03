@@ -1,15 +1,51 @@
 /**
- * Backward compatibility layer for the original writeToTENTATIVEVersion2 function.
- * This maintains compatibility with the original terrible variable name while
- * using the new, clean architecture internally.
+ * @fileoverview Backward Compatibility Layer for the NAHS system.
+ * 
+ * This module provides backward compatibility for the original writeToTENTATIVEVersion2
+ * function, maintaining compatibility with legacy code while internally using
+ * the new, clean architecture. It preserves the original function signatures
+ * (including the infamous variable name with typos) for seamless migration.
+ * 
+ * This layer serves as a bridge between the old 701-line monolithic function
+ * and the new modular, maintainable architecture introduced in Version 2.0.0.
+ * 
+ * @author NAHS Development Team
+ * @version 2.0.0
+ * @since 2024-01-01
+ * @memberof Legacy
  */
 
 /**
- * Original function signature with the terrible variable name.
- * This function is kept for backward compatibility but internally uses
- * the new writer architecture.
+ * Original function signature with backward compatibility support.
  * 
- * @param {Map} updatedUpdatedUpdatedUdatedUpdatedUpdatedUpdatedActiveStudentDataMap - The student data map (original name)
+ * This function maintains compatibility with the original writeToTENTATIVEVersion2
+ * function signature, including the infamous variable name with typos. It
+ * provides a seamless transition path while internally delegating to the
+ * new, clean architecture for actual processing.
+ * 
+ * **Migration Note**: This function is deprecated and maintained only for
+ * backward compatibility. New code should use the updated function signature.
+ * 
+ * @function writeToTENTATIVEVersion2Sheet_Original
+ * @memberof Legacy
+ * 
+ * @param {Map<string, Object>} updatedUpdatedUpdatedUdatedUpdatedUpdatedUpdatedActiveStudentDataMap - 
+ *   The student data map (preserves original variable name with typos for compatibility)
+ * @returns {Object} Write operation statistics and results
+ * 
+ * @deprecated Use writeToTENTATIVEVersion2Sheet() instead for new code
+ * 
+ * @example
+ * // Legacy usage (still supported)
+ * const result = writeToTENTATIVEVersion2Sheet_Original(studentDataMap);
+ * 
+ * @example
+ * // Recommended new usage
+ * const result = writeToTENTATIVEVersion2Sheet(studentDataMap);
+ * 
+ * @see {@link writeToTENTATIVEVersion2Sheet} For the new function signature
+ * 
+ * @since 2.0.0
  */
 function writeToTENTATIVEVersion2Sheet_Original(updatedUpdatedUpdatedUdatedUpdatedUpdatedUpdatedActiveStudentDataMap) {
   console.warn('Using legacy function with terrible variable name. The variable name has been fixed in the new architecture.');

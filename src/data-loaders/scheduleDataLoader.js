@@ -1,19 +1,126 @@
 /**
- * Schedule Data Loader
+ * @fileoverview Schedule Data Loader for the NAHS system.
  * 
- * Loads data from the Schedules sheet and converts it to a Map
- * Filters out courses with withdrawal dates.
+ * This module provides specialized functionality for loading student schedule
+ * data from the Schedules sheet. It handles course enrollment information,
+ * filtering logic for withdrawn courses, and provides current academic
+ * schedule data critical for student transition planning.
+ * 
+ * The schedule data includes current course enrollments, period assignments,
+ * and teacher information needed for comprehensive transition tracking.
+ * 
+ * @author NAHS Development Team
+ * @version 2.0.0
+ * @since 2024-01-01
+ * @memberof DataLoaders
  */
 
+/**
+ * Loads student schedule data from the Schedules sheet.
+ * 
+ * This specialized data loader handles student course schedules with intelligent
+ * filtering to exclude courses that have withdrawal dates. It supports multiple
+ * records per student (one per course) and provides current enrollment status
+ * for accurate transition planning.
+ * 
+ * **Key Features:**
+ * - **Course Schedule Loading**: Current student course enrollments
+ * - **Withdrawal Filtering**: Automatically excludes withdrawn courses
+ * - **Multiple Records**: Supports multiple courses per student
+ * - **Period Information**: Provides class period and timing data
+ * - **Teacher Data**: Includes instructor information for each course
+ * 
+ * @class ScheduleDataLoader
+ * @extends BaseDataLoader
+ * @memberof DataLoaders
+ * 
+ * @example
+ * // Load current student schedules
+ * const loader = new ScheduleDataLoader();
+ * const scheduleData = loader.loadData();
+ * console.log(`Loaded schedules for ${scheduleData.size} students`);
+ * 
+ * @example
+ * // Process student course information
+ * const loader = new ScheduleDataLoader();
+ * const data = loader.loadData();
+ * const studentSchedule = data.get('123456');
+ * if (studentSchedule && Array.isArray(studentSchedule)) {
+ *   studentSchedule.forEach(course => {
+ *     console.log(`Course: ${course.COURSE_NAME}, Period: ${course.PERIOD}`);
+ *   });
+ * }
+ * 
+ * @since 2.0.0
+ */
 class ScheduleDataLoader extends BaseDataLoader {
+  /**
+   * Creates a new ScheduleDataLoader instance.
+   * 
+   * Configures the loader to access schedule data from the Schedules sheet
+   * with support for multiple records per student (allowMultiple = true).
+   * Sets up filtering to exclude courses with withdrawal dates.
+   * 
+   * @constructor
+   * @memberof ScheduleDataLoader
+   * 
+   * @example
+   * // Create schedule loader
+   * const loader = new ScheduleDataLoader();
+   * // Configured for multiple records per student (one per course)
+   * 
+   * @since 2.0.0
+   */
   constructor() {
     super(SHEET_NAMES.SCHEDULES, COLUMN_NAMES.STUDENT_ID, true);
   }
 
   /**
-   * Loads schedule data from the Schedules sheet
-   * This replaces the original schedulesSheet function
-   * @returns {Map} Map where keys are student IDs and values are arrays of schedule data
+   * Loads schedule data from the Schedules sheet.
+   * 
+   * This method loads current student course schedules with automatic filtering
+   * to exclude courses that have withdrawal dates. It supports multiple courses
+   * per student and provides comprehensive schedule information for transition
+   * planning.
+   * 
+   * @function loadData
+   * @memberof ScheduleDataLoader
+   * 
+   * @returns {Map<string, Array<Object>>} Map where:
+   *   - **Key**: Student ID (string) - Unique student identifier
+   *   - **Value**: Array of course objects, each containing schedule details for one course
+   * 
+   * @throws {Error} Throws if sheet access fails or data structure is invalid
+   * 
+   * @example
+   * // Load and process schedule data
+   * const loader = new ScheduleDataLoader();
+   * const scheduleData = loader.loadData();
+   * 
+   * // Display student course load
+   * scheduleData.forEach((courses, studentId) => {
+   *   console.log(`Student ${studentId} has ${courses.length} active courses`);
+   *   courses.forEach(course => {
+   *     console.log(`  - ${course.COURSE_NAME} (Period ${course.PERIOD})`);
+   *   });
+   * });
+   * 
+   * @example  
+   * // Error handling
+   * try {
+   *   const loader = new ScheduleDataLoader();
+   *   const data = loader.loadData();
+   *   if (data.size === 0) {
+   *     console.warn('No schedule data loaded - check sheet access');
+   *   }
+   * } catch (error) {
+   *   console.error('Failed to load schedule data:', error.message);
+   * }
+   * 
+   * @see {@link BaseDataLoader#loadData} For inherited loading functionality
+   * @see {@link processRowData} For withdrawal filtering logic
+   * 
+   * @since 2.0.0
    */
   loadData() {
     try {

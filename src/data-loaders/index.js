@@ -1,28 +1,64 @@
 /**
- * Data Loaders Index
+ * @fileoverview Data Loaders Index and Factory for the NAHS system.
  * 
- * Centralizes all data loader class exports for easy importing.
- * In Google Apps Script, we don't have traditional ES6 modules,
- * but this file serves as documentation of available loaders.
+ * This module serves as the central registry and factory for all data loader
+ * classes in the NAHS system. It provides documentation of available loaders,
+ * factory methods for creating loader instances, and utilities for coordinated
+ * data loading operations across multiple sources.
+ * 
+ * In Google Apps Script environments, this file serves as both documentation
+ * and a centralized access point for all data loading functionality.
+ * 
+ * @author NAHS Development Team
+ * @version 2.0.0
+ * @since 2024-01-01
+ * @memberof DataLoaders
  */
 
 /**
- * Available Data Loader Classes:
+ * Registry of available Data Loader Classes in the NAHS system.
  * 
- * - BaseDataLoader: Base class for all data loaders
- * - TentativeDataLoader: Loads TENTATIVE-Version2 sheet data
- * - RegistrationDataLoader: Loads registration data
- * - ScheduleDataLoader: Loads schedule data (filters active courses)
- * - ContactDataLoader: Loads contact information
- * - EntryWithdrawalDataLoader: Loads entry/withdrawal data
- * - FormResponsesDataLoader: Loads teacher form responses
- * - WithdrawnDataLoader: Loads withdrawn students data
- * - WDOtherDataLoader: Loads W/D Other students data
- * - AttendanceDataLoader: Loads attendance data
+ * This documentation serves as a reference for all available data loaders,
+ * their purposes, and their usage patterns. Each loader extends BaseDataLoader
+ * and provides specialized functionality for specific data sources.
+ * 
+ * **Available Data Loader Classes:**
+ * - **BaseDataLoader**: Abstract base class for all data loaders
+ * - **TentativeDataLoader**: Loads TENTATIVE-Version2 sheet data (primary source)
+ * - **RegistrationDataLoader**: Loads registration data from external sources
+ * - **ScheduleDataLoader**: Loads schedule data with active course filtering
+ * - **ContactDataLoader**: Loads student and family contact information
+ * - **EntryWithdrawalDataLoader**: Loads official entry/withdrawal records
+ * - **FormResponsesDataLoader**: Loads teacher form responses with email mapping
+ * - **WithdrawnDataLoader**: Loads withdrawn students tracking data
+ * - **WDOtherDataLoader**: Loads W/D Other category students data
+ * - **AttendanceDataLoader**: Loads attendance data from external sources
+ * 
+ * @namespace DataLoaderRegistry
+ * @memberof DataLoaders
+ * 
+ * @example
+ * // Create specific loader instances
+ * const tentativeLoader = new TentativeDataLoader();
+ * const scheduleLoader = new ScheduleDataLoader();
+ * const contactLoader = new ContactDataLoader();
+ * 
+ * @example
+ * // Use factory methods for coordinated loading
+ * const allLoaders = createAllDataLoaders();
+ * const allData = loadAllStudentDataWithLoaders(allLoaders);
+ * 
+ * @since 2.0.0
  */
 
 /**
- * Available Public Functions (for backward compatibility):
+ * Backward Compatibility Functions Registry.
+ * 
+ * These functions maintain compatibility with existing code that calls
+ * the original function-based data loading approach. New code should
+ * use the class-based loaders directly for better error handling.
+ * 
+ * **Available Public Functions (for backward compatibility):**
  * 
  * - getStudentsFromTENTATIVESheet()
  * - loadRegistrationsData()
