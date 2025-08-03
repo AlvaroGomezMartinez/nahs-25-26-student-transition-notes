@@ -75,6 +75,7 @@ class TentativeRowBuilder {
 
       // Calculate derived fields
       const estimatedExitDay = this._calculateEstimatedExitDay(studentData);
+      console.log(`buildStudentRow - estimatedExitDay result: ${estimatedExitDay}`);
       const { contains504Result, containsESLResult } = this._calculateEducationalFactors(registrationEntry);
       
       // Extract names
@@ -113,12 +114,20 @@ class TentativeRowBuilder {
         ...this._buildPeriodData('8th', teacherInput, tentativeEntry),
 
         // Special Education data
-        ...this._buildSpecialEducationData(teacherInput),
+        ...(() => {
+          const specialEdData = this._buildSpecialEducationData(teacherInput);
+          console.log(`Special Ed data length: ${specialEdData.length}, data: [${specialEdData.join(', ')}]`);
+          return specialEdData;
+        })(),
 
         // Additional fields
         registrationEntry?.["Home Campus"] || null,
         this._getFormattedEntryDate(entryWithdrawalEntry),
-        this.dateUtils.formatToMMDDYYYY(estimatedExitDay) || null,
+        (() => {
+          const formatted = this.dateUtils.formatToMMDDYYYY(estimatedExitDay);
+          console.log(`Row assignment debug: estimatedExitDay=${estimatedExitDay}, formatted=${formatted}, type=${typeof formatted}`);
+          return formatted || null;
+        })(),
         "", // Parent Notice Date
         "", // Withdrawn Date
         "", // Attendance Recovery
@@ -192,27 +201,110 @@ class TentativeRowBuilder {
     const registrationEntry = this._extractRegistrationEntry(studentData);
     const attendanceArray = studentData["Alt_HS_Attendance_Enrollment_Count"];
 
-    const entryData = entryWithdrawalEntry["Entry Date"];
-    if (!entryData) return null;
-
-    const formattedEntryDate = this.dateUtils.formatToMMDDYYYY(entryData);
+    // Try to get entry date from multiple sources
+    let entryData = entryWithdrawalEntry["Entry Date"];
+    
+    // Fallback to most recent Entry Date from Schedules if Entry/Withdrawal date is not available
+    if (!entryData) {
+      entryData = this._extractMostRecentEntryDateFromSchedules(studentData);
+      if (entryData) {
+        console.log('Using most recent Entry Date from schedules:', entryData);
+      }
+    }
+    
     const placementDays = registrationEntry?.["Placement Days"];
-    const daysInAttendance = attendanceArray ? attendanceArray[0][4] : null;
-    const daysInEnrl = attendanceArray ? attendanceArray[0][5] : 0;
-
-    if (!formattedEntryDate || !placementDays || daysInAttendance === null) {
+    
+    // Early return if essential data is missing
+    if (!entryData || !placementDays) {
+      console.log(`Missing essential data for anticipated release date calculation:
+        Entry Date: ${entryData}
+        Placement Days: ${placementDays}
+        Available in Entry/Withdrawal: ${entryWithdrawalEntry["Entry Date"]}
+        Available in Schedules: ${this._extractMostRecentEntryDateFromSchedules(studentData)}`);
       return null;
     }
 
-    const entryDateString = this.dateUtils.formatToMMDDYYYY(formattedEntryDate);
+    // Extract attendance data with correct field names
+    let daysInAttendance = 0;
+    let daysInEnrl = 0;
+    
+    if (attendanceArray && Array.isArray(attendanceArray) && attendanceArray.length > 0) {
+      const attendanceRecord = attendanceArray[0];
+      // Use the correct field names from the attendance data
+      daysInAttendance = attendanceRecord["DAYS IN ATT"] || 0;
+      daysInEnrl = attendanceRecord["EAYS IN Enrl"] || 0;
+    }
+
+    // Fix: Don't double-format the date - pass the original date object/string
     const additionalDays = [daysInAttendance, daysInEnrl];
 
+    console.log(`Calculating anticipated release date for student:
+      Entry Date: ${entryData}
+      Placement Days: ${placementDays}
+      Days in Attendance: ${daysInAttendance}
+      Days in Enrollment: ${daysInEnrl}`);
+
     return NAHS_EXPECTED_WITHDRAW_DATE(
-      entryDateString,
+      entryData, // Pass original entry date (don't double-format)
       placementDays,
-      holidayDates,
+      holidayDates || [],
       additionalDays
     );
+  }
+
+  /**
+   * Extracts the most recent entry date from active schedules (same logic as StudentDataMerger)
+   */
+  _extractMostRecentEntryDateFromSchedules(studentData) {
+    const schedules = studentData["Schedules"];
+    if (!schedules || !Array.isArray(schedules) || schedules.length === 0) {
+      return null;
+    }
+
+    // Filter to only active schedules (no withdrawal date)
+    const activeSchedules = schedules.filter(schedule => 
+      !schedule[COLUMN_NAMES.WITHDRAW_DATE] || 
+      schedule[COLUMN_NAMES.WITHDRAW_DATE] === '' || 
+      schedule[COLUMN_NAMES.WITHDRAW_DATE] === null
+    );
+
+    if (activeSchedules.length === 0) {
+      return null;
+    }
+
+    let mostRecentDate = null;
+    let mostRecentTimestamp = 0;
+
+    activeSchedules.forEach(schedule => {
+      const entryDateValue = schedule[COLUMN_NAMES.ENTRY_DATE];
+      
+      if (entryDateValue && entryDateValue !== '') {
+        try {
+          // Handle both Date objects and string dates
+          let dateToCheck;
+          if (entryDateValue instanceof Date) {
+            dateToCheck = entryDateValue;
+          } else {
+            dateToCheck = new Date(entryDateValue);
+          }
+          
+          // Validate the date is valid
+          if (!isNaN(dateToCheck.getTime())) {
+            const timestamp = dateToCheck.getTime();
+            if (timestamp > mostRecentTimestamp) {
+              mostRecentTimestamp = timestamp;
+              mostRecentDate = entryDateValue instanceof Date ? 
+                entryDateValue.toLocaleDateString() : 
+                entryDateValue;
+            }
+          }
+        } catch (error) {
+          console.log(`Warning: Invalid entry date format in schedule: ${entryDateValue}`);
+        }
+      }
+    });
+
+    return mostRecentDate;
   }
 
   /**
