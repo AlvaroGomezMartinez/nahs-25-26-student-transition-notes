@@ -113,11 +113,14 @@ class FormResponsesDataLoader extends BaseDataLoader {
       const studentText = row[studentColumnIndex];
       const email = row[emailColumnIndex];
       
-      const studentId = extractStudentId(studentText);
-      if (studentId === null) {
+      const studentIdNumber = extractStudentId(studentText);
+      if (studentIdNumber === null) {
         console.warn(`Invalid student ID at row ${i + 1} in Form Responses`);
         continue;
       }
+      
+      // Convert to string to match other data loaders' key format
+      const studentId = String(studentIdNumber);
 
       // Create student data object
       const studentData = this.createRowObject(row, headers);
@@ -129,8 +132,8 @@ class FormResponsesDataLoader extends BaseDataLoader {
         studentData[COLUMN_NAMES.TEACHER_NAME] = DEFAULT_VALUES.UNKNOWN_TEACHER;
       }
 
-      // Perform left join with schedules data
-      const scheduleDataArray = schedulesMap.get(studentId) || [];
+      // Perform left join with schedules data (use numeric ID for schedule lookup)
+      const scheduleDataArray = schedulesMap.get(studentIdNumber) || [];
       const matchingScheduleData = scheduleDataArray.find(
         (schedule) => schedule[COLUMN_NAMES.TEACHER_NAME] === studentData[COLUMN_NAMES.TEACHER_NAME]
       );

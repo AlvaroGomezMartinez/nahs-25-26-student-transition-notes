@@ -300,3 +300,28 @@ class DataUtils {
     return removeEmptyValues(arr);
   }
 }
+
+/**
+ * Global instance of DataUtils for easy access
+ * @type {DataUtils}
+ */
+const globalDataUtils = new DataUtils();
+
+// Make commonly used functions globally available for Google Apps Script
+// This ensures backward compatibility with existing code
+// Only export functions that actually exist as standalone functions
+if (typeof global !== 'undefined') {
+  global.extractStudentId = extractStudentId;
+  global.DataUtils = DataUtils;
+  global.dataUtils = globalDataUtils;
+} else if (typeof window !== 'undefined') {
+  window.extractStudentId = extractStudentId;
+  window.DataUtils = DataUtils;  
+  window.dataUtils = globalDataUtils;
+} else {
+  // For Google Apps Script, functions are automatically global when declared
+  // But we need to ensure they're accessible
+  this.extractStudentId = extractStudentId;
+  this.DataUtils = DataUtils;
+  this.dataUtils = globalDataUtils;
+}

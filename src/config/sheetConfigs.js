@@ -49,13 +49,114 @@ const TENTATIVE_SHEET_CONFIG = {
     COLUMN_NAMES.GRADE
   ],
   outputColumnOrder: [
+    // Basic student information
     'DATE ADDED TO SPREADSHEET',
-    'Student Last Name',
-    'Student First Name',
+    'LAST',
+    'FIRST',
     'STUDENT ID',
     'GRADE',
-    // @todo Check if I need to include the rest of the columns from TENTATIVE_Version2
-    // ... full column order would go here
+    
+    // 1st Period (6 columns)
+    '1st Period - Course Title',
+    '1st Period - Teacher Name', 
+    '1st Period - Transfer Grade',
+    '1st Period - Current Grade',
+    '1st Period - How would you assess this student\'s academic growth?',
+    '1st Period - Academic and Behavioral Progress Notes',
+    
+    // 2nd Period (6 columns)
+    '2nd Period - Course Title',
+    '2nd Period - Teacher Name',
+    '2nd Period - Transfer Grade', 
+    '2nd Period - Current Grade',
+    '2nd Period - How would you assess this student\'s academic progress?',
+    '2nd Period - Academic and Behavioral Progress Notes',
+    
+    // 3rd Period (6 columns)
+    '3rd Period - Course Title',
+    '3rd Period - Teacher Name',
+    '3rd Period - Transfer Grade',
+    '3rd Period - Current Grade', 
+    '3rd Period - How would you assess this student\'s academic progress?',
+    '3rd Period - Academic and Behavioral Progress Notes',
+    
+    // 4th Period (6 columns)
+    '4th Period - Course Title',
+    '4th Period - Teacher Name',
+    '4th Period - Transfer Grade',
+    '4th Period - Current Grade',
+    '4th Period - How would you assess this student\'s academic progress?', 
+    '4th Period - Academic and Behavioral Progress Notes',
+    
+    // 5th Period (6 columns)
+    '5th Period - Course Title',
+    '5th Period - Teacher Name',
+    '5th Period - Transfer Grade',
+    '5th Period - Current Grade',
+    '5th Period - How would you assess this student\'s academic progress?',
+    '5th Period - Academic and Behavioral Progress Notes',
+    
+    // 6th Period (6 columns)
+    '6th Period - Course Title',
+    '6th Period - Teacher Name',
+    '6th Period - Transfer Grade',
+    '6th Period - Current Grade',
+    '6th Period - How would you assess this student\'s academic progress?',
+    '6th Period - Academic and Behavioral Progress Notes',
+    
+    // 7th Period (6 columns)
+    '7th Period - Course Title',
+    '7th Period - Teacher Name',
+    '7th Period - Transfer Grade',
+    '7th Period - Current Grade', 
+    '7th Period - How would you assess this student\'s progress?',
+    '7th Period - Academic and Behavioral Progress Notes',
+    
+    // 8th Period (6 columns)
+    '8th Period - Course Title',
+    '8th Period - Teacher Name',
+    '8th Period - Transfer Grade',
+    '8th Period - Current Grade',
+    '8th Period - How would you assess this student\'s progress?',
+    '8th Period - Academic and Behavioral Progress Notes',
+    
+    // Special Education (6 columns)
+    'SE - Special Education Case Manager',
+    'SE - What accommodations seem to work well with this student to help them be successful?',
+    'SE - What are the student\'s strengths, as far as behavior?',
+    'SE - What are the student\'s needs, as far as behavior?  (Pick behavior having most effect on his/her ability to be successful in class.  If there are no concerns, note that.)',
+    'SE - What are the student\'s needs, as far as functional skills?  (Include daily living skills, fine/gross motor skills, organizational skills, self-advocacy, attendance, etc.)',
+    'SE - Please add any other comments or concerns here:',
+    
+    // Administrative Information
+    'REGULAR CAMPUS',
+    'FIRST DAY OF AEP',
+    'Anticipated Release Date',
+    'Parent Notice Date',
+    'Withdrawn Date',
+    'Attendance Recovery',
+    'COMPASS',
+    'Credit Retrieval',
+    'Behavior Contract',
+    'Campus Mentor',
+    'Other Intervention 1',
+    'Other Intervention 2',
+    'Sect 504',
+    'ESL',
+    'Additional notes or counseling services and Support',
+    'Licensed social worker consultation',
+    'Check if you\'re ready to create Transition Letter with Autocrat',
+    
+    // Contact Information
+    'StudentEmail',
+    'Guardian Name', 
+    'Guardian Email',
+    
+    // Document Merge Fields
+    'Merged Doc ID - Transition Letter',
+    'Merged Doc URL - Transition Letter',
+    'Link to merged Doc - Transition Letter',
+    'Document Merge Status - Transition Letter'
   ]
 };
 

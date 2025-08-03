@@ -535,7 +535,7 @@ class StudentDataMerger extends BaseDataProcessor {
     const updatedMap = new Map();
     
     existingData.forEach((studentData, studentId) => {
-      const formResponses = this.safeMapGet(formResponsesData, studentId);
+      const formResponses = this.safeMapGet(formResponsesData, studentId, []);
       
       updatedMap.set(studentId, {
         ...studentData,

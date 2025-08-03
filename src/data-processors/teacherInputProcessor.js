@@ -230,7 +230,7 @@ class TeacherInputProcessor extends BaseDataProcessor {
 
     // Map form response fields to teacher input
     const fieldMappings = {
-      'How would you assess this student\'s academic growth?': 'How would you assess this student\'s academic progress?',
+      'How would you assess this student\'s academic growth?': 'How would you assess this student\'s academic growth?',
       'Academic and Behavioral Progress Notes': 'Academic and Behavioral Progress Notes'
     };
 
