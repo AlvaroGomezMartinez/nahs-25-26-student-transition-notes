@@ -412,6 +412,69 @@ class StudentDataMerger extends BaseDataProcessor {
       }
     }
 
+    // NEW: Add students with active schedules who are not already in the base map
+    if (dataSources.schedulesData && dataSources.schedulesData.size > 0) {
+      this.log('Adding students with active schedules to base map...');
+      let addedFromSchedules = 0;
+      
+      dataSources.schedulesData.forEach((schedules, studentId) => {
+        // Skip if student is already in the base map
+        if (baseMap.has(studentId)) {
+          return;
+        }
+        
+        // Check if student has active schedules
+        const activeSchedules = this.filterActiveSchedules(schedules);
+        if (activeSchedules.length > 0) {
+          // Extract basic student info from schedule data
+          const firstSchedule = activeSchedules[0];
+          
+          // Try different student name columns that might exist in schedules
+          let studentName = firstSchedule[COLUMN_NAMES.STUDENT_NAME_FULL] || 
+                           firstSchedule[COLUMN_NAMES.STUDENT_NAME_FULL_ALT] ||
+                           firstSchedule["Student Name"] || 
+                           '';
+          
+          const [lastName = '', firstName = ''] = studentName.split(',').map(name => name.trim());
+          
+          // Try different grade columns
+          const grade = firstSchedule[COLUMN_NAMES.GRADE] || 
+                       firstSchedule[COLUMN_NAMES.GRADE_ALT] ||
+                       firstSchedule["Grade"] ||
+                       '';
+          
+          const entryDate = this.extractMostRecentEntryDate(activeSchedules);
+          
+          // Create base student record from schedule data
+          baseMap.set(studentId, {
+            TENTATIVE: [{
+              STUDENT_ID: studentId,
+              FIRST: firstName,
+              LAST: lastName,
+              GRADE: grade,
+              HOME_CAMPUS: '',
+              ENTRY_DATE: entryDate || '',
+              // Mark as added from schedules for identification
+              'DATE ADDED TO SPREADSHEET': new Date().toLocaleDateString()
+            }],
+            Registrations_SY_24_25: [],
+            ContactInfo: [],
+            Schedules: [],
+            Form_Responses_1: [],
+            Entry_Withdrawal: [],
+            Alt_HS_Attendance_Enrollment_Count: [],
+            Withdrawn: [],
+            WD_Other: []
+          });
+          
+          addedFromSchedules++;
+          this.log(`Added student ${studentId} from active schedules: ${firstName} ${lastName} (Grade: ${grade})`);
+        }
+      });
+      
+      this.log(`Added ${addedFromSchedules} additional students from active schedules. Total base map size: ${baseMap.size}`);
+    }
+
     return baseMap;
   }
 
