@@ -225,6 +225,10 @@ class ScheduleProcessor extends BaseDataProcessor {
    * Finds schedules for specific teacher
    * @param {Array} schedules - Array of schedule records
    * @param {string} teacherName - Teacher name to find
+   * 
+   * @todo Find out if this function can be used to create
+   * individualized schedules for teachers' emails.
+   * 
    * @returns {Array} Matching schedule records
    */
   findSchedulesForTeacher(schedules, teacherName) {

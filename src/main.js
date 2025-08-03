@@ -5,7 +5,7 @@
  * workflow for student transition notes. It coordinates data loading, processing, and
  * writing operations using a modular architecture.
  * 
- * @author NAHS Development Team
+ * @author Alvaro Gomez
  * @version 2.0.0
  * @since 2024-01-01
  */
@@ -14,7 +14,8 @@
  * Main entry point for the NAHS Student Transition Notes system.
  * 
  * This function serves as the primary orchestrator for the complete data processing
- * workflow. It uses a clean, modular architecture that separates concerns into data loaders, processors, and writers.
+ * workflow. It uses a clean, modular architecture that separates concerns into
+ * data loaders, processors, and writers.
  * 
  * The process follows these phases:
  * 1. **Data Loading**: Uses specialized loaders to extract data from multiple Google Sheets

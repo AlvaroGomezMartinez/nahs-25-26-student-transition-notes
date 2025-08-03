@@ -274,7 +274,7 @@ const jsdocConfig = {
  *  * Detailed description explaining the module's purpose,
  *  * key functionality, and how it fits into the system.
  *  * 
- *  * @author NAHS Development Team
+ *  * @author Alvaro Gomez
  *  * @version 2.0.0
  *  * @since 2024-01-01
  *  *\/

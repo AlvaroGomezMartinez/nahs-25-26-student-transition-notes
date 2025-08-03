@@ -15,7 +15,7 @@
  * - Attendance records
  * - Entry/withdrawal tracking
  * 
- * @author NAHS Development Team
+ * @author Alvaro Gomez
  * @version 2.0.0
  * @since 2024-01-01
  */
@@ -310,6 +310,7 @@ class StudentDataMerger extends BaseDataProcessor {
           // Preserve original TENTATIVE data structure
           ...processedRecord,
           // Ensure essential fields are populated
+          // @todo Make sure there aren't more fields that need to be populated
           STUDENT_ID: studentId,
           FIRST: firstName,
           LAST: lastName,

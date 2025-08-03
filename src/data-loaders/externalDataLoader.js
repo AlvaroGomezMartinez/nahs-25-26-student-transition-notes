@@ -4,7 +4,7 @@
  * This loader extends BaseDataLoader to handle data from external Google Spreadsheets.
  * It's specifically designed for sheets that exist outside the main project spreadsheet.
  * 
- * @author NAHS Development Team
+ * @author Alvaro Gomez
  * @version 2.0.0
  * @since 2024-01-01
  */

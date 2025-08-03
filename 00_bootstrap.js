@@ -10,7 +10,7 @@
  * - 02_baseDataProcessor.js  
  * - 03_constants.js
  * 
- * @author NAHS Development Team
+ * @author Alvaro Gomez
  * @version 2.0.0
  * @since 2024-01-01
  */

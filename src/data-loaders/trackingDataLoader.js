@@ -3,6 +3,8 @@
  * 
  * Loads data from the Sheet1 (tracking sheet) and converts it to a Map
  * for easier processing. This sheet is located in an external spreadsheet.
+ * 
+ * @todo Delete this loader. The user doesn't use this feature of the project anymore.
  */
 
 class TrackingDataLoader extends BaseDataLoader {

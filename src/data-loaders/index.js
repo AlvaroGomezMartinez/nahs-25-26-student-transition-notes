@@ -1,12 +1,10 @@
 /**
  * Data Loaders Index
  * 
- * Centralizes all data loader exports for easy importing
+ * Centralizes all data loader class exports for easy importing.
+ * In Google Apps Script, we don't have traditional ES6 modules,
+ * but this file serves as documentation of available loaders.
  */
-
-// Export all data loader classes
-// Note: In Google Apps Script, we don't have traditional ES6 modules,
-// but this file serves as documentation of available loaders
 
 /**
  * Available Data Loader Classes:
@@ -76,7 +74,7 @@ function loadAllStudentDataWithLoaders() {
 }
 
 /**
- * Debug version that loads data step by step for inspection
+ * Debugging function that loads data step by step for inspection.
  */
 function debugLoadAllStudentData() {
   console.log("=== Starting Debug Data Loading ===");

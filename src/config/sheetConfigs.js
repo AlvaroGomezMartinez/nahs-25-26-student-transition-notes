@@ -23,6 +23,7 @@ const TENTATIVE_SHEET_CONFIG = {
     'Student First Name',
     'STUDENT ID',
     'GRADE',
+    // @todo Check if I need to include the rest of the columns from TENTATIVE_Version2
     // ... full column order would go here
   ]
 };

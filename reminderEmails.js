@@ -1,12 +1,14 @@
 /**
- *
+ * @fileoverview Function that provides automated email reminders to teacher to
+ * provide their input.
+ * 
  * The sendEmailsForToday function below references the object returned by the
  * getStudentsFromTENTATIVESheet() which is found in the loadTENTATIVEVersion2.gs
  * file in this project.
  * 
  * Sends an email notification to specific recipients with a list of students 
  * who have been enrolled for 10 school days at NAHS. The function checks if each 
- * student's 10-day mark matches today's date and compiles a list of such students.
+ * student's 10-day mark matches today's date and compiles a list of those students.
  * If matches are found, an email is sent with an action item for teachers to provide 
  * input on students' academic and behavioral progress.
  *
@@ -14,13 +16,11 @@
  * Wednesday, Thursday, and Friday on Zina Gonzales' (social worker at NAHS)
  * gmail account so the emails to the teachers are recieved from her.
  *
- * Point of contact: Alvaro Gomez
- *                   Academic Technology Coach
- *                   alvaro.gomez@nisd.net
- *                   Office: +1-210-397-9408
- *                   Mobile: +1-210-363-1577
- *
- * Latest update: 1/4/25
+ * @author Alvaro Gomez
+ * @version 1.0.0
+ * @since 2024-01-01
+ * 
+ * @todo Set five triggers to call sendEmailsForToday() before the start of the school year.
  */
 function sendEmailsForToday() {
   // const today = new Date(2025, 0, 6, 15, 16, 19); // Used for debugging. Uncomment the const below and comment out this one when done debugging.
@@ -44,6 +44,7 @@ function sendEmailsForToday() {
     );
 
     // const emailRecipients = ["alvaro.gomez@nisd.net"]; // Used for debugging. Comment out the array below when debugging.
+    // @todo refactor this array object so that it references const TEACHER_EMAIL_MAPPINGS in 03_constants.gs 
     const emailRecipients = [
       "marco.ayala@nisd.net",
       "alita.barrera@nisd.net",

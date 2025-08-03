@@ -22,7 +22,7 @@ function writeToTENTATIVEVersion2Sheet_Original(updatedUpdatedUpdatedUdatedUpdat
 const writeToTENTATIVEVersion2Sheet_TerriblyNamedVariable = writeToTENTATIVEVersion2Sheet_Original;
 
 /**
- * This is kept as a reference to show what we've improved:
+ * This is kept as a reference to show what was improved in Version 2.0.0:
  * 
  * BEFORE (701 lines of mess):
  * - updatedUpdatedUpdatedUdatedUpdatedUpdatedUpdatedActiveStudentDataMap (with typos!)

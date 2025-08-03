@@ -213,6 +213,7 @@ class TentativeRowBuilder {
    * Gets the student's grade.
    */
   _getGrade(tentativeEntry, entryWithdrawalEntry) {
+    // @todo Look to see what value entryWithdrawalEntry["Grd Lvl"] has and determin if it's needed on the statement below.
     return tentativeEntry["GRADE"] || entryWithdrawalEntry["Grd Lvl"] || null;
   }
 

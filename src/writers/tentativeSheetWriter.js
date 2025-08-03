@@ -169,6 +169,8 @@ class TentativeSheetWriter extends BaseSheetWriter {
       
       // Set vertical alignment
       range.setVerticalAlignment('top');
+
+      // @todo This might be a good spot to add the add checkbox function.
       
     } catch (error) {
       console.error('Error applying specific formatting:', error);

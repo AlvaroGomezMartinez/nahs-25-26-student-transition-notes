@@ -4,7 +4,7 @@
  * This file provides utilities to help configure external spreadsheet IDs
  * and validate external sheet access.
  * 
- * @author NAHS Development Team
+ * @author Alvaro Gomez
  * @version 2.0.0
  * @since 2024-01-01
  */

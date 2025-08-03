@@ -1,5 +1,5 @@
 /**
- * Diagnostic functions to investigate the SHEET_NAMES issue.
+ * Diagnostic functions to investigate an issue with SHEET_NAMES.
  */
 
 /**

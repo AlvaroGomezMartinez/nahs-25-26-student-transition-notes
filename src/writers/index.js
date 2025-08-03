@@ -1,10 +1,9 @@
 /**
  * Index file for the writers module.
  * Provides centralized access to all writer classes and utilities.
+ * Imports all writer classes
+ * In Google Apps Script, these are loaded automatically.
  */
-
-// Import all writer classes
-// (In Google Apps Script, these would be loaded automatically)
 
 /**
  * Main function to write student data to the TENTATIVE-Version2 sheet.
