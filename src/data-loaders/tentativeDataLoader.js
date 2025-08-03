@@ -130,21 +130,45 @@ class TentativeDataLoader extends BaseDataLoader {
    * Captures existing row colors for workflow preservation
    */
   captureRowColors(sheet) {
-    const dataRange = sheet.getDataRange();
-    const values = dataRange.getValues();
-    const backgrounds = dataRange.getBackgrounds();
-
-    const studentColors = {};
-
-    for (let i = 1; i < values.length; i++) {
-      // Skip header row
-      const studentId = values[i][3]; // Column D contains student ID
-      if (studentId) {
-        studentColors[studentId] = backgrounds[i];
+    try {
+      const dataRange = sheet.getDataRange();
+      
+      if (dataRange.getNumRows() <= 1) {
+        console.log('No data rows found for color capture');
+        return {};
       }
-    }
+      
+      const values = dataRange.getValues();
+      const backgrounds = dataRange.getBackgrounds();
 
-    return studentColors;
+      const studentColors = {};
+      let coloredRowCount = 0;
+
+      for (let i = 1; i < values.length; i++) {
+        // Skip header row
+        const studentId = values[i][3]; // Column D contains student ID
+        if (studentId) {
+          const rowColors = backgrounds[i];
+          
+          // Check if this row has non-default colors (not white/transparent)
+          const hasCustomColors = rowColors.some(color => 
+            color && color !== '#ffffff' && color !== '#FFFFFF' && color !== ''
+          );
+          
+          if (hasCustomColors) {
+            studentColors[studentId] = rowColors;
+            coloredRowCount++;
+          }
+        }
+      }
+      
+      console.log(`TentativeDataLoader captured colors for ${coloredRowCount} rows`);
+      return studentColors;
+      
+    } catch (error) {
+      console.error('Error capturing row colors:', error);
+      return {};
+    }
   }
 }
 

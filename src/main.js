@@ -109,13 +109,23 @@ function loadTENTATIVEVersion2() {
 
     console.log(`Successfully processed data for ${activeStudentDataMap.size} students`);
     
-    // Phase 3: Write processed data to sheets using the new writers
-    console.log('Phase 3: Writing data to TENTATIVE-Version2 sheet...');
+    // Phase 3: Preserve row formatting before writing new data
+    console.log('Phase 3: Preserving existing row formatting...');
+    const preservedFormatting = preserveExistingRowColors();
+    console.log(`Preserved formatting for ${Object.keys(preservedFormatting).length} rows`);
+    
+    // Phase 4: Write processed data to sheets using the new writers
+    console.log('Phase 4: Writing data to TENTATIVE-Version2 sheet...');
     
     // Use the new writer system
     const writeStats = writeToTENTATIVEVersion2Sheet(activeStudentDataMap);
     
-    // Phase 4: Summary and completion
+    // Phase 5: Restore row formatting after writing new data
+    console.log('Phase 5: Restoring row formatting...');
+    restoreRowColors(preservedFormatting);
+    console.log('Row formatting restored successfully');
+    
+    // Phase 6: Summary and completion
     const endTime = new Date();
     const processingTime = (endTime - startTime) / 1000;
     
@@ -378,43 +388,53 @@ function writeProcessedDataToSheet(activeStudents) {
 }
 
 /**
- * Preserves existing row colors from the TENTATIVE-Version2 sheet before data refresh.
+ * Preserves existing row formatting from the TENTATIVE-Version2 sheet before data refresh.
  * 
- * This function captures the current background colors of all rows in the
- * TENTATIVE-Version2 sheet before the data is refreshed. This allows the
- * system to maintain any manual color coding that users may have applied
+ * This function captures the current formatting (background colors, text colors, font styles,
+ * font weights, etc.) of all rows in the TENTATIVE-Version2 sheet before the data is refreshed.
+ * This allows the system to maintain any manual formatting that users may have applied
  * to highlight specific students or conditions.
  * 
  * The function handles:
- * - **Color Extraction**: Reads background colors from all sheet rows
- * - **Student Mapping**: Associates colors with specific student IDs
- * - **Data Preservation**: Creates a mapping for color restoration
+ * - **Background Colors**: Preserves cell background colors
+ * - **Text Colors**: Preserves font colors
+ * - **Font Styles**: Preserves bold, italic, underline formatting
+ * - **Font Properties**: Preserves font family and size
+ * - **Student Mapping**: Associates formatting with specific student IDs
+ * - **Data Preservation**: Creates a comprehensive mapping for format restoration
  * - **Error Resilience**: Handles missing or invalid data gracefully
  * 
  * @function preserveExistingRowColors
  * @memberof Main
  * 
- * @returns {Object<string, Array<Array<string>>>} Map of student colors where:
+ * @returns {Object<string, Object>} Map of student formatting where:
  *   - **Key**: Student ID (string) - Unique identifier for each student
- *   - **Value**: Array of background colors for that student's row
+ *   - **Value**: Formatting object containing:
+ *     - backgrounds: Array of background colors for the row
+ *     - fontColors: Array of text colors for the row
+ *     - fontWeights: Array of font weights (normal, bold)
+ *     - fontStyles: Array of font styles (normal, italic)
+ *     - textDecorations: Array of text decorations (none, underline)
+ *     - fontFamilies: Array of font families
+ *     - fontSizes: Array of font sizes
  * 
  * @throws {Error} Throws if sheet access fails
  * 
  * @example
- * // Preserve colors before data refresh
- * const colorMap = preserveExistingRowColors();
+ * // Preserve formatting before data refresh
+ * const formatMap = preserveExistingRowColors();
  * 
- * // After writing new data, restore colors
- * Object.keys(colorMap).forEach(studentId => {
- *   const colors = colorMap[studentId];
- *   // Apply colors to the appropriate row
+ * // After writing new data, restore formatting
+ * Object.keys(formatMap).forEach(studentId => {
+ *   const formatting = formatMap[studentId];
+ *   // Apply formatting to the appropriate row
  * });
  * 
  * @example
- * // Check if student has custom colors
- * const colors = preserveExistingRowColors();
- * const studentColors = colors['1234567'];
- * if (studentColors && studentColors.some(color => color !== '#ffffff')) {
+ * // Check if student has custom formatting
+ * const formats = preserveExistingRowColors();
+ * const studentFormat = formats['1234567'];
+ * if (studentFormat && studentFormat.backgrounds.some(color => color !== '#ffffff')) {
  *   console.log('Student has custom highlighting');
  * }
  * 
@@ -424,20 +444,94 @@ function writeProcessedDataToSheet(activeStudents) {
  * @since 2.0.0
  */
 function preserveExistingRowColors() {
-  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SHEET_NAMES.TENTATIVE_V2);
-  const dataRange = sheet.getDataRange();
-  const data = dataRange.getValues();
-  const backgrounds = dataRange.getBackgrounds();
-  
-  const studentColors = {};
-  for (let i = 0; i < data.length; i++) {
-    const studentId = data[i][3]; // Column D contains student ID
-    if (studentId) {
-      studentColors[studentId] = backgrounds[i];
+  try {
+    const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SHEET_NAMES.TENTATIVE_V2);
+    
+    if (!sheet) {
+      console.warn(`Sheet '${SHEET_NAMES.TENTATIVE_V2}' not found - skipping formatting preservation`);
+      return {};
     }
+    
+    const dataRange = sheet.getDataRange();
+    
+    if (dataRange.getNumRows() <= 1) {
+      console.log('No data rows found - skipping formatting preservation');
+      return {};
+    }
+    
+    const data = dataRange.getValues();
+    
+    // Get all formatting properties
+    const backgrounds = dataRange.getBackgrounds();
+    const fontColors = dataRange.getFontColors();
+    const fontWeights = dataRange.getFontWeights();
+    const fontStyles = dataRange.getFontStyles();
+    const textDecorations = dataRange.getTextStyles();
+    const fontFamilies = dataRange.getFontFamilies();
+    const fontSizes = dataRange.getFontSizes();
+    
+    const studentFormatting = {};
+    let formattedRowCount = 0;
+    
+    for (let i = 1; i < data.length; i++) { // Skip header row
+      const studentId = data[i][3]; // Column D contains student ID
+      if (studentId) {
+        const rowBackgrounds = backgrounds[i];
+        const rowFontColors = fontColors[i];
+        const rowFontWeights = fontWeights[i];
+        const rowFontStyles = fontStyles[i];
+        const rowTextDecorations = textDecorations[i];
+        const rowFontFamilies = fontFamilies[i];
+        const rowFontSizes = fontSizes[i];
+        
+        // Check if this row has non-default formatting
+        const hasCustomBackgrounds = rowBackgrounds.some(color => 
+          color && color !== '#ffffff' && color !== '#FFFFFF' && color !== ''
+        );
+        
+        const hasCustomFontColors = rowFontColors.some(color => 
+          color && color !== '#000000' && color !== '#000' && color !== ''
+        );
+        
+        const hasCustomFontWeights = rowFontWeights.some(weight => 
+          weight && weight !== 'normal'
+        );
+        
+        const hasCustomFontStyles = rowFontStyles.some(style => 
+          style && style !== 'normal'
+        );
+        
+        const hasCustomTextDecorations = rowTextDecorations.some(decoration => {
+          // Check if decoration object has underline property set to true
+          return decoration && typeof decoration === 'object' && decoration.underline === true;
+        });
+        
+        const hasCustomFormatting = hasCustomBackgrounds || hasCustomFontColors || 
+                                   hasCustomFontWeights || hasCustomFontStyles || 
+                                   hasCustomTextDecorations;
+        
+        if (hasCustomFormatting) {
+          studentFormatting[studentId] = {
+            backgrounds: rowBackgrounds,
+            fontColors: rowFontColors,
+            fontWeights: rowFontWeights,
+            fontStyles: rowFontStyles,
+            textDecorations: rowTextDecorations,
+            fontFamilies: rowFontFamilies,
+            fontSizes: rowFontSizes
+          };
+          formattedRowCount++;
+        }
+      }
+    }
+    
+    console.log(`Found ${formattedRowCount} rows with custom formatting out of ${data.length - 1} data rows`);
+    return studentFormatting;
+    
+  } catch (error) {
+    console.error('Error preserving row formatting:', error);
+    return {};
   }
-  
-  return studentColors;
 }
 
 /**
@@ -658,20 +752,100 @@ function diagnoseSpreadsheetStructure() {
 }
 
 /**
- * Restores row colors after data refresh
- * @param {Object} studentColors - Map of student IDs to colors
+ * Restores row formatting after data refresh
+ * 
+ * This function restores comprehensive formatting (background colors, text colors,
+ * font styles, etc.) to student rows after the data has been refreshed. It uses
+ * the formatting data captured by preserveExistingRowColors to maintain user
+ * customizations across data updates.
+ * 
+ * @function restoreRowColors
+ * @memberof Main
+ * 
+ * @param {Object} studentFormatting - Map of student IDs to their preserved formatting where:
+ *   - **Key**: Student ID (string)
+ *   - **Value**: Formatting object containing all preserved format properties
+ * 
+ * @throws {Error} Logs errors but doesn't throw to avoid breaking main process
+ * 
+ * @example
+ * // Restore formatting after data refresh
+ * const formatting = preserveExistingRowColors();
+ * // ... perform data refresh ...
+ * restoreRowColors(formatting);
+ * 
+ * @see {@link preserveExistingRowColors} For the companion preservation function
+ * 
+ * @since 2.0.0
  */
-function restoreRowColors(studentColors) {
-  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SHEET_NAMES.TENTATIVE_V2);
-  const newDataRange = sheet.getDataRange();
-  const newData = newDataRange.getValues();
-  
-  for (let j = 0; j < newData.length; j++) {
-    const newStudentId = newData[j][3]; // Column D contains student ID
-    if (newStudentId && studentColors[newStudentId]) {
-      const range = sheet.getRange(j + 1, 1, 1, newData[0].length);
-      range.setBackgrounds([studentColors[newStudentId]]);
+function restoreRowColors(studentFormatting) {
+  try {
+    if (!studentFormatting || Object.keys(studentFormatting).length === 0) {
+      console.log('No formatting to restore');
+      return;
     }
+    
+    const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SHEET_NAMES.TENTATIVE_V2);
+    
+    if (!sheet) {
+      console.warn(`Sheet '${SHEET_NAMES.TENTATIVE_V2}' not found - cannot restore formatting`);
+      return;
+    }
+    
+    const newDataRange = sheet.getDataRange();
+    const newData = newDataRange.getValues();
+    
+    let restoredCount = 0;
+    
+    for (let j = 1; j < newData.length; j++) { // Skip header row
+      const newStudentId = newData[j][3]; // Column D contains student ID
+      
+      if (newStudentId && studentFormatting[newStudentId]) {
+        try {
+          const range = sheet.getRange(j + 1, 1, 1, newData[0].length);
+          const formatting = studentFormatting[newStudentId];
+          
+          // Apply all formatting properties
+          if (formatting.backgrounds) {
+            range.setBackgrounds([formatting.backgrounds]);
+          }
+          
+          if (formatting.fontColors) {
+            range.setFontColors([formatting.fontColors]);
+          }
+          
+          if (formatting.fontWeights) {
+            range.setFontWeights([formatting.fontWeights]);
+          }
+          
+          if (formatting.fontStyles) {
+            range.setFontStyles([formatting.fontStyles]);
+          }
+          
+          if (formatting.textDecorations) {
+            range.setTextStyles([formatting.textDecorations]);
+          }
+          
+          if (formatting.fontFamilies) {
+            range.setFontFamilies([formatting.fontFamilies]);
+          }
+          
+          if (formatting.fontSizes) {
+            range.setFontSizes([formatting.fontSizes]);
+          }
+          
+          restoredCount++;
+        } catch (rangeError) {
+          console.warn(`Failed to restore formatting for student ${newStudentId}:`, rangeError);
+        }
+      }
+    }
+    
+    console.log(`Successfully restored formatting for ${restoredCount} rows`);
+    
+  } catch (error) {
+    console.error('Error restoring row formatting:', error);
+    // Don't throw - formatting restoration shouldn't break the main process
   }
 }
 
