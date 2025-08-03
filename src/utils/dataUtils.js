@@ -307,21 +307,93 @@ class DataUtils {
  */
 const globalDataUtils = new DataUtils();
 
+/**
+ * Ensures checkboxes are present in a specific column of a sheet.
+ * 
+ * This utility function creates checkboxes for all data rows in the specified
+ * column, ensuring that existing boolean values are preserved and non-boolean
+ * values are converted to false (unchecked). This is commonly used for
+ * tracking columns in various sheets.
+ * 
+ * @function ensureCheckboxesInColumn
+ * @memberof Utils.DataUtils
+ * 
+ * @param {GoogleAppsScript.Spreadsheet.Sheet} sheet - The sheet to modify
+ * @param {number} columnNumber - The column number (1-based) where to add checkboxes
+ * @param {string} [columnLetter] - Optional column letter for logging (e.g., "BX")
+ * @returns {boolean} True if checkboxes were successfully created, false otherwise
+ * 
+ * @example
+ * // Add checkboxes to column BX (column 76) in TENTATIVE-Version2 sheet
+ * const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('TENTATIVE-Version2');
+ * const success = ensureCheckboxesInColumn(sheet, 76, 'BX');
+ * if (success) {
+ *   console.log('Checkboxes added successfully');
+ * }
+ * 
+ * @since 2.0.0
+ */
+function ensureCheckboxesInColumn(sheet, columnNumber, columnLetter = null) {
+  try {
+    if (!sheet || typeof columnNumber !== 'number' || columnNumber < 1) {
+      console.error('Invalid parameters for ensureCheckboxesInColumn');
+      return false;
+    }
+
+    const lastRow = sheet.getLastRow();
+    
+    if (lastRow <= 1) {
+      console.log(`No data rows found in sheet ${sheet.getName()} - skipping checkbox creation`);
+      return true; // Not an error, just no data
+    }
+
+    const range = sheet.getRange(2, columnNumber, lastRow - 1, 1);
+    const values = range.getValues();
+    
+    // Ensure all cells have proper boolean values before adding checkboxes
+    let changedValues = false;
+    for (let i = 0; i < values.length; i++) {
+      if (values[i][0] !== true && values[i][0] !== false) {
+        values[i][0] = false; // Set default to false (unchecked)
+        changedValues = true;
+      }
+    }
+    
+    // Set the values first if any were changed, then insert checkboxes
+    if (changedValues) {
+      range.setValues(values);
+    }
+    range.insertCheckboxes();
+    
+    const columnDesc = columnLetter ? `column ${columnLetter} (${columnNumber})` : `column ${columnNumber}`;
+    console.log(`Added checkboxes to ${columnDesc} for ${values.length} rows in sheet ${sheet.getName()}`);
+    return true;
+    
+  } catch (error) {
+    const columnDesc = columnLetter ? `column ${columnLetter} (${columnNumber})` : `column ${columnNumber}`;
+    console.error(`Error creating checkboxes in ${columnDesc}:`, error);
+    return false;
+  }
+}
+
 // Make commonly used functions globally available for Google Apps Script
 // This ensures backward compatibility with existing code
 // Only export functions that actually exist as standalone functions
 if (typeof global !== 'undefined') {
   global.extractStudentId = extractStudentId;
+  global.ensureCheckboxesInColumn = ensureCheckboxesInColumn;
   global.DataUtils = DataUtils;
   global.dataUtils = globalDataUtils;
 } else if (typeof window !== 'undefined') {
   window.extractStudentId = extractStudentId;
+  window.ensureCheckboxesInColumn = ensureCheckboxesInColumn;
   window.DataUtils = DataUtils;  
   window.dataUtils = globalDataUtils;
 } else {
   // For Google Apps Script, functions are automatically global when declared
   // But we need to ensure they're accessible
   this.extractStudentId = extractStudentId;
+  this.ensureCheckboxesInColumn = ensureCheckboxesInColumn;
   this.DataUtils = DataUtils;
   this.dataUtils = globalDataUtils;
 }

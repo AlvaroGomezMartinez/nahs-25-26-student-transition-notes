@@ -237,10 +237,34 @@ class TentativeSheetWriter extends BaseSheetWriter {
       // Set vertical alignment
       range.setVerticalAlignment('top');
 
-      // @todo This might be a good spot to add the add checkbox function.
+      // Add checkboxes in column BX
+      this._ensureCheckboxesInColumnBX();
       
     } catch (error) {
       console.error('Error applying specific formatting:', error);
+    }
+  }
+
+  /**
+   * Ensures checkboxes are present in column BX (column 76).
+   * This method creates checkboxes for all data rows in the TENTATIVE-Version2 sheet.
+   * @private
+   */
+  _ensureCheckboxesInColumnBX() {
+    try {
+      const sheet = this.getSheet();
+      
+      // Use the utility function for checkbox creation
+      const success = ensureCheckboxesInColumn(sheet, 76, 'BX');
+      
+      if (success) {
+        this.log('Successfully added checkboxes to column BX');
+      } else {
+        this.log('Failed to add checkboxes to column BX', 'warn');
+      }
+    } catch (error) {
+      console.error('Error in _ensureCheckboxesInColumnBX:', error);
+      // Don't throw - checkbox errors shouldn't break the data write
     }
   }
 

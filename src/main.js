@@ -677,24 +677,25 @@ function restoreRowColors(studentColors) {
 
 /**
  * Ensures checkboxes are present in column BX (legacy function)
- * TODO: Move this to a utilities file
+ * This function maintains backward compatibility while using the new utility.
+ * 
+ * @deprecated Use ensureCheckboxesInColumn utility function instead
+ * @see ensureCheckboxesInColumn
  */
 function ensureCheckboxesInColumnBX() {
-  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SHEET_NAMES.TENTATIVE_V2);
-  const columnBX = 76; // Column BX
-  const lastRow = sheet.getLastRow();
-  
-  if (lastRow > 1) {
-    const range = sheet.getRange(2, columnBX, lastRow - 1, 1);
-    const values = range.getValues();
+  try {
+    const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SHEET_NAMES.TENTATIVE_V2);
     
-    for (let i = 0; i < values.length; i++) {
-      if (values[i][0] !== true && values[i][0] !== false) {
-        values[i][0] = false; // Set default to false (unchecked)
-      }
+    if (!sheet) {
+      console.error('TENTATIVE-Version2 sheet not found');
+      return false;
     }
     
-    range.setValues(values);
-    range.insertCheckboxes();
+    // Use the new utility function
+    return ensureCheckboxesInColumn(sheet, 76, 'BX');
+    
+  } catch (error) {
+    console.error('Error in ensureCheckboxesInColumnBX:', error);
+    return false;
   }
 }
