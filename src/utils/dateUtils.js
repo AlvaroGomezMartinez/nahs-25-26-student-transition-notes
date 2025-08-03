@@ -69,6 +69,48 @@ function formatDateToMMDDYYYY(date) {
 }
 
 /**
+ * Formats a date according to the specified format string.
+ * 
+ * This function provides flexible date formatting to support various
+ * display requirements throughout the NAHS system. It handles common
+ * format patterns used in reports, emails, and user interfaces.
+ * 
+ * @function formatDate
+ * @memberof DateUtils
+ * 
+ * @param {Date|string|number} date - The date to format
+ * @param {string} format - Format string using patterns:
+ *   - yyyy: 4-digit year
+ *   - MM: 2-digit month (01-12)
+ *   - dd: 2-digit day (01-31)
+ *   - MM/dd/yyyy: US date format
+ *   - yyyy-MM-dd: ISO date format
+ *   - MM-dd-yyyy: Alternative US format
+ * 
+ * @returns {string|null} Formatted date string or null if invalid
+ * 
+ * @example
+ * formatDate(new Date(2024, 0, 15), 'MM/dd/yyyy'); // "01/15/2024"
+ * formatDate(new Date(2024, 0, 15), 'yyyy-MM-dd'); // "2024-01-15"
+ * formatDate(new Date(2024, 0, 15), 'MM-dd-yyyy'); // "01-15-2024"
+ */
+function formatDate(date, format) {
+  if (date === null || date === undefined) return null;
+  const d = new Date(date);
+  if (isNaN(d.getTime())) return null;
+  
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  
+  // Replace format patterns
+  return format
+    .replace(/yyyy/g, year)
+    .replace(/MM/g, month)
+    .replace(/dd/g, day);
+}
+
+/**
  * Determines if a given date falls on a weekend (Saturday or Sunday).
  * 
  * This function is commonly used in business logic to exclude weekends
@@ -304,6 +346,16 @@ class DateUtils {
    */
   formatToMMDDYYYY(date) {
     return formatDateToMMDDYYYY(date);
+  }
+
+  /**
+   * Formats a date according to the specified format string.
+   * @param {Date|string|number} date - The date to format
+   * @param {string} format - Format string (yyyy-MM-dd, MM/dd/yyyy, MM-dd-yyyy)
+   * @returns {string|null} Formatted date string or null if invalid
+   */
+  formatDate(date, format) {
+    return formatDate(date, format);
   }
 
   /**

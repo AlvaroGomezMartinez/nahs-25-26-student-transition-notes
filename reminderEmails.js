@@ -1,161 +1,155 @@
 /**
- * @fileoverview Function that provides automated email reminders to teacher to
- * provide their input.
+ * @fileoverview Legacy Email Reminder Functions for NAHS System.
  * 
- * The sendEmailsForToday function below references the object returned by the
- * getStudentsFromTENTATIVESheet() which is found in the loadTENTATIVEVersion2.gs
- * file in this project.
+ * This file maintains backward compatibility for existing triggers and scripts
+ * that reference the original sendEmailsForToday function. All functionality
+ * has been refactored into the new EmailReminderService class located in
+ * src/services/emailReminderService.js.
  * 
- * Sends an email notification to specific recipients with a list of students 
- * who have been enrolled for 10 school days at NAHS. The function checks if each 
- * student's 10-day mark matches today's date and compiles a list of those students.
- * If matches are found, an email is sent with an action item for teachers to provide 
- * input on students' academic and behavioral progress.
- *
- * sendEmailsForToday has five triggers set to run it every Monday, Tuesday,
- * Wednesday, Thursday, and Friday on Zina Gonzales' (social worker at NAHS)
- * gmail account so the emails to the teachers are recieved from her.
- *
+ * @deprecated Since version 2.0.0. Use EmailReminderService class instead.
  * @author Alvaro Gomez
- * @version 1.0.0
+ * @version 2.0.0 (refactored)
  * @since 2024-01-01
  * 
- * @todo Set five triggers to call sendEmailsForToday() before the start of the school year.
+ * @todo Update existing triggers to use the new EmailReminderService class
+ * @see {@link EmailReminderService} For the new implementation
+ */
+
+/**
+ * Legacy function for sending daily email reminders.
+ * 
+ * This function maintains the original interface while delegating to the new
+ * EmailReminderService class. It exists for backward compatibility with
+ * existing triggers and scripts.
+ * 
+ * @function sendEmailsForToday
+ * @deprecated Since version 2.0.0. Use EmailReminderService class instead.
+ * 
+ * @returns {Object} Results of the reminder process
+ * 
+ * @example
+ * // Legacy usage (maintained for compatibility)
+ * sendEmailsForToday();
+ * 
+ * // Preferred new usage
+ * const service = new EmailReminderService();
+ * service.sendDailyReminders();
+ * 
+ * @since 1.0.0
  */
 function sendEmailsForToday() {
-  // const today = new Date(2025, 0, 6, 15, 16, 19); // Used for debugging. Uncomment the const below and comment out this one when done debugging.
-  const today = new Date();
-  const formattedDate = `${today.getMonth() + 1}/${today.getDate()}/${today.getFullYear()}`; // Adding 1 to getMonth() because months are 0-indexed
-
-  // Check if today is a weekend
-  const dayOfWeek = today.getDay(); // Sunday = 0, Monday = 1, ..., Saturday = 6
-  const isWeekend2 = (dayOfWeek === 0 || dayOfWeek === 6);
-
-  // Check if today is a holiday
-  const isHoliday = holidayDates.includes(formattedDate);
-
-  // Run the emails only if it's a weekday and not a holiday
-  if (!isWeekend2 && !isHoliday) {
-    // const today = '2025-01-06' // This is for debugging and sending emails out manually. Set today's date in the variable. When using this, don't forget to turn it back off.
-    const today = Utilities.formatDate(
-      new Date(),
-      Session.getScriptTimeZone(),
-      "yyyy-MM-dd"
-    );
-
-    // const emailRecipients = ["alvaro.gomez@nisd.net"]; // Used for debugging. Comment out the array below when debugging.
-    // @todo refactor this array object so that it references const TEACHER_EMAIL_MAPPINGS in 03_constants.gs 
-    const emailRecipients = [
-      "marco.ayala@nisd.net",
-      "alita.barrera@nisd.net",
-      "gabriela.chavarria-medina@nisd.net",
-      "leticia.collier@nisd.net",
-      "staci.cunningham@nisd.net",
-      "samantha.daywood@nisd.net",
-      "richard.delarosa@nisd.net",
-      "ramon.duran@nisd.net",
-      "janice.flores@nisd.net",
-      "lauren.flores@nisd.net",
-      "roslyn.francis@nisd.net",
-      "daniel.galdeano@nisd.net",
-      "nancy-1.garcia@nisd.net",
-      "cierra.gibson@nisd.net",
-      "zina.gonzales@nisd.net",
-      "alvaro.gomez@nisd.net",
-      "teressa.hensley@nisd.net",
-      "catherine.huff@nisd.net",
-      "erin.knippa@nisd.net",
-      "joshua.lacour@nisd.net",
-      "thalia.mendez@nisd.net",
-      "alexandria.murphy@nisd.net",
-      "dennis.olivares@nisd.net",
-      "loretta.owens@nisd.net",
-      "denisse.perez@nisd.net",
-      "jessica.poladelcastillo@nisd.net",
-      "angela.rodriguez@nisd.net",
-      "linda.rodriguez@nisd.net",
-      "jessica-1.vela@nisd.net",
-      "miranda.wenzlaff@nisd.net",
-    ];
-
-    let dataObjects;
-    try {
-      dataObjects = getStudentsFromTENTATIVESheet();
-    } catch (error) {
-      Logger.log("Check Line 87 in the reminderEmails.gs file: Error calling getStudentsFromTENTATIVESheet " + error);
-      return;
-    }
-
-    if (!dataObjects || dataObjects.size === 0) {
-      Logger.log("Check Line 93 in the reminderEmails.gs file: No data found in dataObjects or dataObjects is undefined.");
-      return;
-    }
-
-    let studentsForToday = [];
-
-    try {
-      for (let [studentID, dataArray] of dataObjects.entries()) {
-        if (dataArray && dataArray[0] && dataArray[0]["FIRST DAY OF AEP"]) {
-          let startDate = new Date(dataArray[0]["FIRST DAY OF AEP"]);
-
-          let tenDaysMark = addWorkdays(startDate, 10, holidayDates || []);
-          
-          let formattedTenDaysMark = Utilities.formatDate(
-            tenDaysMark,
-            Session.getScriptTimeZone(),
-            "yyyy-MM-dd"
-          );
-
-          if (formattedTenDaysMark === today) {
-            let lastName = dataArray[0]["LAST"];
-            let firstName = dataArray[0]["FIRST"];
-            let studentID = dataArray[0]["STUDENT ID"];
-            let studentGrade = dataArray[0]["GRADE"];
-            studentsForToday.push(
-              `${lastName}, ${firstName} (${studentID}), Grade: ${studentGrade}`
-            );
-          }
-        } else {
-          Logger.log(`Check Line 83: Data issue for Student ID ${studentID}: "FIRST DAY OF AEP" not found`);
-        }
-      }
-    } catch (error) {
-      Logger.log("Check Line 88: Error within for loop: " + error);
-      return;
-    }
-
-    const sendEmail = (recipients, subject, body) => {
-      GmailApp.sendEmail(recipients.join(","), subject, body);
-    };
-
-    if (studentsForToday.length > 0) {
-      let dueDate = new Date(today);
-      let workdaysAdded = 0;
-      while (workdaysAdded < 2) {
-        dueDate.setDate(dueDate.getDate() + 1);
-
-        const formattedDate = Utilities.formatDate(dueDate, Session.getScriptTimeZone(), "M/d/yyyy");
-
-        if (!isWeekend(dueDate) && !holidayDates.includes(formattedDate)) {
-          workdaysAdded++;
-        }
-      }
-
-      let formattedDueDate = Utilities.formatDate(dueDate, Session.getScriptTimeZone(), "MM-dd-yyyy");
-      let subject = "Transition Reminder: Today's List of Students with 10 Days at NAHS";
-      let formLink = "https://forms.gle/1NirWqZkvcABGgYc9";
-      let body = `NAHS Teachers,\n\nBelow is today's list of students that have been enrolled for 10 days at NAHS:\n\n${studentsForToday.join(
-        "\n"
-      )}\n\nACTION ITEM (Due by end of day, ${formattedDueDate}): If you have one of these students on your roster, please go to: ${formLink} and provide your input on their academic growth and behavioral progress.\n\n****REMINDER****\nWhen inputting the period on the form, select the period that is listed on the student's schedule, the one you enter their attendance with.\n\nThank you`;
-
-      sendEmail(emailRecipients, subject, body);
-    } else {
-      let subject = "Transition Reminder: Today's List of Students with 10 Days at NAHS";
-      let body = `NAHS Teachers,\n\nWe do not have any students on today's 10-Day list!\nPlease work on any you have pending from before and be on the look out for the next list.\n\nHave a great day.`;
-
-      sendEmail(emailRecipients, subject, body);
-    }
-  } else {
-    Logger.log("Reminder emails were not sent because it is either a weekend or a holiday.")
+  try {
+    console.log('=== Legacy sendEmailsForToday Function ===');
+    console.log('Note: This function is deprecated. Consider upgrading to EmailReminderService.');
+    console.log('Location: src/services/emailReminderService.js');
+    
+    // Delegate to the new service
+    const service = new EmailReminderService();
+    const result = service.sendDailyReminders();
+    
+    console.log('Legacy function completed successfully');
+    return result;
+    
+  } catch (error) {
+    console.error('Error in legacy sendEmailsForToday function:', error);
+    
+    // Fallback error logging for compatibility
+    Logger.log(`Legacy reminderEmails.js error: ${error.message}`);
+    
+    throw error;
   }
+}
+
+/**
+ * Debug version of the legacy function.
+ * 
+ * This function provides a debug interface for the legacy sendEmailsForToday
+ * function, allowing for testing with custom parameters.
+ * 
+ * @function debugSendEmailsForToday
+ * @deprecated Since version 2.0.0. Use testEmailReminders function instead.
+ * 
+ * @param {Date} [testDate] - Date to simulate for testing
+ * @param {Array<string>} [testRecipients] - Email recipients for testing
+ * 
+ * @returns {Object} Test results
+ * 
+ * @example
+ * // Debug with specific date
+ * debugSendEmailsForToday(new Date('2025-01-15'), ['test@nisd.net']);
+ * 
+ * // Quick debug with current date
+ * debugSendEmailsForToday();
+ * 
+ * @since 1.0.0
+ */
+function debugSendEmailsForToday(testDate = null, testRecipients = ['alvaro.gomez@nisd.net']) {
+  try {
+    console.log('=== Legacy Debug Function ===');
+    console.log('Note: This function is deprecated. Use testEmailReminders instead.');
+    
+    // Delegate to the new test function
+    return testEmailReminders({
+      testDate: testDate,
+      testRecipients: testRecipients,
+      verbose: true
+    });
+    
+  } catch (error) {
+    console.error('Error in legacy debug function:', error);
+    throw error;
+  }
+}
+
+/**
+ * Migration helper function.
+ * 
+ * This function provides information about migrating from the legacy
+ * sendEmailsForToday function to the new EmailReminderService class.
+ * 
+ * @function showMigrationGuide
+ * 
+ * @example
+ * // Get migration information
+ * showMigrationGuide();
+ * 
+ * @since 2.0.0
+ */
+function showMigrationGuide() {
+  console.log('=== Email Reminder Migration Guide ===');
+  console.log('');
+  console.log('LEGACY (Current):');
+  console.log('  sendEmailsForToday();');
+  console.log('');
+  console.log('NEW (Recommended):');
+  console.log('  const service = new EmailReminderService();');
+  console.log('  service.sendDailyReminders();');
+  console.log('');
+  console.log('NEW (With Options):');
+  console.log('  const service = new EmailReminderService({');
+  console.log('    debugMode: true,');
+  console.log('    testRecipients: ["test@nisd.net"]');
+  console.log('  });');
+  console.log('  service.sendDailyReminders();');
+  console.log('');
+  console.log('TESTING:');
+  console.log('  testEmailReminders({ testDate: new Date(), verbose: true });');
+  console.log('');
+  console.log('FILE LOCATIONS:');
+  console.log('  New Service: src/services/emailReminderService.js');
+  console.log('  Legacy File: reminderEmails.js (this file)');
+  console.log('');
+  console.log('BENEFITS OF NEW SYSTEM:');
+  console.log('  - Modular architecture integration');
+  console.log('  - Better error handling and logging');
+  console.log('  - Centralized teacher email management');
+  console.log('  - Enhanced testing and debugging capabilities');
+  console.log('  - Improved date/holiday handling');
+  console.log('  - Configuration options for different environments');
+  console.log('');
+  console.log('MIGRATION STEPS:');
+  console.log('  1. Test new system: testEmailReminders()');
+  console.log('  2. Update triggers to use new EmailReminderService');
+  console.log('  3. Remove dependency on this legacy file');
+  console.log('');
 }
