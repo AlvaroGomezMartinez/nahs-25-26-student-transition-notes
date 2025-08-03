@@ -114,20 +114,12 @@ class TentativeRowBuilder {
         ...this._buildPeriodData('8th', teacherInput, tentativeEntry),
 
         // Special Education data
-        ...(() => {
-          const specialEdData = this._buildSpecialEducationData(teacherInput);
-          console.log(`Special Ed data length: ${specialEdData.length}, data: [${specialEdData.join(', ')}]`);
-          return specialEdData;
-        })(),
+        ...this._buildSpecialEducationData(teacherInput),
 
         // Additional fields
         registrationEntry?.["Home Campus"] || null,
         this._getFormattedEntryDate(entryWithdrawalEntry),
-        (() => {
-          const formatted = this.dateUtils.formatToMMDDYYYY(estimatedExitDay);
-          console.log(`Row assignment debug: estimatedExitDay=${estimatedExitDay}, formatted=${formatted}, type=${typeof formatted}`);
-          return formatted || null;
-        })(),
+        this.dateUtils.formatToMMDDYYYY(estimatedExitDay) || null,
         "", // Parent Notice Date
         "", // Withdrawn Date
         "", // Attendance Recovery
