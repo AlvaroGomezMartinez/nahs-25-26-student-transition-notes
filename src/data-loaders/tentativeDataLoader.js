@@ -6,7 +6,7 @@
  * for student transitions. It handles color preservation for workflow tracking
  * and provides the foundation student data that other loaders will enhance.
  * 
- * @author NAHS Development Team
+ * @author Alvaro Gomez
  * @version 2.0.0 
  * @since 2024-01-01
  * @memberof DataLoaders

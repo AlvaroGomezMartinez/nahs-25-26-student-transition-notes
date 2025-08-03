@@ -9,7 +9,7 @@
  * The processors handle complex business logic transformations, data merging,
  * filtering, and validation required for comprehensive transition tracking.
  * 
- * @author NAHS Development Team
+ * @author Alvaro Gomez
  * @version 2.0.0
  * @since 2024-01-01
  * @memberof DataProcessors

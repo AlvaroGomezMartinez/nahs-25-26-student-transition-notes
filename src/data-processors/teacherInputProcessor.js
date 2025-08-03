@@ -9,7 +9,7 @@
  * The processor replaces nested teacher input functions from the original monolithic
  * approach with a clean, maintainable class-based architecture.
  * 
- * @author NAHS Development Team
+ * @author Alvaro Gomez
  * @version 2.0.0
  * @since 2024-01-01
  * @memberof DataProcessors

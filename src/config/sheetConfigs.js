@@ -9,7 +9,7 @@
  * These configurations ensure proper data validation, column mapping, and
  * output formatting for all sheet-based operations in the system.
  * 
- * @author NAHS Development Team
+ * @author Alvaro Gomez
  * @version 2.0.0
  * @since 2024-01-01
  * @memberof Config

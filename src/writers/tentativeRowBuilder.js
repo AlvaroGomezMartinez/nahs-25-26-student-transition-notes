@@ -9,7 +9,7 @@
  * The row builder coordinates data from tentative records, registrations,
  * contacts, schedules, and teacher inputs to create comprehensive student records.
  * 
- * @author NAHS Development Team
+ * @author Alvaro Gomez
  * @version 2.0.0
  * @since 2024-01-01
  * @memberof Writers

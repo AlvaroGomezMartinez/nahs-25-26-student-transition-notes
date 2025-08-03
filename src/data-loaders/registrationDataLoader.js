@@ -9,7 +9,7 @@
  * The registration data includes student contact information, course preferences,
  * and enrollment details that inform transition decisions.
  * 
- * @author NAHS Development Team
+ * @author Alvaro Gomez
  * @version 2.0.0
  * @since 2024-01-01
  * @memberof DataLoaders

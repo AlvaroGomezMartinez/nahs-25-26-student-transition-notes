@@ -9,7 +9,7 @@
  * The W/D Other category includes students with unique transition situations
  * that require special processing or exclusion from standard workflows.
  * 
- * @author NAHS Development Team
+ * @author Alvaro Gomez
  * @version 2.0.0
  * @since 2024-01-01
  * @memberof DataLoaders

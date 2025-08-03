@@ -9,7 +9,7 @@
  * The entry/withdrawal data provides the official record of student transitions
  * and is used to determine current enrollment status and transition timing.
  * 
- * @author NAHS Development Team
+ * @author Alvaro Gomez
  * @version 2.0.0
  * @since 2024-01-01
  * @memberof DataLoaders

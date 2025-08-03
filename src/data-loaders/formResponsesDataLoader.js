@@ -6,10 +6,10 @@
  * email data. It handles the complex teacher input processing required for
  * comprehensive student transition tracking and teacher feedback integration.
  * 
- * The form responses contain critical teacher input about student performance,
- * behavior, and transition recommendations that inform decision-making.
+ * The form responses data includes student information, timeline decisions,
+ * and administrative notes needed for comprehensive transition tracking.
  * 
- * @author NAHS Development Team
+ * @author Alvaro Gomez
  * @version 2.0.0
  * @since 2024-01-01
  * @memberof DataLoaders

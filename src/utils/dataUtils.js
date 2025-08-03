@@ -9,7 +9,7 @@
  * These utilities ensure consistent data handling patterns and provide
  * reliable helper functions for complex data processing workflows.
  * 
- * @author NAHS Development Team
+ * @author Alvaro Gomez
  * @version 2.0.0
  * @since 2024-01-01
  * @memberof Utils

@@ -9,7 +9,7 @@
  * The module replaces the original 701-line monolithic function with a modular,
  * maintainable architecture while preserving existing functionality.
  * 
- * @author NAHS Development Team
+ * @author Alvaro Gomez
  * @version 2.0.0
  * @since 2024-01-01
  * @memberof Writers

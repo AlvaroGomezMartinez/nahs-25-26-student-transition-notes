@@ -6,10 +6,10 @@
  * the new, clean architecture. It preserves the original function signatures
  * (including the infamous variable name with typos) for seamless migration.
  * 
- * This layer serves as a bridge between the old 701-line monolithic function
- * and the new modular, maintainable architecture introduced in Version 2.0.0.
+ * This module serves as a bridge between old and new code versions,
+ * ensuring smooth transitions during system updates.
  * 
- * @author NAHS Development Team
+ * @author Alvaro Gomez
  * @version 2.0.0
  * @since 2024-01-01
  * @memberof Legacy
