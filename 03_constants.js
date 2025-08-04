@@ -134,7 +134,16 @@ const COLUMN_NAMES = {
   WITHDRAW_DATE: 'Wdraw Date',
   PARENT_NAME: 'Parent Name',
   GUARDIAN_EMAIL: 'Guardian 1 Email',
-  STUDENT_EMAIL: 'Student Email'
+  STUDENT_EMAIL: 'Student Email',
+  NOTIFICATION_PHONE: 'Notification Phone',
+  GUARDIAN_1_NAME: 'Guardian 1',
+  GUARDIAN_1_EMAIL: 'Guardian 1 Email',
+  GUARDIAN_1_CELL: 'Guardian 1 Cell',
+  GUARDIAN_1_HOME: 'Guardian 1 Home',
+  GUARDIAN_2_NAME: 'Guardian 2',
+  GUARDIAN_2_EMAIL: 'Guardian 2 Email', 
+  GUARDIAN_2_CELL: 'Guardian 2 Cell',
+  GUARDIAN_2_HOME: 'Guardian 2 Home'
 };
 
 /**
@@ -877,6 +886,43 @@ function testCompleteSystemAfterAllFixes() {
   console.log('=== Final System Test Complete ===');
 }
 
+/**
+ * Essential system validation function
+ */
+function testCompleteSystem() {
+  console.log('=== Complete System Test ===');
+  try {
+    const result = loadTENTATIVEVersion2();
+    console.log('System test result:', result ? 'SUCCESS' : 'NEEDS ATTENTION');
+  } catch (error) {
+    console.error('System test failed:', error.message);
+  }
+}
+
+/**
+ * System health check 
+ */
+function validateSheetIntegrity() {
+  console.log('=== Sheet Integrity Check ===');
+  
+  // Quick validation that all required sheets exist
+  const requiredSheets = [
+    SHEET_NAMES.CONTACT_INFO,
+    SHEET_NAMES.SCHEDULES, 
+    SHEET_NAMES.ENTRY_WITHDRAWAL,
+    SHEET_NAMES.TENTATIVE_V2
+  ];
+  
+  requiredSheets.forEach(sheetName => {
+    try {
+      const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(sheetName);
+      console.log(`✅ ${sheetName}: ${sheet ? 'EXISTS' : 'MISSING'}`);
+    } catch (error) {
+      console.log(`❌ ${sheetName}: ERROR - ${error.message}`);
+    }
+  });
+}
+
 // For debugging
 function debugTentativeStructure() {
   console.log('=== Debugging TENTATIVE-Version2 Data Structure ===');
@@ -913,3 +959,218 @@ function debugTentativeStructure() {
     console.error('Error debugging tentative structure:', error);
   }
 }
+
+/**
+ * Diagnostic function to check ContactInfo data loading
+ */
+function debugContactDataLoading() {
+  console.log('=== Debugging ContactInfo Data Loading ===');
+  
+  // Step 1: Check if the sheet exists and its structure
+  try {
+    const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SHEET_NAMES.CONTACT_INFO);
+    if (!sheet) {
+      console.error('❌ ContactInfo sheet not found');
+      return;
+    }
+    
+    console.log('✅ ContactInfo sheet found');
+    console.log(`Rows: ${sheet.getLastRow()}, Columns: ${sheet.getLastColumn()}`);
+    
+    // Step 2: Check the headers
+    const headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
+    console.log('Headers found:');
+    headers.forEach((header, index) => {
+      const letter = String.fromCharCode(65 + index);
+      console.log(`  ${letter}: "${header}"`);
+    });
+    
+    // Step 3: Check for Student ID column
+    const studentIdIndex = headers.indexOf(COLUMN_NAMES.STUDENT_ID);
+    const altStudentIdIndex = headers.indexOf(COLUMN_NAMES.STUDENT_ID_ALT);
+    
+    console.log(`\nLooking for key column: "${COLUMN_NAMES.STUDENT_ID}"`);
+    console.log(`Found at index: ${studentIdIndex}`);
+    if (studentIdIndex === -1) {
+      console.log(`Alternative column "${COLUMN_NAMES.STUDENT_ID_ALT}" at index: ${altStudentIdIndex}`);
+    }
+    
+    // Step 4: Test the loader
+    console.log('\n--- Testing ContactDataLoader ---');
+    const loader = new ContactDataLoader();
+    const data = loader.loadData();
+    
+    console.log(`Loaded ${data.size} contact records`);
+    
+    // Step 5: Show sample data
+    if (data.size > 0) {
+      console.log('\nSample records:');
+      let count = 0;
+      for (const [studentId, contactData] of data) {
+        if (count >= 3) break; // Show first 3 records
+        console.log(`Student ID: ${studentId}`);
+        console.log(`Data keys: ${Object.keys(contactData).join(', ')}`);
+        console.log(`Sample data:`, contactData);
+        console.log('---');
+        count++;
+      }
+    }
+    
+  } catch (error) {
+    console.error('Error in diagnostic:', error);
+  }
+}
+
+/**
+ * Quick function to check what column names are expected
+ */
+function checkContactColumnNames() {
+  console.log('=== Contact Column Name Check ===');
+  console.log('COLUMN_NAMES.STUDENT_ID:', COLUMN_NAMES.STUDENT_ID);
+  console.log('COLUMN_NAMES.STUDENT_ID_ALT:', COLUMN_NAMES.STUDENT_ID_ALT);
+  console.log('COLUMN_NAMES.STUDENT_EMAIL:', COLUMN_NAMES.STUDENT_EMAIL);
+  console.log('COLUMN_NAMES.PARENT_NAME:', COLUMN_NAMES.PARENT_NAME);
+  console.log('COLUMN_NAMES.GUARDIAN_EMAIL:', COLUMN_NAMES.GUARDIAN_EMAIL);
+}
+
+/**
+ * Direct sheet inspection
+ */
+function inspectContactSheetDirectly() {
+  console.log('=== Direct ContactInfo Sheet Inspection ===');
+  try {
+    const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('ContactInfo');
+    if (!sheet) {
+      console.error('ContactInfo sheet not found');
+      return;
+    }
+    
+    const data = sheet.getDataRange().getValues();
+    
+    console.log('First 3 rows of ContactInfo:');
+    for (let i = 0; i < Math.min(3, data.length); i++) {
+      console.log(`Row ${i}:`, data[i]);
+    }
+  } catch (error) {
+    console.error('Error inspecting sheet:', error);
+  }
+}
+
+/**
+ * Enhanced ContactInfo inspection to check for column alignment issues
+ */
+function inspectContactDataAlignment() {
+  console.log('=== ContactInfo Data Alignment Check ===');
+  
+  try {
+    const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('ContactInfo');
+    if (!sheet) {
+      console.error('ContactInfo sheet not found');
+      return;
+    }
+    
+    const data = sheet.getDataRange().getValues();
+    const headers = data[0];
+    
+    console.log('Expected vs Actual Column Mapping:');
+    console.log('Column A (Current Building):', headers[0]);
+    console.log('Column B (Student ID):', headers[1]);
+    console.log('Column C (Student Name):', headers[2]);
+    console.log('Column D (Grade Level):', headers[3]);
+    console.log('Column E (Parent Name):', headers[4]);
+    console.log('Column F (Notification Phone):', headers[5]);
+    console.log('Column G (Guardian 1 Email):', headers[6]);
+    console.log('Column H (Guardian 2 Email):', headers[7]);
+    console.log('Column I (Student Email):', headers[8]);
+    
+    console.log('\nSample row 2 data:');
+    if (data.length > 1) {
+      const sampleRow = data[1];
+      headers.forEach((header, index) => {
+        console.log(`${header}: "${sampleRow[index]}"`);
+      });
+    }
+    
+    console.log('\nData Type Analysis:');
+    if (data.length > 1) {
+      const sampleRow = data[1];
+      console.log('Parent Name contains phone?', /^\(\d{3}\)/.test(sampleRow[4]));
+      console.log('Notification Phone contains name?', /^[A-Za-z]/.test(sampleRow[5]));
+      console.log('Guardian 1 Email looks like email?', /@/.test(sampleRow[6]));
+    }
+    
+  } catch (error) {
+    console.error('Error inspecting alignment:', error);
+  }
+}
+
+/**
+ * Test the fixed ContactDataLoader
+ */
+function testFixedContactDataLoader() {
+  console.log('=== Testing Fixed ContactDataLoader ===');
+  
+  try {
+    const loader = new ContactDataLoader();
+    const data = loader.loadData();
+    
+    console.log(`Loaded ${data.size} contact records`);
+    
+    if (data.size > 0) {
+      console.log('\nSample records after fix:');
+      let count = 0;
+      for (const [studentId, contactData] of data) {
+        if (count >= 2) break;
+        console.log(`\nStudent ID: ${studentId}`);
+        console.log(`Data type: ${typeof contactData}`);
+        console.log(`Is Array: ${Array.isArray(contactData)}`);
+        console.log(`Keys: ${Object.keys(contactData).join(', ')}`);
+        console.log(`Parent Name: "${contactData['Parent Name']}"`);
+        console.log(`Guardian Email: "${contactData['Guardian 1 Email']}"`);
+        console.log(`Student Email: "${contactData['Student Email']}"`);
+        count++;
+      }
+    }
+    
+  } catch (error) {
+    console.error('Error testing fixed loader:', error);
+  }
+}
+
+/**
+ * Test the corrected ContactDataLoader with actual column structure
+ */
+function testCorrectedContactDataLoader() {
+  console.log('=== Testing Corrected ContactDataLoader ===');
+  
+  try {
+    const loader = new ContactDataLoader();
+    const data = loader.loadData();
+    
+    console.log(`Loaded ${data.size} contact records`);
+    
+    if (data.size > 0) {
+      console.log('\nSample records with corrected mapping:');
+      let count = 0;
+      for (const [studentId, contactData] of data) {
+        if (count >= 2) break;
+        console.log(`\n--- Student ID: ${studentId} ---`);
+        console.log(`Student Name: "${contactData['Student Name']}"`);
+        console.log(`Grade Level: "${contactData['Grade Level']}"`);
+        console.log(`Notification Phone: "${contactData['Notification Phone']}"`);
+        console.log(`Parent Name: "${contactData['Parent Name']}"`);
+        console.log(`Guardian 1 Email: "${contactData['Guardian 1 Email']}"`);
+        console.log(`Guardian 1 Cell: "${contactData['Guardian 1 Cell']}"`);
+        console.log(`Guardian 2 Name: "${contactData['Guardian 2 Name']}"`);
+        console.log(`Guardian 2 Email: "${contactData['Guardian 2 Email']}"`);
+        console.log(`Student Email: "${contactData['Student Email']}"`);
+        console.log(`Available keys: ${Object.keys(contactData).join(', ')}`);
+        count++;
+      }
+    }
+    
+  } catch (error) {
+    console.error('Error testing corrected loader:', error);
+  }
+}
+
