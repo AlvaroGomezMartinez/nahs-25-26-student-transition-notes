@@ -330,15 +330,11 @@ class EmailReminderService {
     
     // Add additional staff members not in teacher mappings
     const additionalStaff = [
-      'leticia.collier@nisd.net',
-      'samantha.daywood@nisd.net',
       'daniel.galdeano@nisd.net',
-      'cierra.gibson@nisd.net',
       'zina.gonzales@nisd.net',
       'alvaro.gomez@nisd.net',
       'teressa.hensley@nisd.net',
       'angela.rodriguez@nisd.net',
-      'linda.rodriguez@nisd.net'
     ];
     
     const allRecipients = [...emailAddresses, ...additionalStaff];
