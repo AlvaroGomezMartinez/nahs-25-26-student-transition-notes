@@ -75,16 +75,75 @@ class ContactDataLoader extends BaseDataLoader {
   }
 
   /**
-   * Loads contact data from the ContactInfo sheet
+   * Loads contact data from the ContactInfo sheet with correct column mapping
    * This replaces the original loadContactData function
-   * @returns {Map} Map where keys are student IDs and values are contact data
+   * @returns {Map} Map where keys are student IDs and values are properly structured contact data objects
    */
   loadData() {
+    console.log('Loading contact data with correct column mapping...');
+    
     try {
-      console.log('Loading contact data...');
-      return super.loadData();
+      const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(this.sheetName);
+      if (!sheet) {
+        console.error(`Sheet '${this.sheetName}' not found`);
+        return new Map();
+      }
+
+      const data = sheet.getDataRange().getValues();
+      if (data.length === 0) {
+        console.warn('ContactInfo sheet is empty');
+        return new Map();
+      }
+
+      const headers = data[0];
+      const studentIdIndex = headers.indexOf('Student ID');
+      
+      if (studentIdIndex === -1) {
+        console.error('Student ID column not found in ContactInfo');
+        console.error('Available headers:', headers);
+        return new Map();
+      }
+
+      const resultMap = new Map();
+
+      // Process each row with correct column mapping
+      for (let i = 1; i < data.length; i++) {
+        const row = data[i];
+        const studentId = row[studentIdIndex];
+        
+        if (!studentId) {
+          console.warn(`Empty Student ID at row ${i + 1}, skipping`);
+          continue;
+        }
+
+        // ✅ FIXED: Create contact data structure based on actual sheet columns
+        const contactData = {
+          'Current Building': row[0] || '',
+          'Student ID': studentId,
+          'Student Name': row[2] || '',
+          'Grade Level': row[3] || '',
+          
+          // ✅ Map to actual column positions based on your output
+          'Notification Phone': row[4] || '', // Column E: "Notification" (phone)
+          'Parent Name': row[5] || '', // Column F: "Guardian 1" (name)
+          'Guardian 1 Email': row[6] || '', // Column G: "Guardian 1 Email"
+          'Guardian 1 Cell': row[7] || '', // Column H: "Guardian 1 Cell"
+          'Guardian 1 Home': row[8] || '', // Column I: "Guardian 1 Home"
+          'Guardian 2 Name': row[9] || '', // Column J: "Guardian 2"
+          'Guardian 2 Email': row[10] || '', // Column K: "Guardian 2 Email"
+          'Guardian 2 Cell': row[11] || '', // Column L: "Guardian 2 Cell"
+          'Guardian 2 Home': row[12] || '', // Column M: "Guardian 2 Home"
+          'Student Email': row[13] || '', // Column N: "Student Email"
+        };
+
+        resultMap.set(String(studentId).trim(), contactData);
+      }
+
+      console.log(`ContactDataLoader: Processed ${resultMap.size} contact records with correct column mapping`);
+      return resultMap;
+      
     } catch (error) {
-      console.error('Error loading contact data:', error);
+      console.error('Error in ContactDataLoader:', error);
       return new Map();
     }
   }
