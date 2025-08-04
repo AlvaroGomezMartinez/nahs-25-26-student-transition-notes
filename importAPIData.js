@@ -24,7 +24,7 @@ function importAPIData() {
    */
   const sheetsMapping = [
     { sourceSheet: 'Schedules', sourceRange: 'A2:N', targetSheet: 'Schedules' },
-    { sourceSheet: 'ContactInfo', sourceRange: 'A2:I', targetSheet: 'ContactInfo' },
+    { sourceSheet: 'ContactInfo', sourceRange: 'A2:N', targetSheet: 'ContactInfo' },
     { sourceSheet: 'Entry_Withdrawal2', sourceRange: 'A2:L', targetSheet: 'Entry_Withdrawal' }
   ];
   
