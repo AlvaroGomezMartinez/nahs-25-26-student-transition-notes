@@ -128,30 +128,6 @@ class RegistrationDataLoader extends BaseDataLoader {
       
       const result = super.loadData();
       
-      // Debug: Log registration data loading results
-      console.log(`DEBUG: Registration data loading results:`);
-      console.log(`  Total students loaded: ${result.size}`);
-      
-      if (result.size > 0) {
-        const sampleStudentIds = Array.from(result.keys()).slice(0, 5);
-        console.log(`  Sample student IDs: [${sampleStudentIds.join(', ')}]`);
-        
-        // Log specific students we're looking for
-        const targetStudents = ['787581', '753881'];
-        targetStudents.forEach(studentId => {
-          if (result.has(studentId)) {
-            const data = result.get(studentId);
-            console.log(`  Student ${studentId} registration data found:`);
-            console.log(`    Placement Days: ${data["Placement Days"]}`);
-            console.log(`    Keys: [${Object.keys(data).join(', ')}]`);
-          } else {
-            console.log(`  Student ${studentId} NOT found in registration data`);
-          }
-        });
-      } else {
-        console.log(`  WARNING: No registration data loaded!`);
-      }
-      
       return result;
     } catch (error) {
       console.error('Error loading registration data:', error);

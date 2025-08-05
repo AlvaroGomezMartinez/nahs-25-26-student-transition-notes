@@ -484,34 +484,10 @@ class StudentDataMerger extends BaseDataProcessor {
   mergeRegistrationData(existingData, registrationData) {
     this.log('Merging registration data...');
     
-    // Debug: Log which students have registration data
-    console.log(`DEBUG: Registration data merge analysis:`);
-    console.log(`  Existing data student count: ${existingData.size}`);
-    console.log(`  Registration data student count: ${registrationData.size}`);
-    
-    const existingStudents = Array.from(existingData.keys());
-    const registrationStudents = Array.from(registrationData.keys());
-    
-    console.log(`  Sample existing students: [${existingStudents.slice(0, 5).join(', ')}]`);
-    console.log(`  Sample registration students: [${registrationStudents.slice(0, 5).join(', ')}]`);
-    
-    // Check for students in registration but not in existing
-    const studentsOnlyInRegistration = registrationStudents.filter(id => !existingData.has(id));
-    if (studentsOnlyInRegistration.length > 0) {
-      console.log(`  Students in registration but not in existing data: [${studentsOnlyInRegistration.slice(0, 10).join(', ')}]`);
-    }
-    
     const updatedMap = new Map();
     
     existingData.forEach((studentData, studentId) => {
       const registrationInfo = this.safeMapGet(registrationData, studentId, []);
-      
-      // Debug: Log registration data availability for specific student
-      if (studentId === '787581' || studentId === '753881') {
-        console.log(`DEBUG: Registration merge for student ${studentId}:`);
-        console.log(`  Has registration data: ${registrationData.has(studentId)}`);
-        console.log(`  Registration info: ${JSON.stringify(registrationInfo)}`);
-      }
       
       updatedMap.set(studentId, {
         ...studentData,

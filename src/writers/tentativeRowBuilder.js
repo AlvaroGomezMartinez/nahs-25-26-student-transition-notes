@@ -462,11 +462,11 @@ class TentativeRowBuilder {
     
     return [
       seData["Case Manager"] || "",
-      "", // What accommodations seem to work well
-      "", // Student's strengths, behavior
-      "", // Student's needs, behavior
-      "", // Student's needs, functional skills
-      ""  // Additional comments
+      seData["What accommodations seem to work well with this student to help them be successful?"] || "",
+      seData["What are the student's strengths, as far as behavior?"] || "",
+      seData["What are the student's needs, as far as behavior?"] || "",
+      seData["What are the student's needs, as far as functional skills?"] || "",
+      seData["Please add any other comments or concerns here:"] || ""
     ];
   }
 

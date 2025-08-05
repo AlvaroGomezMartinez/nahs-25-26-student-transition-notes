@@ -580,12 +580,18 @@ class TeacherInputProcessor extends BaseDataProcessor {
           teacherInput[period]["Current Grade"] = tentativeEntry[`${periodPrefix} - Current Grade`];
         }
         if (tentativeEntry[`${periodPrefix} - How would you assess this student's academic growth?`]) {
-          teacherInput[period]["How would you assess this student's academic growth?"] = 
-            tentativeEntry[`${periodPrefix} - How would you assess this student's academic growth?`];
+          // Only use tentative data if no form response data exists
+          if (!teacherInput[period]["How would you assess this student's academic growth?"]) {
+            teacherInput[period]["How would you assess this student's academic growth?"] = 
+              tentativeEntry[`${periodPrefix} - How would you assess this student's academic growth?`];
+          }
         }
         if (tentativeEntry[`${periodPrefix} - Academic and Behavioral Progress Notes`]) {
-          teacherInput[period]["Academic and Behavioral Progress Notes"] = 
-            tentativeEntry[`${periodPrefix} - Academic and Behavioral Progress Notes`];
+          // Only use tentative data if no form response data exists
+          if (!teacherInput[period]["Academic and Behavioral Progress Notes"]) {
+            teacherInput[period]["Academic and Behavioral Progress Notes"] = 
+              tentativeEntry[`${periodPrefix} - Academic and Behavioral Progress Notes`];
+          }
         }
       }
     }
