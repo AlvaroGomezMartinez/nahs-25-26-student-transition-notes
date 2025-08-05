@@ -204,7 +204,20 @@ class TentativeRowBuilder {
       }
     }
     
-    const placementDays = registrationEntry?.["Placement Days"];
+    // Try to get placement days with fallback to backup sheet
+    let placementDays = registrationEntry?.["Placement Days"];
+    let placementDaysSource = "Form Responses 2";
+    
+    // If placement days is missing from Form Responses 2, try backup sheet
+    if (!placementDays || placementDays === "" || placementDays === null) {
+      placementDays = this._getPlacementDaysFromBackupSheet(studentData);
+      if (placementDays) {
+        placementDaysSource = "Registrations SY 24.25 (backup)";
+      }
+    }
+    
+    // Simple debug: Log what we found for placement days
+    console.log(`Student placement days: ${placementDays} (from ${placementDaysSource})`);
     
     // Early return if essential data is missing
     if (!entryData || !placementDays) {
@@ -297,6 +310,72 @@ class TentativeRowBuilder {
     });
 
     return mostRecentDate;
+  }
+
+  /**
+   * Gets placement days from backup "Registrations SY 24.25" sheet when missing from primary source.
+   * @param {Object} studentData - The student data object
+   * @returns {number|null} Placement days from backup sheet or null if not found
+   */
+  _getPlacementDaysFromBackupSheet(studentData) {
+    try {
+      // Get the student ID from tentative data
+      const tentativeEntry = this._extractTentativeEntry(studentData);
+      const studentId = tentativeEntry["STUDENT ID"];
+      
+      if (!studentId) {
+        return null;
+      }
+
+      // Access the backup "Registrations SY 24.25" sheet - specifically "Copy of Form Responses 2"
+      const backupSpreadsheetId = "1kAWRpWO4xDtRShLB5YtTtWxTbVg800fuU2RvAlYhrfA";
+      const backupSpreadsheet = SpreadsheetApp.openById(backupSpreadsheetId);
+      const backupSheet = backupSpreadsheet.getSheetByName("Copy of Form Responses 2");
+      
+      // Get all data from the backup sheet
+      const backupData = backupSheet.getDataRange().getValues();
+      
+      if (backupData.length === 0) {
+        console.log('Backup sheet "Copy of Form Responses 2" is empty');
+        return null;
+      }
+      
+      // Find the header row to locate Student ID and Placement Days columns
+      const headerRow = backupData[0];
+      const studentIdColumnIndex = headerRow.findIndex(header => 
+        header && header.toString().toLowerCase().includes('student id')
+      );
+      const placementDaysColumnIndex = headerRow.findIndex(header => 
+        header && header.toString().toLowerCase().includes('placement days')
+      );
+      
+      if (studentIdColumnIndex === -1 || placementDaysColumnIndex === -1) {
+        console.log(`Backup sheet columns not found: Student ID index: ${studentIdColumnIndex}, Placement Days index: ${placementDaysColumnIndex}`);
+        return null;
+      }
+      
+      // Search for the student in the backup data
+      for (let i = 1; i < backupData.length; i++) {
+        const row = backupData[i];
+        const backupStudentId = row[studentIdColumnIndex];
+        
+        if (backupStudentId && backupStudentId.toString() === studentId.toString()) {
+          const backupPlacementDays = row[placementDaysColumnIndex];
+          
+          if (backupPlacementDays && backupPlacementDays !== "" && !isNaN(backupPlacementDays)) {
+            console.log(`Found placement days in backup sheet for student ${studentId}: ${backupPlacementDays}`);
+            return Number(backupPlacementDays);
+          }
+        }
+      }
+      
+      console.log(`Student ${studentId} not found in backup sheet or placement days missing`);
+      return null;
+      
+    } catch (error) {
+      console.error(`Error accessing backup sheet for placement days: ${error.message}`);
+      return null;
+    }
   }
 
   /**

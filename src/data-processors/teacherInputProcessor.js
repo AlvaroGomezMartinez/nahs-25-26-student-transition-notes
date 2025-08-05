@@ -90,13 +90,22 @@ class TeacherInputProcessor extends BaseDataProcessor {
     // Initialize the teacher input structure
     const teacherInput = this.initializeTeacherInputStructure();
 
-    // Try to populate from form responses first (preferred method)
+    // ALWAYS populate base course titles and teacher names from schedule data first
+    if (scheduleData && Array.isArray(scheduleData)) {
+      this.populateBasicScheduleData(teacherInput, scheduleData);
+    }
+
+    // Then overlay form response data if available
     if (formResponses && Array.isArray(formResponses) && formResponses.length > 0) {
+      this.log(`Processing form responses for student ${studentId}`);
       this.populateFromFormResponses(teacherInput, formResponses, scheduleData, studentId);
     } else {
-      // Fallback to schedule and tentative data
-      this.log(`No form responses for student ${studentId}, using fallback method`);
-      this.populateFromScheduleAndTentative(teacherInput, scheduleData, tentativeData, studentId);
+      this.log(`No form responses for student ${studentId}`);
+    }
+
+    // Finally, overlay tentative data if available
+    if (tentativeData && Array.isArray(tentativeData) && tentativeData.length > 0) {
+      this.populateFromTentativeData(teacherInput, tentativeData[0], studentId);
     }
 
     return teacherInput;
@@ -137,6 +146,36 @@ class TeacherInputProcessor extends BaseDataProcessor {
     };
 
     return structure;
+  }
+
+  /**
+   * Populates basic course titles and teacher names from schedule data
+   * This ensures all periods have course information regardless of form response availability
+   * @param {Object} teacherInput - Teacher input structure to populate
+   * @param {Array} scheduleData - Schedule data
+   */
+  populateBasicScheduleData(teacherInput, scheduleData) {
+    this.log('Populating basic course titles and teacher names from schedule data');
+
+    const flatSchedules = this.flattenScheduleArray(scheduleData);
+
+    flatSchedules.forEach(schedule => {
+      const period = this.mapPeriodFromSchedule(schedule[COLUMN_NAMES.PERIOD]);
+      
+      if (period && teacherInput[period]) {
+        // Only populate Course Title and Teacher Name, don't overwrite other fields
+        teacherInput[period][COLUMN_NAMES.COURSE_TITLE] = 
+          schedule[COLUMN_NAMES.COURSE_TITLE] || DEFAULT_VALUES.EMPTY_STRING;
+        teacherInput[period][COLUMN_NAMES.TEACHER_NAME] = 
+          schedule[COLUMN_NAMES.TEACHER_NAME] || DEFAULT_VALUES.EMPTY_STRING;
+        
+        // Handle case manager assignment
+        if (schedule[COLUMN_NAMES.COURSE_TITLE] === 'Case Manag HS') {
+          teacherInput[PERIODS.SPECIAL_ED][COLUMN_NAMES.CASE_MANAGER] = 
+            schedule[COLUMN_NAMES.TEACHER_NAME] || DEFAULT_VALUES.EMPTY_STRING;
+        }
+      }
+    });
   }
 
   /**
@@ -222,12 +261,9 @@ class TeacherInputProcessor extends BaseDataProcessor {
    * @param {Object} schedule - Matching schedule data
    */
   mapFormResponseToTeacherInput(periodInput, response, schedule) {
-    // Map basic course information
-    periodInput[COLUMN_NAMES.COURSE_TITLE] = 
-      schedule[COLUMN_NAMES.COURSE_TITLE] || DEFAULT_VALUES.EMPTY_STRING;
-    periodInput[COLUMN_NAMES.TEACHER_NAME] = 
-      response[COLUMN_NAMES.TEACHER_NAME] || DEFAULT_VALUES.EMPTY_STRING;
-
+    // NOTE: Course Title and Teacher Name are already populated from schedule data
+    // We only overlay the form response-specific data here
+    
     // Map form response fields to teacher input
     const fieldMappings = {
       'How would you assess this student\'s academic growth?': 'How would you assess this student\'s academic growth?',
@@ -436,35 +472,57 @@ class TeacherInputProcessor extends BaseDataProcessor {
       if (teacherInput.hasOwnProperty(period) && periodMap.hasOwnProperty(period)) {
         const periodPrefix = periodMap[period];
 
-        teacherInput[period]["Course Title"] = 
-          tentativeEntry[`${periodPrefix} - Course Title`] || "";
-        teacherInput[period]["Teacher Name"] = 
-          tentativeEntry[`${periodPrefix} - Teacher Name`] || "";
-        teacherInput[period]["Transfer Grade"] = 
-          tentativeEntry[`${periodPrefix} - Transfer Grade`] || "";
-        teacherInput[period]["Current Grade"] = 
-          tentativeEntry[`${periodPrefix} - Current Grade`] || "";
-        teacherInput[period]["How would you assess this student's academic growth?"] = 
-          tentativeEntry[`${periodPrefix} - How would you assess this student's academic growth?`] || "";
-        teacherInput[period]["Academic and Behavioral Progress Notes"] = 
-          tentativeEntry[`${periodPrefix} - Academic and Behavioral Progress Notes`] || "";
+        // Only overlay tentative data if it exists, don't replace with empty strings
+        if (tentativeEntry[`${periodPrefix} - Course Title`]) {
+          teacherInput[period]["Course Title"] = tentativeEntry[`${periodPrefix} - Course Title`];
+        }
+        if (tentativeEntry[`${periodPrefix} - Teacher Name`]) {
+          teacherInput[period]["Teacher Name"] = tentativeEntry[`${periodPrefix} - Teacher Name`];
+        }
+        if (tentativeEntry[`${periodPrefix} - Transfer Grade`]) {
+          teacherInput[period]["Transfer Grade"] = tentativeEntry[`${periodPrefix} - Transfer Grade`];
+        }
+        if (tentativeEntry[`${periodPrefix} - Current Grade`]) {
+          teacherInput[period]["Current Grade"] = tentativeEntry[`${periodPrefix} - Current Grade`];
+        }
+        if (tentativeEntry[`${periodPrefix} - How would you assess this student's academic growth?`]) {
+          teacherInput[period]["How would you assess this student's academic growth?"] = 
+            tentativeEntry[`${periodPrefix} - How would you assess this student's academic growth?`];
+        }
+        if (tentativeEntry[`${periodPrefix} - Academic and Behavioral Progress Notes`]) {
+          teacherInput[period]["Academic and Behavioral Progress Notes"] = 
+            tentativeEntry[`${periodPrefix} - Academic and Behavioral Progress Notes`];
+        }
       }
     }
 
     // Handle Special Education separately
     if (teacherInput.hasOwnProperty("Special Education")) {
-      teacherInput["Special Education"]["Case Manager"] = 
-        tentativeEntry["Special Education - Case Manager"] || "";
-      teacherInput["Special Education"]["What accommodations seem to work well with this student to help them be successful?"] = 
-        tentativeEntry["Special Education - What accommodations seem to work well with this student to help them be successful?"] || "";
-      teacherInput["Special Education"]["What are the student's strengths, as far as behavior?"] = 
-        tentativeEntry["Special Education - What are the student's strengths, as far as behavior?"] || "";
-      teacherInput["Special Education"]["What are the student's needs, as far as behavior?"] = 
-        tentativeEntry["Special Education - What are the student's needs, as far as behavior?"] || "";
-      teacherInput["Special Education"]["What are the student's needs, as far as functional skills?"] = 
-        tentativeEntry["Special Education - What are the student's needs, as far as functional skills?"] || "";
-      teacherInput["Special Education"]["Please add any other comments or concerns here:"] = 
-        tentativeEntry["Special Education - Please add any other comments or concerns here:"] || "";
+      // Only overlay tentative data if it exists, don't replace with empty strings
+      if (tentativeEntry["Special Education - Case Manager"]) {
+        teacherInput["Special Education"]["Case Manager"] = 
+          tentativeEntry["Special Education - Case Manager"];
+      }
+      if (tentativeEntry["Special Education - What accommodations seem to work well with this student to help them be successful?"]) {
+        teacherInput["Special Education"]["What accommodations seem to work well with this student to help them be successful?"] = 
+          tentativeEntry["Special Education - What accommodations seem to work well with this student to help them be successful?"];
+      }
+      if (tentativeEntry["Special Education - What are the student's strengths, as far as behavior?"]) {
+        teacherInput["Special Education"]["What are the student's strengths, as far as behavior?"] = 
+          tentativeEntry["Special Education - What are the student's strengths, as far as behavior?"];
+      }
+      if (tentativeEntry["Special Education - What are the student's needs, as far as behavior?"]) {
+        teacherInput["Special Education"]["What are the student's needs, as far as behavior?"] = 
+          tentativeEntry["Special Education - What are the student's needs, as far as behavior?"];
+      }
+      if (tentativeEntry["Special Education - What are the student's needs, as far as functional skills?"]) {
+        teacherInput["Special Education"]["What are the student's needs, as far as functional skills?"] = 
+          tentativeEntry["Special Education - What are the student's needs, as far as functional skills?"];
+      }
+      if (tentativeEntry["Special Education - Please add any other comments or concerns here:"]) {
+        teacherInput["Special Education"]["Please add any other comments or concerns here:"] = 
+          tentativeEntry["Special Education - Please add any other comments or concerns here:"];
+      }
     }
   }
 }
