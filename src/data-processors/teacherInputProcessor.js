@@ -188,8 +188,11 @@ class TeacherInputProcessor extends BaseDataProcessor {
     this.log('Populating teacher input from form responses');
 
     const flatSchedules = this.flattenScheduleArray(scheduleData);
+    
+    // Process form responses and handle multiple submissions from same teacher
+    const processedResponses = this.processMultipleResponsesPerTeacher(formResponses);
 
-    formResponses.forEach(response => {
+    processedResponses.forEach(response => {
       const teacherName = response[COLUMN_NAMES.TEACHER_NAME];
       
       if (!teacherName) {
@@ -214,6 +217,97 @@ class TeacherInputProcessor extends BaseDataProcessor {
         this.log(`No matching schedule found for teacher: ${teacherName}`, 'warn');
       }
     });
+  }
+
+  /**
+   * Processes multiple form responses from the same teacher, keeping only the most recent
+   * @param {Array} formResponses - Array of form response objects
+   * @returns {Array} Processed array with one response per teacher (most recent)
+   */
+  processMultipleResponsesPerTeacher(formResponses) {
+    if (!formResponses || !Array.isArray(formResponses)) {
+      return [];
+    }
+
+    // Group responses by teacher name
+    const responsesByTeacher = new Map();
+    
+    formResponses.forEach(response => {
+      const teacherName = response[COLUMN_NAMES.TEACHER_NAME];
+      
+      if (!teacherName) {
+        return; // Skip responses without teacher name
+      }
+      
+      if (!responsesByTeacher.has(teacherName)) {
+        responsesByTeacher.set(teacherName, []);
+      }
+      
+      responsesByTeacher.get(teacherName).push(response);
+    });
+
+    // Process each teacher's responses to find the most recent
+    const finalResponses = [];
+    
+    responsesByTeacher.forEach((responses, teacherName) => {
+      if (responses.length === 1) {
+        // Only one response from this teacher, use it
+        finalResponses.push(responses[0]);
+      } else {
+        // Multiple responses from same teacher, find the most recent
+        this.log(`Found ${responses.length} responses from teacher: ${teacherName}`, 'info');
+        
+        const mostRecentResponse = this.findMostRecentResponse(responses, teacherName);
+        finalResponses.push(mostRecentResponse);
+        
+        this.log(`Using most recent response from ${teacherName}`, 'info');
+      }
+    });
+
+    return finalResponses;
+  }
+
+  /**
+   * Finds the most recent response from multiple responses by the same teacher
+   * @param {Array} responses - Array of response objects from the same teacher
+   * @param {string} teacherName - Teacher name for logging
+   * @returns {Object} The most recent response
+   */
+  findMostRecentResponse(responses, teacherName) {
+    // Look for timestamp field to determine most recent
+    // Common timestamp field names in Google Forms
+    const timestampFields = ['Timestamp', 'timestamp', 'Date', 'date', 'Submit Time', 'Submitted'];
+    
+    let timestampField = null;
+    
+    // Find which timestamp field exists in the responses
+    for (const field of timestampFields) {
+      if (responses[0].hasOwnProperty(field)) {
+        timestampField = field;
+        break;
+      }
+    }
+    
+    if (timestampField) {
+      // Sort by timestamp and return the most recent
+      const sortedResponses = responses.sort((a, b) => {
+        const dateA = new Date(a[timestampField]);
+        const dateB = new Date(b[timestampField]);
+        return dateB - dateA; // Most recent first
+      });
+      
+      const mostRecent = sortedResponses[0];
+      const oldestDate = new Date(sortedResponses[sortedResponses.length - 1][timestampField]);
+      const newestDate = new Date(mostRecent[timestampField]);
+      
+      this.log(`Teacher ${teacherName}: Using response from ${newestDate.toLocaleString()} (vs oldest: ${oldestDate.toLocaleString()})`, 'info');
+      
+      return mostRecent;
+    } else {
+      // No timestamp field found, use the last response in the array (assuming it's more recent)
+      this.log(`No timestamp field found for teacher ${teacherName}, using last response in data`, 'warn');
+      return responses[responses.length - 1];
+    }
   }
 
   /**

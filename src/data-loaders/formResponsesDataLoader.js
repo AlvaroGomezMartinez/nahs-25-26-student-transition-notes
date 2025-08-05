@@ -81,13 +81,16 @@ class FormResponsesDataLoader extends BaseDataLoader {
       }
 
       const headers = data[0];
-      const studentColumnIndex = headers.indexOf('Student');
+      // Column F (index 5) contains the student ID data
+      const studentColumnIndex = 5; // Fixed to column F where student IDs are located
       const emailColumnIndex = headers.indexOf('Email Address');
       
-      if (studentColumnIndex === -1 || emailColumnIndex === -1) {
-        console.error('Required columns not found in Form Responses sheet');
+      if (emailColumnIndex === -1) {
+        console.error('Required Email Address column not found in Form Responses sheet');
         return new Map();
       }
+
+      console.log(`Using fixed column indices: Student=5 (Column F), Email=${emailColumnIndex}`);
 
       return this.processFormResponseRows(data, headers, studentColumnIndex, emailColumnIndex);
     } catch (error) {

@@ -196,7 +196,7 @@ const FORM_RESPONSES_SHEET_CONFIG = {
   name: SHEET_NAMES.FORM_RESPONSES_1,
   keyColumn: COLUMN_NAMES.STUDENT_ID,
   emailColumn: 'Email Address',
-  studentColumn: 'Student',
+  studentColumnIndex: 5, // Column F (0-based index) where student IDs are located after cleanup
   allowMultipleRecords: true
 };
 
