@@ -21,31 +21,41 @@
  * This specialized class handles the complex logic of extracting and formatting
  * data from multiple sources to create comprehensive student data rows. It
  * coordinates data merging, field calculation, and formatting to produce
- * the final row structure required for the TENTATIVE-Version2 sheet.
+ * the final row structure required for the TENTATIVE-Version2 sheet with
+ * enhanced teacher input processing and clean production-ready implementation.
  * 
  * **Key Features:**
  * - **Multi-Source Data Integration**: Combines data from tentative, registration, contact, and schedule sources
+ * - **Enhanced Teacher Input Processing**: Integrates duplicate-detection processed teacher feedback intelligently
+ * - **Smart Data Precedence**: Form responses take priority over tentative data with fallback logic
  * - **Derived Field Calculation**: Computes estimated exit dates, educational factors, and status indicators
+ * - **Source Data Compatibility**: Handles eligibility field mapping with proper source data spelling
  * - **Data Validation**: Ensures data integrity and handles missing or invalid data gracefully
  * - **Format Standardization**: Applies consistent formatting for dates, names, and other fields
- * - **Teacher Input Integration**: Incorporates processed teacher feedback and recommendations
+ * - **Production-Ready Architecture**: Clean, optimized code without debugging artifacts
+ * 
+ * **Data Processing Flow:**
+ * 1. Teacher input processed through duplicate detection system
+ * 2. Form response data takes precedence over tentative data
+ * 3. Intelligent fallback to tentative data when needed
+ * 4. Complete row assembly with all calculated fields
  * 
  * @class TentativeRowBuilder
  * @memberof Writers
  * 
  * @example
- * // Build a student data row
+ * // Build a student data row with enhanced teacher input
  * const builder = new TentativeRowBuilder();
  * const studentData = mergedStudentData.get('123456');
- * const teacherInput = processedTeacherInput.get('123456');
+ * const teacherInput = processedTeacherInput.get('123456'); // Processed through duplicate detection
  * const rowData = builder.buildStudentRow('123456', studentData, teacherInput);
  * 
  * @example
- * // Process multiple students
+ * // Process multiple students with data precedence
  * const builder = new TentativeRowBuilder();
  * const outputRows = [];
  * studentDataMap.forEach((data, studentId) => {
- *   const teacherData = teacherInputMap.get(studentId) || {};
+ *   const teacherData = teacherInputMap.get(studentId) || {}; // Duplicate-processed data
  *   const row = builder.buildStudentRow(studentId, data, teacherData);
  *   outputRows.push(row);
  * });

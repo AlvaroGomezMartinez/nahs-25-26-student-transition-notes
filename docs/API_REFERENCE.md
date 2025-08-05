@@ -1,27 +1,59 @@
 # NAHS Student Transition Notes - API Reference
 
-## Quick Reference Guide
+## 🚀 Production-Ready System API
 
-This document provides a concise overview of all documented functions, classes, and constants in the NAHS Student Transition Notes system. For detailed documentation with examples, see the [full JSDoc documentation](./api/index.html).
+This document provides a comprehensive overview of all documented functions, classes, and constants in the enhanced NAHS Student Transition Notes system. The system now includes advanced duplicate detection, smart data precedence, and production-ready architecture.
 
-## Main Entry Points
+**System Status**: ✅ Production Ready with Enhanced Features
+
+## 🎯 Main Entry Points
 
 ### Primary Functions
 
-| Function | Description | Returns | Usage |
-|----------|-------------|---------|-------|
-| `loadTENTATIVEVersion2()` | Main system entry point that orchestrates complete workflow | `Object` - Processing statistics | `const stats = loadTENTATIVEVersion2();` |
-| `loadAllStudentData()` | Loads data from all Google Sheets using modular loaders | `Map<string, Object>` - Student data by ID | `const data = loadAllStudentData();` |
-| `processStudentData(rawData)` | Processes and enriches student data using business logic | `Map<string, Object>` - Processed student data | `const processed = processStudentData(raw);` |
-| `writeProcessedDataToSheet(students)` | Writes processed data to TENTATIVE-Version2 sheet | `Object` - Write statistics | `const stats = writeProcessedDataToSheet(data);` |
+| Function | Description | Returns | Usage | Status |
+|----------|-------------|---------|-------|--------|
+| `loadTENTATIVEVersion2()` | **Enhanced main entry point** with duplicate detection and data precedence | `Object` - Processing statistics | `const stats = loadTENTATIVEVersion2();` | ✅ **Enhanced** |
+| `loadAllStudentData()` | Loads data from all Google Sheets with optimized loaders | `Map<string, Object>` - Student data by ID | `const data = loadAllStudentData();` | ✅ **Optimized** |
+| `processStudentData(rawData)` | **Enhanced processing** with duplicate detection and precedence logic | `Map<string, Object>` - Processed student data | `const processed = processStudentData(raw);` | ✅ **Enhanced** |
+| `writeProcessedDataToSheet(students)` | Writes processed data to TENTATIVE-Version2 sheet with validation | `Object` - Write statistics | `const stats = writeProcessedDataToSheet(data);` | ✅ **Production** |
 
-### Legacy/Compatibility Functions
+## 🔧 Enhanced Data Processing Classes
 
-| Function | Description | Status |
-|----------|-------------|--------|
-| `loadTENTATIVEVersion2_OriginalName()` | Backward compatibility function | ⚠️ Deprecated |
-| `filterActiveStudents(studentData)` | Filters withdrawn students | ⚠️ Deprecated (auto-filtered) |
-| `preserveExistingRowColors()` | Preserves sheet row colors | ✅ Active |
+### **TeacherInputProcessor** *(NEW Enhanced Features)*
+
+| Method | Description | Returns | Usage |
+|--------|-------------|---------|-------|
+| `processTeacherInput(formData, scheduleData)` | **Enhanced with duplicate detection** - Processes teacher form responses with intelligent duplicate handling | `Map<string, Object>` | `const processed = processor.processTeacherInput(forms, schedules);` |
+| `findDuplicateResponses(responses)` | **NEW** - Identifies and groups duplicate teacher submissions | `Map<string, Array>` | `const duplicates = processor.findDuplicateResponses(responses);` |
+| `findMostRecentResponse(responseGroup)` | **NEW** - Selects most recent response using timestamp analysis | `Object` | `const latest = processor.findMostRecentResponse(group);` |
+| `processMultipleResponsesPerTeacher(duplicates)` | **NEW** - Handles multiple responses per teacher intelligently | `Map<string, Object>` | `const processed = processor.processMultipleResponsesPerTeacher(dups);` |
+
+### **Enhanced Data Loaders**
+
+| Class | Description | Key Features | Status |
+|-------|-------------|--------------|---------|
+| `FormResponsesDataLoader` | **Enhanced** teacher form response loading with Column F extraction | Column F optimization, duplicate support | ✅ **Enhanced** |
+| `StudentDataMerger` | **Enhanced** multi-source data merging with smart precedence | Form response priority, intelligent fallback | ✅ **Enhanced** |
+| `TentativeRowBuilder` | **Production-ready** row building with source data compatibility | Clean architecture, eligibility field mapping | ✅ **Production** |
+
+## 📊 Enhanced System Features
+
+### **🔍 Duplicate Detection System**
+
+| Feature | Description | Implementation |
+|---------|-------------|----------------|
+| **Teacher Response Grouping** | Groups multiple submissions by teacher email | `Map<teacherEmail, responseArray>` |
+| **Timestamp Analysis** | Identifies most recent submissions using timestamps | Column A timestamp parsing with fallback |
+| **Intelligent Selection** | Selects best response per teacher automatically | Newest timestamp or last in array |
+| **Data Integration** | Merges selected responses with schedule data | Teacher email matching with validation |
+
+### **🎯 Smart Data Precedence**
+
+| Priority Level | Data Source | Usage | Fallback |
+|----------------|-------------|-------|-----------|
+| **1 (Highest)** | Teacher Form Responses | Transition decisions, feedback | Tentative data if missing |
+| **2 (Fallback)** | Tentative Sheet Data | Complete student records | Registration data baseline |
+| **3 (Baseline)** | Registration Data | Foundational information | Error handling |
 
 ## Configuration Constants
 

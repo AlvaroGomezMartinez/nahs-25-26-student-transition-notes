@@ -26,16 +26,18 @@
  * **Key Features:**
  * - **Teacher Response Loading**: Captures all teacher form submissions  
  * - **Email Mapping**: Associates responses with specific teacher email addresses
+ * - **Column F Student ID Extraction**: Optimized for cleaned sheet structure where student IDs are in column F
  * - **Multiple Records**: Supports multiple teacher responses per student
  * - **Response Validation**: Ensures data integrity and completeness
  * - **Feedback Integration**: Provides teacher input for transition decisions
+ * - **Duplicate Handling**: Works with TeacherInputProcessor for intelligent duplicate resolution
  * 
  * @class FormResponsesDataLoader
  * @extends BaseDataLoader
  * @memberof DataLoaders
  * 
  * @example
- * // Load teacher form responses
+ * // Load teacher form responses with column F extraction
  * const loader = new FormResponsesDataLoader();
  * const responseData = loader.loadData();
  * console.log(`Loaded responses for ${responseData.size} students`);
@@ -53,6 +55,7 @@
  * }
  * 
  * @since 2.0.0
+ * @version 2.1.0 - Enhanced with column F student ID extraction and improved duplicate handling support
  */
 class FormResponsesDataLoader extends BaseDataLoader {
   constructor() {

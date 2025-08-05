@@ -26,24 +26,33 @@
  * This processor implements sophisticated data merging logic to combine
  * student information from various Google Sheets into a comprehensive
  * student profile. It handles data conflicts, missing information, and
- * maintains referential integrity across data sources.
+ * maintains referential integrity across data sources with enhanced
+ * data precedence logic for teacher form responses.
  * 
  * **Key Features:**
  * - **Multi-source Integration**: Merges data from 8+ different sheets
- * - **Conflict Resolution**: Handles conflicting data between sources
+ * - **Smart Data Precedence**: Form responses take priority over tentative data
+ * - **Conflict Resolution**: Handles conflicting data between sources intelligently
+ * - **Teacher Input Priority**: Teacher form submissions override tentative records
  * - **Data Validation**: Ensures data integrity during merge operations
  * - **Performance Optimization**: Efficient Map operations for large datasets
  * - **Error Resilience**: Continues processing when individual sources fail
+ * - **Fallback Logic**: Uses tentative data when form responses incomplete
  * 
  * **Data Sources Processed:**
- * 1. TENTATIVE - Primary student information
- * 2. Registrations - Enrollment and placement data
- * 3. ContactInfo - Student and parent contact details
- * 4. Schedules - Course assignments and teachers
- * 5. Form Responses - Teacher feedback and assessments
+ * 1. TENTATIVE - Primary student information (fallback priority)
+ * 2. Form Responses - Teacher feedback and assessments (highest priority)
+ * 3. Registrations - Enrollment and placement data
+ * 4. ContactInfo - Student and parent contact details
+ * 5. Schedules - Course assignments and teachers
  * 6. Attendance - Enrollment counts and attendance data
  * 7. Entry/Withdrawal - Program entry and exit tracking
  * 8. Additional sources as needed
+ * 
+ * **Data Precedence Logic:**
+ * - Teacher form responses take precedence for transition decisions
+ * - Tentative data provides fallback when form responses missing
+ * - Intelligent merging preserves most complete and recent information
  * 
  * @class StudentDataMerger
  * @extends BaseDataProcessor

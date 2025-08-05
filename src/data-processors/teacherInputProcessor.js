@@ -25,20 +25,23 @@
  * 
  * **Key Features:**
  * - **Form Response Processing**: Transforms teacher form submissions into structured data
+ * - **Duplicate Submission Handling**: Automatically detects and resolves multiple submissions from the same teacher for the same student, using the most recent response
  * - **Schedule Integration**: Correlates teacher input with student schedule information
  * - **Multi-Teacher Coordination**: Handles multiple teacher responses per student
  * - **Recommendation Synthesis**: Processes teacher recommendations and feedback
  * - **Data Validation**: Ensures teacher input data integrity and completeness
+ * - **Smart Data Precedence**: Form response data takes precedence over tentative data, with intelligent fallback handling
  * 
  * @class TeacherInputProcessor
  * @extends BaseDataProcessor
  * @memberof DataProcessors
  * 
  * @example
- * // Process teacher input for a student
+ * // Process teacher input for a student with duplicate detection
  * const processor = new TeacherInputProcessor();
  * const studentData = mergedStudentData.get('123456');
  * const teacherInput = processor.processTeacherInput('123456', studentData);
+ * // Automatically uses most recent teacher responses
  * 
  * @example
  * // Process teacher input with validation
@@ -49,6 +52,7 @@
  * }
  * 
  * @since 2.0.0
+ * @version 2.1.0 - Added duplicate teacher submission detection and enhanced data precedence logic
  */
 class TeacherInputProcessor extends BaseDataProcessor {
   constructor() {
@@ -220,9 +224,31 @@ class TeacherInputProcessor extends BaseDataProcessor {
   }
 
   /**
-   * Processes multiple form responses from the same teacher, keeping only the most recent
+   * Processes multiple form responses from the same teacher, keeping only the most recent.
+   * 
+   * This method implements intelligent duplicate detection by grouping responses by teacher
+   * name and automatically selecting the most recent submission when multiple responses
+   * exist from the same teacher for the same student. This ensures that updated teacher
+   * feedback always takes precedence over older submissions.
+   * 
+   * **Algorithm:**
+   * 1. Groups responses by teacher name
+   * 2. For each teacher with multiple responses, finds the most recent by timestamp
+   * 3. Returns deduplicated array with one response per teacher
+   * 
    * @param {Array} formResponses - Array of form response objects
    * @returns {Array} Processed array with one response per teacher (most recent)
+   * 
+   * @example
+   * // Automatic duplicate resolution
+   * const responses = [
+   *   { teacherName: "Smith, John", timestamp: "2024-01-01", feedback: "Old feedback" },
+   *   { teacherName: "Smith, John", timestamp: "2024-01-02", feedback: "Updated feedback" }
+   * ];
+   * const result = processor.processMultipleResponsesPerTeacher(responses);
+   * // Returns: [{ teacherName: "Smith, John", timestamp: "2024-01-02", feedback: "Updated feedback" }]
+   * 
+   * @since 2.1.0
    */
   processMultipleResponsesPerTeacher(formResponses) {
     if (!formResponses || !Array.isArray(formResponses)) {
@@ -268,10 +294,32 @@ class TeacherInputProcessor extends BaseDataProcessor {
   }
 
   /**
-   * Finds the most recent response from multiple responses by the same teacher
+   * Finds the most recent response from multiple responses by the same teacher.
+   * 
+   * Uses timestamp analysis to determine the most recent submission when a teacher
+   * has submitted multiple responses for the same student. Supports various timestamp
+   * field formats commonly used in Google Forms and provides fallback logic when
+   * timestamps are unavailable.
+   * 
+   * **Timestamp Detection:**
+   * - Searches for common timestamp field names: 'Timestamp', 'Date', 'Submit Time'
+   * - Handles both Date objects and string representations
+   * - Falls back to array position when no timestamp is available
+   * 
    * @param {Array} responses - Array of response objects from the same teacher
-   * @param {string} teacherName - Teacher name for logging
-   * @returns {Object} The most recent response
+   * @param {string} teacherName - Teacher name for logging purposes
+   * @returns {Object} The most recent response object
+   * 
+   * @example
+   * // Timestamp-based selection
+   * const responses = [
+   *   { teacherName: "Doe, Jane", timestamp: "2024-01-01 10:00:00", feedback: "Initial" },
+   *   { teacherName: "Doe, Jane", timestamp: "2024-01-01 14:30:00", feedback: "Updated" }
+   * ];
+   * const latest = processor.findMostRecentResponse(responses, "Doe, Jane");
+   * // Returns the 14:30:00 response
+   * 
+   * @since 2.1.0
    */
   findMostRecentResponse(responses, teacherName) {
     // Look for timestamp field to determine most recent
