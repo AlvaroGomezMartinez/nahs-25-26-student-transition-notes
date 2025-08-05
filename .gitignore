@@ -4,3 +4,9 @@
 # Ignore clasp authentication files
 .clasp.json
 .claspignore
+
+# Ignore debugging files
+debug-*.js
+diagnose*.js
+simpleTest*.js
+validate*.js
