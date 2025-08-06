@@ -1,10 +1,9 @@
-/**
- * README for NAHS Student Transition Notes Refactoring Project
- * 
- * This document explains the refactored structure and how to use the new system.
- */
-
 # NAHS Student Transition Notes - Production Ready System
+
+![Status](https://img.shields.io/badge/Status-Production%20Ready-brightgreen)
+![Google Apps Script](https://img.shields.io/badge/Google%20Apps%20Script-Enabled-blue)
+![Version](https://img.shields.io/badge/Version-2.1.0-success)
+![Documentation](https://img.shields.io/badge/Documentation-Complete-green)
 
 ## Overview
 This project manages student transition data for NAHS (Alternative High School) students. The system loads data from multiple Google Sheets, processes it with enhanced duplicate detection and data precedence logic, and writes consolidated information to a TENTATIVE-Version2 sheet.
@@ -230,3 +229,4 @@ When adding new functionality:
 Contact: Alvaro Gomez (alvaro.gomez@nisd.net)
 Office: +1-210-397-9408
 Mobile: +1-210-363-1577
+
