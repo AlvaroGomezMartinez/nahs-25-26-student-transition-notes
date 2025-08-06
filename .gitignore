@@ -10,3 +10,6 @@ debug-*.js
 diagnose*.js
 simpleTest*.js
 validate*.js
+
+# Ignore test files
+test_*.js
