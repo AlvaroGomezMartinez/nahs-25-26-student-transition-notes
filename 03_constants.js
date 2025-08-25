@@ -118,6 +118,10 @@ const COLUMN_NAMES = {
   STUDENT_ID_STU: 'STU ID', // Alternative format for attendance data
   STUDENT_FIRST_NAME: 'Student First Name',
   STUDENT_LAST_NAME: 'Student Last Name',
+  // Backwards-compatible aliases used across older services
+  // Some sheets use short headers 'FIRST' and 'LAST' — include those
+  FIRST: 'FIRST',
+  LAST: 'LAST',
   STUDENT_NAME_FULL: 'Student Name(Last, First)',
   STUDENT_NAME_FULL_ALT: 'Student Name (Last, First MI)', // Alternative format from Schedules
   GRADE: 'GRADE',
@@ -126,6 +130,7 @@ const COLUMN_NAMES = {
   ENTRY_DATE: 'Entry Date',
   PLACEMENT_DAYS: 'Placement Days',
   START_DATE: 'Start Date', // From registrations
+  FIRST_DAY_OF_AEP: 'FIRST DAY OF AEP',
   DATE_ADDED: 'DATE ADDED TO SPREADSHEET',
   TEACHER_NAME: 'Teacher Name',
   COURSE_TITLE: 'Course Title',

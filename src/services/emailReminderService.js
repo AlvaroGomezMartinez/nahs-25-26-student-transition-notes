@@ -56,8 +56,10 @@ class EmailReminderService {
    * @param {string} [options.formUrl] - Custom form URL for teacher input
    */
   constructor(options = {}) {
-    this.debugMode = options.debugMode || false;
-    this.testRecipients = options.testRecipients || null;
+  // Default to non-debug (production) unless explicitly enabled
+  this.debugMode = options.debugMode || false;
+  // Only use testRecipients when explicitly provided
+  this.testRecipients = options.testRecipients || null;
     this.testDate = options.testDate || null;
     this.formUrl = options.formUrl || 'https://forms.gle/1NirWqZkvcABGgYc9';
     
@@ -169,8 +171,21 @@ class EmailReminderService {
    * @returns {Object} Decision object with send boolean and reason
    */
   _shouldSendRemindersToday(date) {
+    // Compute weekend/holiday status
+    const isWeekend = this._isWeekend(date);
+    const isHoliday = this._isHoliday(date, holidayDates);
+
+    // Debug logging to help track unexpected weekend/holiday behavior
+    if (this.debugMode) {
+      try {
+        console.log(`_shouldSendRemindersToday: date=${date.toString()}, day=${date.getDay()}, isWeekend=${isWeekend}, isHoliday=${isHoliday}`);
+      } catch (e) {
+        console.log('_shouldSendRemindersToday: debug logging failed', e);
+      }
+    }
+
     // Skip weekends
-    if (this._isWeekend(date)) {
+    if (isWeekend) {
       return {
         send: false,
         reason: 'Weekend (reminders only sent on weekdays)'
@@ -178,7 +193,7 @@ class EmailReminderService {
     }
     
     // Skip holidays
-    if (this._isHoliday(date, holidayDates)) {
+    if (isHoliday) {
       return {
         send: false,
         reason: 'Holiday (reminders not sent on holidays)'
@@ -229,6 +244,20 @@ class EmailReminderService {
       try {
         // Handle both Map structure and direct object structure
         const studentRecord = Array.isArray(dataArray) ? dataArray[0] : dataArray;
+        // Temporary one-time debug: show keys present on a student record
+        if (this.debugMode && !this._hasLoggedSampleStudentKeys) {
+          try {
+            console.log('DEBUG: sample studentRecord keys:', Object.keys(studentRecord));
+            // Print a compact sample of the record (only a few keys)
+            const sample = {};
+            Object.keys(studentRecord || {}).slice(0, 10).forEach(k => { sample[k] = studentRecord[k]; });
+            console.log('DEBUG: sample studentRecord values:', sample);
+          } catch (e) {
+            console.log('DEBUG: failed to print sample studentRecord', e);
+          }
+          // Avoid spamming logs; only log once per service instance
+          this._hasLoggedSampleStudentKeys = true;
+        }
         
         if (!studentRecord || !studentRecord[COLUMN_NAMES.FIRST_DAY_OF_AEP]) {
           if (this.debugMode) {
@@ -511,10 +540,24 @@ Have a great day.`;
     let currentDate = new Date(startDate);
     let workdaysAdded = 0;
     
+    if (this.debugMode) {
+      try {
+        console.log(`_addWorkdays: start=${startDate.toDateString()}, numWorkdays=${numWorkdays}, holidays=${Array.isArray(holidays) ? holidays.length : 'NA'}`);
+      } catch (e) {
+        console.log('_addWorkdays: debug logging failed', e);
+      }
+    }
+    
     while (workdaysAdded < numWorkdays) {
       currentDate.setDate(currentDate.getDate() + 1);
-      
-      if (!this._isWeekend(currentDate) && !this._isHoliday(currentDate, holidays)) {
+      const isWeekend = this._isWeekend(currentDate);
+      const isHoliday = this._isHoliday(currentDate, holidays);
+
+      if (this.debugMode) {
+        console.log(`_addWorkdays: evaluating ${currentDate.toDateString()} - isWeekend=${isWeekend}, isHoliday=${isHoliday}, workdaysAdded=${workdaysAdded}`);
+      }
+
+      if (!isWeekend && !isHoliday) {
         workdaysAdded++;
       }
     }
@@ -617,4 +660,17 @@ function testEmailReminders(options = {}) {
     console.error('Error during email reminder testing:', error);
     throw error;
   }
+}
+
+/**
+ * Small safe example that calls the service in debug mode with a single test recipient.
+ * Use this from the Apps Script editor to do a dry-run without sending real emails.
+ */
+function debugSendDailyReminders() {
+  const service = new EmailReminderService({
+    debugMode: true,
+    testRecipients: ['alvaro.gomez@nisd.net']
+  });
+
+  return service.sendDailyReminders();
 }

@@ -37,7 +37,7 @@ function testEmailReminderServiceSafe() {
     console.log('\n--- Test 2: Weekend Detection ---');
     const weekendService = new EmailReminderService({
       debugMode: true,
-      testDate: new Date('2025-01-04'), // Saturday
+  testDate: new Date(2025, 7, 24), // Sunday
       testRecipients: ['alvaro.gomez@nisd.net']
     });
     const weekendResult = weekendService.sendDailyReminders();
@@ -55,10 +55,10 @@ function testEmailReminderServiceSafe() {
     // Test 4: Date calculation testing (no email sending)
     console.log('\n--- Test 4: Date Calculation Testing ---');
     const dateService = new EmailReminderService({ debugMode: true });
-    const testStartDate = new Date('2025-01-01');
+  const testStartDate = new Date(2025, 11, 19);
     const dueDate = dateService._calculateDueDate(testStartDate);
-    console.log(`Due date calculation: ${testStartDate.toDateString()} + 2 workdays = ${dueDate.toDateString()}`);
-    
+    console.log(`Due date calculation: ${testStartDate.toDateString()} + 2 workdays = ${dueDate.toDateString()}. The due date should be 01/06/26`);
+
     // Test 5: Service health check (safe)
     console.log('\n--- Test 5: Service Health Check ---');
     const healthStatus = checkServiceHealth();
@@ -100,7 +100,7 @@ function testEmailReminderServiceComprehensive() {
     console.log('\n--- Test 2: Weekend Detection ---');
     const weekendService = new EmailReminderService({
       debugMode: true,
-      testDate: new Date('2025-01-04'), // Saturday
+      testDate: new Date(2026, 0, 3), // Saturday
       testRecipients: ['alvaro.gomez@nisd.net']
     });
     const weekendResult = weekendService.sendDailyReminders();
@@ -110,7 +110,7 @@ function testEmailReminderServiceComprehensive() {
     console.log('\n--- Test 3: Weekday Processing ---');
     const weekdayService = new EmailReminderService({
       debugMode: true,
-      testDate: new Date('2025-01-06'), // Monday
+      testDate: new Date(2025, 7, 25), // Monday
       testRecipients: ['alvaro.gomez@nisd.net']
     });
     const weekdayResult = weekdayService.sendDailyReminders();
@@ -120,7 +120,7 @@ function testEmailReminderServiceComprehensive() {
     console.log('\n--- Test 4: Legacy Function Test (Debug Mode) ---');
     console.log('Note: Testing legacy function in safe debug mode to avoid real emails');
     const legacyResult = debugSendEmailsForToday(
-      new Date('2025-01-06'), // Monday 
+      new Date(2025, 7, 25), // Monday 
       ['alvaro.gomez@nisd.net'] // Safe test recipient
     );
     console.log(`Legacy function: ${legacyResult ? 'PASS' : 'FAIL'}`);
@@ -153,10 +153,10 @@ function testEmailReminderDateScenarios() {
   console.log('=== Email Reminder Date Scenarios Test ===');
   
   const testDates = [
-    { date: '2025-08-11', description: 'Monday (weekday)' },
-    { date: '2025-08-22', description: 'Saturday (weekend)' },
-    { date: '2025-08-25', description: 'Sunday (weekend)' },
-    { date: '2025-01-15', description: 'Tuesday (weekday)' }
+  { date: new Date(2025, 7, 25), description: 'Monday (weekday)' },
+  { date: new Date(2025, 7, 23), description: 'Saturday (weekend)' },
+  { date: new Date(2025, 7, 24), description: 'Sunday (weekend)' },
+  { date: new Date(2026, 0, 13), description: 'Tuesday (weekday)' }
   ];
   
   const results = {};
@@ -258,7 +258,7 @@ function testLegacyMigration() {
     // Test debug legacy function
     console.log('\n--- Legacy Debug Function Test ---');
     const debugResult = debugSendEmailsForToday(
-      new Date('2025-01-06'), 
+      new Date(), // Use today's date
       ['alvaro.gomez@nisd.net']
     );
     console.log('Legacy debug function executed:', debugResult ? 'SUCCESS' : 'FAILED');
@@ -327,8 +327,8 @@ function testEmailReminderDateScenariosSafe() {
   
   // Only test weekends and holidays - these never send emails
   const testDates = [
-    { date: '2025-01-04', description: 'Saturday (weekend - SAFE)' },
-    { date: '2025-01-05', description: 'Sunday (weekend - SAFE)' },
+  { date: new Date(2025, 7, 23), description: 'Saturday (weekend - SAFE)' },
+  { date: new Date(2025, 7, 24), description: 'Sunday (weekend - SAFE)' },
     // Note: Not testing weekdays to avoid any chance of real emails
   ];
   
@@ -379,7 +379,7 @@ function testLegacyMigrationSafe() {
     // Only test debug legacy function - never production
     console.log('\n--- Legacy Debug Function Test (SAFE) ---');
     const debugResult = debugSendEmailsForToday(
-      new Date('2025-01-04'), // Saturday - safe, no emails sent
+  new Date(2025, 7, 23), // Saturday - safe, no emails sent
       ['alvaro.gomez@nisd.net']
     );
     console.log('Legacy debug function executed:', debugResult ? 'SUCCESS' : 'FAILED');
@@ -447,12 +447,12 @@ function test10DayMilestoneScenario() {
   
   try {
     // Calculate a test date that would trigger 10-day milestone
-    // If a student started on Dec 16, 2024 (Monday), their 10-day mark would be around Jan 3, 2025
-    // Let's use Jan 3, 2025 as our test date and simulate students who started Dec 16, 2024
-    
-    const testDate = new Date('2025-01-03'); // Friday
-    const simulatedStartDate = new Date('2024-12-16'); // 10+ workdays before
-    
+  // If a student started on Aug 11, 2025 (Monday), their 10-day mark would be Aug 22, 2025
+  // Let's use Aug 22, 2025 as our test date and simulate students who started Aug 11, 2025
+
+  const testDate = new Date(2025, 7, 22); // Friday
+  const simulatedStartDate = new Date(2025, 7, 11); // 10+ workdays before
+
     console.log(`\n--- Test Configuration ---`);
     console.log(`Test Date: ${testDate.toDateString()}`);
     console.log(`Simulated Student Start Date: ${simulatedStartDate.toDateString()}`);
@@ -506,11 +506,11 @@ function testMultiple10DayScenarios() {
   
   // Test different dates that might have students at 10-day milestone
   const testDates = [
-    { date: '2025-01-03', description: 'Friday Jan 3 (students from Dec 16)' },
-    { date: '2025-01-06', description: 'Monday Jan 6 (students from Dec 19)' },
-    { date: '2025-01-07', description: 'Tuesday Jan 7 (students from Dec 20)' },
-    { date: '2025-01-08', description: 'Wednesday Jan 8 (students from Dec 23)' },
-    { date: '2025-01-09', description: 'Thursday Jan 9 (students from Dec 24)' }
+    { date: new Date(2025, 10, 21), description: 'Tuesday Dec 9 (students from Nov 21), Thanksgiving Break' },
+    { date: new Date(2025, 11, 19), description: 'Friday Jan 16 (students from Dec 19), Christmas Break' },
+    { date: new Date(2025, 11, 20), description: 'Tuesday Jan 7 (students from Dec 20)' },
+    { date: new Date(2026, 2, 4), description: 'Wednesday Mar 25 (students from Mar 4), Spring Break and Planning Day' },
+    { date: new Date(2026, 4, 4), description: 'Friday May 15 (students from May 4), regular days' }
   ];
   
   const results = {};
@@ -571,7 +571,7 @@ function testSmartSchoolCalendar10DayScenario() {
   try {
     // Use today's date or a test date
     const today = new Date(); // Current date
-    const testToday = new Date('2025-01-15'); // Or use a specific test date
+  const testToday = new Date(2025, 0, 15); // Or use a specific test date
     
     console.log(`\n--- Smart Calendar Calculation ---`);
     console.log(`Using test date: ${testToday.toDateString()}`);
@@ -691,7 +691,7 @@ function testMultipleSmartCalendarScenarios() {
   
   // Test the last few weekdays to see which might have 10-day milestones
   const testDates = [];
-  const baseDate = new Date('2025-01-15'); // Start from a recent date
+  const baseDate = new Date(2025, 0, 15); // Start from a recent date
   
   // Generate 5 recent weekdays
   for (let i = 0; i < 10; i++) {

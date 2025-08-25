@@ -1,17 +1,52 @@
 /**
- * An array of holiday dates for NISD (Northside Independent School District).
- * This array is utilized to exclude non-school days from calculations
- * for determining the expected student exit date from DAEP (Disciplinary Alternative Education Program).
+ * Holiday dates for NISD normalized to 'yyyy-MM-dd' format.
  *
- * Each date in the array is formatted as 'MM/DD/YYYY' and represents a school holiday or break
- * during which no classes are held.
+ * The external library (`NISDHolidayLibrary.getHolidayDates()`) returns dates as
+ * 'MM/DD/YYYY'. The rest of the codebase compares against 'yyyy-MM-dd' strings,
+ * so we normalize here. If the external library is unavailable during tests,
+ * we safely fall back to an empty array.
  *
- * The holiday dates are retrieved from the NISDHolidayLibrary Google Apps Script library 
- * using the `getHolidayDates` method.
- * 
- * Script ID: 1OjYgamk2Sz8G1B4IOJKdWNM9-t6RwSJ_uq7nUJJO6h_7jSogTDT7CX10
- *
- * @constant {string[]} holidayDates - An array of strings, where each string is a holiday date
- * formatted as 'MM/DD/YYYY' representing days when school is not in session.
+ * @constant {string[]} holidayDates - Array of ISO-style date strings 'yyyy-MM-dd'
  */
-const holidayDates = NISDHolidayLibrary.getHolidayDates();
+let holidayDates = [];
+
+try {
+	const raw = (typeof NISDHolidayLibrary !== 'undefined' &&
+							 NISDHolidayLibrary.getHolidayDates) ?
+							 NISDHolidayLibrary.getHolidayDates() : [];
+
+	if (Array.isArray(raw)) {
+		// Convert 'MM/DD/YYYY' -> 'yyyy-MM-dd'
+		holidayDates = raw.map(s => {
+			try {
+				// Some entries may already be ISO; try parsing flexibly
+				const parts = String(s).trim();
+				const d = new Date(parts);
+				if (isNaN(d.getTime())) {
+					// Try manual parse for MM/DD/YYYY
+					const m = parts.split('/');
+					if (m.length === 3) {
+						const mm = String(m[0]).padStart(2, '0');
+						const dd = String(m[1]).padStart(2, '0');
+						const yyyy = m[2];
+						return `${yyyy}-${mm}-${dd}`;
+					}
+					return null;
+				}
+				const yyyy = d.getFullYear();
+				const mm = String(d.getMonth() + 1).padStart(2, '0');
+				const dd = String(d.getDate()).padStart(2, '0');
+				return `${yyyy}-${mm}-${dd}`;
+			} catch (e) {
+				return null;
+			}
+		}).filter(Boolean);
+	}
+
+} catch (error) {
+	// If the external library isn't available (tests, local runs), keep empty list
+	console.warn('holidayDates: Could not load NISDHolidayLibrary, continuing with no holidays');
+	holidayDates = [];
+}
+
+// holidayDates is available in the global scope for other modules to use
