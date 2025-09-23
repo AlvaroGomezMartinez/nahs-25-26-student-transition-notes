@@ -6,27 +6,36 @@ This comprehensive unit testing framework has been created to validate the refac
 
 ## Test Structure
 
-The testing framework is organized in a modular structure under the `tests/unit/` directory:
+The testing framework is organized in a clean, modular structure:
 
 ```
-tests/unit/
-├── testRunner.js           # Main test orchestration and execution
-├── testUtils.js           # Common utilities and mock objects
-├── config/
-│   └── test_constants.js  # Configuration and constants testing
-├── utils/
-│   ├── test_dateUtils.js  # Date utility function testing
-│   ├── test_dataUtils.js  # Data manipulation utility testing
-│   └── test_validationUtils.js # Validation utility testing
-├── data-loaders/
-│   ├── test_baseDataLoader.js # Base data loader class testing
-│   └── test_dataLoaders.js    # Specific data loader testing
-├── data-processors/
-│   └── test_dataProcessors.js # Data processing logic testing
-├── writers/
-│   └── test_writers.js        # Sheet writing functionality testing
-└── integration/
-    └── test_integration.js    # End-to-end integration testing
+tests/
+├── TESTING_GUIDE.md           # This documentation
+├── consoleTestRunner.js       # Console-based runner for GAS editor
+├── debug/                     # Diagnostic and debugging utilities
+│   ├── diagnostics.js         # System diagnostics for troubleshooting
+│   └── diagnosticPlacementDays.js # Placement day diagnostics
+└── unit/                      # Organized unit tests
+    ├── testRunner.js          # Main test orchestration and execution
+    ├── testUtils.js           # Common utilities and mock objects
+    ├── config/
+    │   └── test_constants.js  # Configuration and constants testing
+    ├── data-loaders/
+    │   ├── test_baseDataLoader.js # Base data loader class testing
+    │   └── test_dataLoaders.js    # Specific data loader testing
+    ├── data-processors/
+    │   └── test_dataProcessors.js # Data processing logic testing
+    ├── integration/
+    │   └── test_integration.js    # End-to-end integration testing
+    ├── services/              # Service layer tests
+    │   ├── testEmailReminderService.js # Email reminder service tests
+    │   └── ImportEmails_Unit-Testing.js # Email import functionality tests
+    ├── utils/
+    │   ├── test_dateUtils.js  # Date utility function testing
+    │   ├── test_dataUtils.js  # Data manipulation utility testing
+    │   └── test_validationUtils.js # Validation utility testing
+    └── writers/
+        └── test_writers.js        # Sheet writing functionality testing
 ```
 
 ## Test Categories
@@ -90,7 +99,22 @@ tests/unit/
   - Batch operations
   - Factory pattern implementations
 
-### 6. Integration Tests (`integration/`)
+### 6. Service Tests (`services/`)
+- **testEmailReminderService.js**: Email reminder functionality
+  - Email service initialization and configuration
+  - Email template processing and personalization
+  - Safe testing mode (no real emails sent)
+  - Batch email operations
+  - Error handling and retry logic
+  - Email validation and formatting
+
+- **ImportEmails_Unit-Testing.js**: Email import functionality
+  - Email data import and processing
+  - Student email lookup and validation
+  - Email address normalization
+  - Import error handling
+
+### 7. Integration Tests (`integration/`)
 - **test_integration.js**: End-to-end workflows
   - Complete data pipeline testing
   - Main entry point validation
@@ -107,14 +131,21 @@ tests/unit/
 
 ### Execution Methods
 
-#### 1. Run All Tests
+#### 1. Main Test Runner (Recommended)
+Use the comprehensive test runner located in `tests/unit/testRunner.js`:
 ```javascript
-// In Google Apps Script editor, run:
-registerAllTests();
-// Then navigate to the web app URL to view test results
+// In Google Apps Script editor, run the doGet() function or access via web app URL
+// This runs all tests and displays results in a web interface
 ```
 
-#### 2. Run Specific Test Categories
+#### 2. Console-Based Testing
+For debugging and direct execution in the Google Apps Script editor, use `tests/consoleTestRunner.js`:
+```javascript
+// Run all tests with console output (no web interface)
+runTestsInConsole();
+```
+
+#### 3. Run Specific Test Categories
 ```javascript
 // Run only utility tests
 runTestCategory('utils');
@@ -128,6 +159,9 @@ runTestCategory('processors');
 // Run only writer tests
 runTestCategory('writers');
 
+// Run only service tests
+runTestCategory('services');
+
 // Run only integration tests
 runTestCategory('integration');
 
@@ -135,45 +169,23 @@ runTestCategory('integration');
 runTestCategory('all');
 ```
 
-#### 3. Run Individual Tests
+#### 4. Run Individual Tests
 ```javascript
 // Run a specific test by name
 runSingleTest('Constants Tests');
 runSingleTest('Date Utils Tests');
+runSingleTest('Email Reminder Service Tests');
 runSingleTest('Integration Tests');
 ```
 
-#### 4. Console-Based Testing (Alternative)
-For debugging and direct execution in the Google Apps Script editor:
+#### 5. Debugging and Diagnostics
+For system troubleshooting, use the diagnostic utilities in `tests/debug/`:
 ```javascript
-// Run all tests with console output
-runTestsInConsole();
+// System diagnostics - check constants and configuration
+inspectConstants();
 
-// Quick system verification
-quickSystemCheck();
-
-// Run specific test modules
-runSingleTestModule('DateUtil');
-runSingleTestModule('BaseDataLoader');
-
-// Individual test runners (in tests/individualTestRunners.js)
-runDateUtilTestsOnly();
-runBaseDataLoaderTestsOnly();
-```
-
-The console test runner (`tests/consoleTestRunner.js`) provides:
-- Direct execution in GAS editor without web interface
-- Real-time console logging of test results
-- System dependency verification
-- Individual test module execution
-
-For faster testing that avoids timeout issues, use the lightweight test runner (`tests/lightweightTestRunner.js`):
-```javascript
-// Run essential tests only (core functionality)
-runEssentialTestsInConsole();
-
-// Run all tests except slow constants tests
-runFastTestsInConsole();
+// Placement day diagnostics
+runPlacementDayDiagnostics();
 ```
 
 ### Web Interface
@@ -328,6 +340,39 @@ The test suite comprehensively covers:
 5. **Performance**: Keep test execution time reasonable
 
 ## Recent Updates and Fixes
+
+### Test Structure Cleanup (September 2025)
+
+The testing framework underwent a significant cleanup to improve organization and eliminate redundancy:
+
+#### Structural Improvements:
+- **Removed empty `integration/` folder**: Integration tests are properly organized in `unit/integration/`
+- **Consolidated test runners**: Eliminated 3 redundant test runners, keeping only the essential ones
+- **Created `debug/` folder**: Moved diagnostic files for better organization
+- **Added `services/` folder**: Organized email-related tests in a dedicated services directory
+
+#### Files Removed:
+- `lightweightTestRunner.js` - Redundant lightweight runner
+- `simpleTestRunner.js` - Redundant simple runner  
+- `individualTestRunners.js` - Redundant individual runners
+- Empty `integration/` directory
+
+#### Files Reorganized:
+- `diagnostics.js` → `debug/diagnostics.js`
+- `diagnosticPlacementDays.js` → `debug/diagnosticPlacementDays.js`
+- `testEmailReminderService.js` → `unit/services/testEmailReminderService.js`
+- `ImportEmails_Unit-Testing.js` → `unit/services/ImportEmails_Unit-Testing.js`
+
+#### Retained Structure:
+- `consoleTestRunner.js` - Console-based testing for GAS editor
+- `unit/testRunner.js` - Main comprehensive test runner
+- All organized unit tests in their respective categories
+
+This cleanup provides:
+- **Better organization**: Clear separation of test types and utilities
+- **Reduced redundancy**: No duplicate test runners
+- **Improved maintainability**: Easier to find and manage test files
+- **Preserved functionality**: All valuable test code retained
 
 ### Date Utility Test Fixes (July 2025)
 
