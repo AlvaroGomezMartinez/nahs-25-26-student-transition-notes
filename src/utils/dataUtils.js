@@ -347,26 +347,57 @@ function ensureCheckboxesInColumn(sheet, columnNumber, columnLetter = null) {
       return true; // Not an error, just no data
     }
 
-    const range = sheet.getRange(2, columnNumber, lastRow - 1, 1);
-    const values = range.getValues();
-    
-    // Ensure all cells have proper boolean values before adding checkboxes
-    let changedValues = false;
-    for (let i = 0; i < values.length; i++) {
-      if (values[i][0] !== true && values[i][0] !== false) {
-        values[i][0] = false; // Set default to false (unchecked)
-        changedValues = true;
+    // Process in chunks of 50 rows to prevent memory issues
+    const CHUNK_SIZE = 50;
+    const totalRows = lastRow - 1;  // Exclude header row
+    let processedRows = 0;
+
+    for (let startRow = 2; startRow <= lastRow; startRow += CHUNK_SIZE) {
+      // Calculate the number of rows for this chunk
+      const rowsInChunk = Math.min(CHUNK_SIZE, lastRow - startRow + 1);
+      
+      // Get the range for this chunk
+      const range = sheet.getRange(startRow, columnNumber, rowsInChunk, 1);
+      const values = range.getValues();
+      
+      // Ensure all cells have proper boolean values before adding checkboxes
+      let changedValues = false;
+      for (let i = 0; i < values.length; i++) {
+        const currentValue = values[i][0];
+        // Convert string 'TRUE'/'FALSE' to boolean if needed
+        if (typeof currentValue === 'string') {
+          const upperValue = currentValue.toUpperCase();
+          if (upperValue === 'TRUE') {
+            values[i][0] = true;
+            changedValues = true;
+          } else if (upperValue === 'FALSE') {
+            values[i][0] = false;
+            changedValues = true;
+          }
+        }
+        // Set non-boolean/non-string values to false
+        if (values[i][0] !== true && values[i][0] !== false) {
+          values[i][0] = false;
+          changedValues = true;
+        }
+      }
+      
+      // Set the values first if any were changed, then insert checkboxes
+      if (changedValues) {
+        range.setValues(values);
+      }
+      range.insertCheckboxes();
+      
+      processedRows += rowsInChunk;
+      
+      // Add a small delay every few chunks to prevent quota issues
+      if (processedRows % (CHUNK_SIZE * 4) === 0) {
+        Utilities.sleep(100);
       }
     }
     
-    // Set the values first if any were changed, then insert checkboxes
-    if (changedValues) {
-      range.setValues(values);
-    }
-    range.insertCheckboxes();
-    
     const columnDesc = columnLetter ? `column ${columnLetter} (${columnNumber})` : `column ${columnNumber}`;
-    console.log(`Added checkboxes to ${columnDesc} for ${values.length} rows in sheet ${sheet.getName()}`);
+    console.log(`Added checkboxes to ${columnDesc} for ${totalRows} rows in sheet ${sheet.getName()}`);
     return true;
     
   } catch (error) {
