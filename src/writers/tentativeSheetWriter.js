@@ -258,9 +258,9 @@ class TentativeSheetWriter extends BaseSheetWriter {
       const success = ensureCheckboxesInColumn(sheet, 76, 'BX');
       
       if (success) {
-        this.log('Successfully added checkboxes to column BX');
+        console.log('Successfully added checkboxes to column BX');
       } else {
-        this.log('Failed to add checkboxes to column BX', 'warn');
+        console.warn('Failed to add checkboxes to column BX');
       }
     } catch (error) {
       console.error('Error in _ensureCheckboxesInColumnBX:', error);
