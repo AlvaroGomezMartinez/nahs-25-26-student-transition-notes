@@ -2,7 +2,7 @@
  * @fileoverview Registration Data Loader for the NAHS system.
  * 
  * This module provides specialized functionality for loading student registration
- * data from external spreadsheets containing Form Responses 1 data. It handles
+ * data from external spreadsheets containing Form Responses 2 data. It handles
  * the integration with external registration systems and provides critical
  * student enrollment information for transition tracking.
  * 
@@ -124,14 +124,18 @@ class RegistrationDataLoader extends BaseDataLoader {
   loadData() {
     try {
       console.log('Loading registration data from external spreadsheet...');
-      console.log('External spreadsheet ID:', EXTERNAL_SPREADSHEETS.REGISTRATIONS_SOURCE);
       
       const result = super.loadData();
       
+      if (result.size > 0) {
+        console.log(`✓ Loaded registration data for ${result.size} students`);
+      } else {
+        console.warn('⚠️ No registration data loaded - check external spreadsheet');
+      }
+      
       return result;
     } catch (error) {
-      console.error('Error loading registration data:', error);
-      console.error('Note: Registration data is expected to be in an external spreadsheet');
+      console.error('❌ Error loading registration data:', error.message);
       console.error('Please verify the EXTERNAL_SPREADSHEETS.REGISTRATIONS_SOURCE configuration');
       return new Map();
     }
@@ -148,21 +152,42 @@ class RegistrationDataLoader extends BaseDataLoader {
     const resultMap = new Map();
     const latestDates = {};
 
-    // Find latest start date for each student (mimicking original logic)
+    // Find latest registration date for each student
     for (let i = 1; i < data.length; i++) {
       const row = data[i];
-      const studentId = this.extractKey(row[keyColumnIndex]);
       
+      // Skip empty rows
+      if (!row || row.every(cell => !cell)) {
+        continue;
+      }
+      
+      const studentId = this.extractKey(row[keyColumnIndex]);
       if (studentId === null) continue;
 
-      const startDateIndex = headers.indexOf('Start Date');
-      if (startDateIndex !== -1) {
-        const startDate = new Date(row[startDateIndex]);
+      // Look for either "Start Date" or "Registration Date" column
+      let dateColumnIndex = headers.indexOf('Start Date');
+      if (dateColumnIndex === -1) {
+        dateColumnIndex = headers.indexOf('Registration Date');
+      }
+      
+      if (dateColumnIndex !== -1 && row[dateColumnIndex]) {
+        const registrationDate = new Date(row[dateColumnIndex]);
         
-        if (!latestDates[studentId] || startDate > latestDates[studentId]) {
-          latestDates[studentId] = startDate;
-          
-          const rowData = this.createRowObject(row, headers);
+        // Validate the date before using it
+        if (!isNaN(registrationDate.getTime())) {
+          // Keep the record with the latest date for each student
+          if (!latestDates[studentId] || registrationDate > latestDates[studentId]) {
+            latestDates[studentId] = registrationDate;
+            const rowData = this.createRowObject(row, headers);
+            resultMap.set(studentId, [rowData]);
+          }
+        } else {
+          console.warn(`Invalid registration date found for student ${studentId}: ${row[dateColumnIndex]}`);
+        }
+      } else {
+        // Handle rows without date - still include them
+        const rowData = this.createRowObject(row, headers);
+        if (!resultMap.has(studentId)) {
           resultMap.set(studentId, [rowData]);
         }
       }

@@ -10,8 +10,8 @@
  * processing logic throughout the system.
  * 
  * @author Alvaro Gomez
- * @version 2.0.0
- * @since 2024-01-01
+ * @version 2.0.1
+ * @since 2025-09-23
  */
 
 /**
@@ -79,13 +79,21 @@ const SHEET_NAMES = {
  * @enum {string}
  * 
  * @property {string} STUDENT_ID - Unique student identifier column
+ * @property {string} STUDENT_ID_ALT - Alternative format with lowercase 'd'
+ * @property {string} STUDENT_ID_STU - Alternative format for attendance data
  * @property {string} STUDENT_FIRST_NAME - Student's first name column
  * @property {string} STUDENT_LAST_NAME - Student's last name column
+ * @property {string} FIRST - Backwards-compatible alias for first name
+ * @property {string} LAST - Backwards-compatible alias for last name
  * @property {string} STUDENT_NAME_FULL - Full name in "Last, First" format
+ * @property {string} STUDENT_NAME_FULL_ALT - Alternative format from Schedules
  * @property {string} GRADE - Current grade level column
+ * @property {string} GRADE_ALT - Alternative grade format
  * @property {string} HOME_CAMPUS - Student's home campus assignment
  * @property {string} ENTRY_DATE - Date student entered the program
  * @property {string} PLACEMENT_DAYS - Number of days in current placement
+ * @property {string} START_DATE - Program start date from registrations
+ * @property {string} FIRST_DAY_OF_AEP - First day of AEP placement
  * @property {string} DATE_ADDED - Date record was added to system
  * @property {string} TEACHER_NAME - Teacher's name for course assignments
  * @property {string} COURSE_TITLE - Course title or subject name
@@ -95,6 +103,19 @@ const SHEET_NAMES = {
  * @property {string} PARENT_NAME - Parent or guardian's name
  * @property {string} GUARDIAN_EMAIL - Primary guardian email address
  * @property {string} STUDENT_EMAIL - Student's email address
+ * @property {string} NOTIFICATION_PHONE - Notification phone number
+ * @property {string} GUARDIAN_1_NAME - Primary guardian's name
+ * @property {string} GUARDIAN_1_EMAIL - Primary guardian email address
+ * @property {string} GUARDIAN_1_CELL - Primary guardian cell phone
+ * @property {string} GUARDIAN_1_HOME - Primary guardian home phone
+ * @property {string} GUARDIAN_2_NAME - Secondary guardian's name
+ * @property {string} GUARDIAN_2_EMAIL - Secondary guardian email address
+ * @property {string} GUARDIAN_2_CELL - Secondary guardian cell phone
+ * @property {string} GUARDIAN_2_HOME - Secondary guardian home phone
+ * @property {string} RECIDIVIST - Repeat NAHS student indicator
+ * @property {string} ELIGIBILITY - Student eligibility status
+ * @property {string} EDUCATIONAL_FACTORS - Educational factors column
+ * @property {string} BEHAVIOR_CONTRACT - Behavior contract indicator
  * 
  * @example
  * // Find column index by name
@@ -110,45 +131,49 @@ const SHEET_NAMES = {
  *   }
  * });
  * 
- * @since 2.0.0
+ * @since 2.0.1
  */
 const COLUMN_NAMES = {
-  STUDENT_ID: 'STUDENT ID',
-  STUDENT_ID_ALT: 'Student Id', // Alternative format with lowercase 'd'
-  STUDENT_ID_STU: 'STU ID', // Alternative format for attendance data
-  STUDENT_FIRST_NAME: 'Student First Name',
-  STUDENT_LAST_NAME: 'Student Last Name',
+  STUDENT_ID: "STUDENT ID",
+  STUDENT_ID_ALT: "Student Id", // Alternative format with lowercase 'd'
+  STUDENT_ID_STU: "STU ID", // Alternative format for attendance data
+  STUDENT_FIRST_NAME: "Student First Name",
+  STUDENT_LAST_NAME: "Student Last Name",
   // Backwards-compatible aliases used across older services
   // Some sheets use short headers 'FIRST' and 'LAST' — include those
-  FIRST: 'FIRST',
-  LAST: 'LAST',
-  STUDENT_NAME_FULL: 'Student Name(Last, First)',
-  STUDENT_NAME_FULL_ALT: 'Student Name (Last, First MI)', // Alternative format from Schedules
-  GRADE: 'GRADE',
-  GRADE_ALT: 'Grd Lvl', // Alternative format
-  HOME_CAMPUS: 'Home Campus',
-  ENTRY_DATE: 'Entry Date',
-  PLACEMENT_DAYS: 'Placement Days',
-  START_DATE: 'Start Date', // From registrations
-  FIRST_DAY_OF_AEP: 'FIRST DAY OF AEP',
-  DATE_ADDED: 'DATE ADDED TO SPREADSHEET',
-  TEACHER_NAME: 'Teacher Name',
-  COURSE_TITLE: 'Course Title',
-  CASE_MANAGER: 'Case Manager',
-  PERIOD: 'Per Beg',
-  WITHDRAW_DATE: 'Wdraw Date',
-  PARENT_NAME: 'Parent Name',
-  GUARDIAN_EMAIL: 'Guardian 1 Email',
-  STUDENT_EMAIL: 'Student Email',
-  NOTIFICATION_PHONE: 'Notification Phone',
-  GUARDIAN_1_NAME: 'Guardian 1',
-  GUARDIAN_1_EMAIL: 'Guardian 1 Email',
-  GUARDIAN_1_CELL: 'Guardian 1 Cell',
-  GUARDIAN_1_HOME: 'Guardian 1 Home',
-  GUARDIAN_2_NAME: 'Guardian 2',
-  GUARDIAN_2_EMAIL: 'Guardian 2 Email', 
-  GUARDIAN_2_CELL: 'Guardian 2 Cell',
-  GUARDIAN_2_HOME: 'Guardian 2 Home'
+  FIRST: "FIRST",
+  LAST: "LAST",
+  STUDENT_NAME_FULL: "Student Name(Last, First)",
+  STUDENT_NAME_FULL_ALT: "Student Name (Last, First MI)", // Alternative format from Schedules
+  GRADE: "GRADE",
+  GRADE_ALT: "Grd Lvl", // Alternative format
+  HOME_CAMPUS: "Home Campus",
+  ENTRY_DATE: "Entry Date",
+  PLACEMENT_DAYS: "Placement Days",
+  START_DATE: "Start Date", // From registrations
+  FIRST_DAY_OF_AEP: "FIRST DAY OF AEP",
+  DATE_ADDED: "DATE ADDED TO SPREADSHEET",
+  TEACHER_NAME: "Teacher Name",
+  COURSE_TITLE: "Course Title",
+  CASE_MANAGER: "Case Manager",
+  PERIOD: "Per Beg",
+  WITHDRAW_DATE: "Wdraw Date",
+  PARENT_NAME: "Parent Name",
+  GUARDIAN_EMAIL: "Guardian 1 Email",
+  STUDENT_EMAIL: "Student Email",
+  NOTIFICATION_PHONE: "Notification Phone",
+  GUARDIAN_1_NAME: "Guardian 1",
+  GUARDIAN_1_EMAIL: "Guardian 1 Email",
+  GUARDIAN_1_CELL: "Guardian 1 Cell",
+  GUARDIAN_1_HOME: "Guardian 1 Home",
+  GUARDIAN_2_NAME: "Guardian 2",
+  GUARDIAN_2_EMAIL: "Guardian 2 Email",
+  GUARDIAN_2_CELL: "Guardian 2 Cell",
+  GUARDIAN_2_HOME: "Guardian 2 Home",
+  RECIDIVIST: "Repeat NAHS Student",
+  ELIGIBILITY: "Eligibilty",
+  EDUCATIONAL_FACTORS: "Educational Factors",
+  BEHAVIOR_CONTRACT: "Behavior Contract"
 };
 
 /**

@@ -10,8 +10,8 @@
  * output formatting for all sheet-based operations in the system.
  * 
  * @author Alvaro Gomez
- * @version 2.0.0
- * @since 2024-01-01
+ * @version 2.0.1
+ * @since 2025-09-23
  * @memberof Config
  */
 
@@ -169,7 +169,11 @@ const REGISTRATIONS_SHEET_CONFIG = {
   requiredColumns: [
     COLUMN_NAMES.STUDENT_ID,
     COLUMN_NAMES.PLACEMENT_DAYS,
-    COLUMN_NAMES.HOME_CAMPUS
+    COLUMN_NAMES.HOME_CAMPUS,
+    COLUMN_NAMES.RECIDIVIST,
+    COLUMN_NAMES.ELIGIBILITY,
+    COLUMN_NAMES.EDUCATIONAL_FACTORS,
+    COLUMN_NAMES.BEHAVIOR_CONTRACT
   ]
 };
 
