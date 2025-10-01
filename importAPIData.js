@@ -53,7 +53,7 @@ function importAPIData() {
         if (lastRow > 1) {
           targetSheet.getRange(2, 1, lastRow - 1, targetSheet.getLastColumn()).clearContent();
         }
-        
+
         // Get data from source sheet
         const data = sourceSheet.getRange(mapping.sourceRange).getValues();
         
@@ -61,9 +61,9 @@ function importAPIData() {
         if (data.length > 0) {
           targetSheet.getRange(2, 1, data.length, data[0].length).setValues(data);
         }
-        
+
         // Add note to cell A1
-        targetSheet.getRange('A1').setNote(`Last imported: ${formattedDate} from _API`);
+        targetSheet.getRange('A1').setNote(`Last imported: ${formattedDate} from _DataLake`);
       } catch (sheetError) {
         Logger.log(`Error processing sheet mapping '${mapping.sourceSheet}' to '${mapping.targetSheet}': ${sheetError.message}`);
       }
