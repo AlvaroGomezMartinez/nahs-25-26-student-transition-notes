@@ -10,8 +10,8 @@
  * and teacher information needed for comprehensive transition tracking.
  * 
  * @author Alvaro Gomez
- * @version 2.0.0
- * @since 2024-01-01
+ * @version 2.0.1
+ * @since 2025-10-01
  * @memberof DataLoaders
  */
 
@@ -20,8 +20,8 @@
  * 
  * This specialized data loader handles student course schedules with intelligent
  * filtering to exclude courses that have withdrawal dates. It supports multiple
- * records per student (one per course) and provides current enrollment status
- * for accurate transition planning.
+ * records per student (e.g. each course has its own row, so for an eight period
+ * day, there would be eight rows per student) and provides current enrollment status.
  * 
  * **Key Features:**
  * - **Course Schedule Loading**: Current student course enrollments
@@ -51,7 +51,7 @@
  *   });
  * }
  * 
- * @since 2.0.0
+ * @since 2.0.1
  */
 class ScheduleDataLoader extends BaseDataLoader {
   /**

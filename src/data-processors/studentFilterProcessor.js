@@ -7,12 +7,21 @@
  * students eligible for transition processing while excluding withdrawn
  * or special status students appropriately.
  * 
+ * **Enhanced Re-enrollment Detection:**
+ * The processor now includes logic to detect when students who have been
+ * moved to the "Withdrawn" or "W/D Other" sheets have re-enrolled and have
+ * active course schedules. These students are automatically included back
+ * in the processing, allowing them to appear in the TENTATIVE-Version2 sheet.
+ * 
+ * A student is considered "re-enrolled" if they have schedule records with
+ * no withdrawal date (blank "Wdraw Date" column), indicating active enrollment.
+ * 
  * The processor replaces complex filtering logic from the original system
  * with a clean, maintainable approach for student eligibility determination.
  * 
  * @author Alvaro Gomez
- * @version 2.0.0
- * @since 2024-01-01
+ * @version 2.1.0
+ * @since 2025-10-01
  * @memberof DataProcessors
  */
 
@@ -101,13 +110,13 @@ class StudentFilterProcessor extends BaseDataProcessor {
   }
 
   /**
-   * Filters out students who are in the withdrawn list
+   * Filters out students who are in the withdrawn list, but allows re-enrollment
    * @param {Map} studentData - Student data map
    * @param {Map} withdrawnData - Withdrawn students data
    * @returns {Map} Filtered student data
    */
   filterOutWithdrawnStudents(studentData, withdrawnData) {
-    this.log('Filtering out withdrawn students...');
+    this.log('Filtering out withdrawn students (checking for re-enrollments)...');
     
     if (!withdrawnData || withdrawnData.size === 0) {
       this.log('No withdrawn data provided, skipping withdrawn filter');
@@ -116,28 +125,80 @@ class StudentFilterProcessor extends BaseDataProcessor {
 
     const filteredMap = new Map();
     let removedCount = 0;
+    let reEnrolledCount = 0;
 
     studentData.forEach((data, studentId) => {
       if (!withdrawnData.has(studentId)) {
+        // Student is not in withdrawn list, include them
         filteredMap.set(studentId, data);
       } else {
-        removedCount++;
-        this.log(`Removed withdrawn student: ${studentId}`);
+        // Student is in withdrawn list, check if they have active enrollments
+        if (this.hasActiveEnrollments(data)) {
+          // Student has re-enrolled with active courses, include them
+          filteredMap.set(studentId, data);
+          reEnrolledCount++;
+          this.log(`Re-enrolled withdrawn student with active courses: ${studentId}`);
+        } else {
+          // Student remains withdrawn with no active courses, exclude them
+          removedCount++;
+          this.log(`Removed withdrawn student (no active enrollments): ${studentId}`);
+        }
       }
     });
 
-    this.log(`Removed ${removedCount} withdrawn students`);
+    this.log(`Removed ${removedCount} withdrawn students, re-enrolled ${reEnrolledCount} students with active courses`);
     return filteredMap;
   }
 
   /**
-   * Filters out students who are in the W/D Other list
+   * Checks if a student has active enrollments (courses without withdrawal dates).
+   * 
+   * This method is critical for handling re-enrollment scenarios where a student
+   * who was previously withdrawn enrolls in new courses. The system detects active
+   * enrollments by checking if any schedule records have a blank "Wdraw Date" field.
+   * 
+   * **Re-enrollment Detection Logic:**
+   * - Students with any schedule records that have no withdrawal date are considered active
+   * - Multiple enrollment periods are supported (e.g., student withdraws, then re-enrolls)
+   * - Both current and future course enrollments are considered active
+   * 
+   * **Example Scenario:**
+   * - Student "Jones, Prince-Karter J" withdraws on 9/8/2025 (moved to Withdrawn sheet)
+   * - Student re-enrolls on 9/18/2025 with new courses (blank withdrawal dates)
+   * - System detects active enrollments and moves student back to TENTATIVE-Version2
+   * 
+   * @param {Object} studentData - Student data object containing schedule information
+   * @returns {boolean} True if student has any active course enrollments
+   */
+  hasActiveEnrollments(studentData) {
+    // Check if student has schedule data
+    if (!studentData || !studentData.Schedules || !Array.isArray(studentData.Schedules)) {
+      return false;
+    }
+
+    // Check if any course in the schedule has no withdrawal date (indicating active enrollment)
+    const activeSchedules = studentData.Schedules.filter(schedule => {
+      const withdrawDate = schedule[COLUMN_NAMES.WITHDRAW_DATE];
+      return !withdrawDate || withdrawDate === '' || withdrawDate === null;
+    });
+
+    const hasActive = activeSchedules.length > 0;
+    
+    if (hasActive) {
+      this.log(`Student has ${activeSchedules.length} active course enrollments`);
+    }
+
+    return hasActive;
+  }
+
+  /**
+   * Filters out students who are in the W/D Other list, but allows re-enrollment
    * @param {Map} studentData - Student data map
    * @param {Map} wdOtherData - W/D Other students data
    * @returns {Map} Filtered student data
    */
   filterOutWDOtherStudents(studentData, wdOtherData) {
-    this.log('Filtering out W/D Other students...');
+    this.log('Filtering out W/D Other students (checking for re-enrollments)...');
     
     if (!wdOtherData || wdOtherData.size === 0) {
       this.log('No W/D Other data provided, skipping W/D Other filter');
@@ -146,17 +207,28 @@ class StudentFilterProcessor extends BaseDataProcessor {
 
     const filteredMap = new Map();
     let removedCount = 0;
+    let reEnrolledCount = 0;
 
     studentData.forEach((data, studentId) => {
       if (!wdOtherData.has(studentId)) {
+        // Student is not in W/D Other list, include them
         filteredMap.set(studentId, data);
       } else {
-        removedCount++;
-        this.log(`Removed W/D Other student: ${studentId}`);
+        // Student is in W/D Other list, check if they have active enrollments
+        if (this.hasActiveEnrollments(data)) {
+          // Student has re-enrolled with active courses, include them
+          filteredMap.set(studentId, data);
+          reEnrolledCount++;
+          this.log(`Re-enrolled W/D Other student with active courses: ${studentId}`);
+        } else {
+          // Student remains in W/D Other with no active courses, exclude them
+          removedCount++;
+          this.log(`Removed W/D Other student (no active enrollments): ${studentId}`);
+        }
       }
     });
 
-    this.log(`Removed ${removedCount} W/D Other students`);
+    this.log(`Removed ${removedCount} W/D Other students, re-enrolled ${reEnrolledCount} students with active courses`);
     return filteredMap;
   }
 
