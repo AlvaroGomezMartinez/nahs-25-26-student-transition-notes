@@ -109,21 +109,21 @@ function loadTENTATIVEVersion2() {
 
     console.log(`Successfully processed data for ${activeStudentDataMap.size} students`);
     
-    // Phase 3: Preserve row formatting before writing new data
-    console.log('Phase 3: Preserving existing row formatting...');
-    const preservedFormatting = preserveExistingRowColors();
-    console.log(`Preserved formatting for ${Object.keys(preservedFormatting).length} rows`);
+    // Phase 3: Preserve row formatting for rows that will be updated
+    console.log('Phase 3: Preserving formatting for rows being updated...');
+    const preservedFormatting = preserveFormattingForUpdatedRows(activeStudentDataMap);
+    console.log(`Preserved formatting for ${Object.keys(preservedFormatting).length} rows that will be updated`);
     
-    // Phase 4: Write processed data to sheets using the new writers
-    console.log('Phase 4: Writing data to TENTATIVE-Version2 sheet...');
+    // Phase 4: Write processed data to sheets using the new merge approach
+    console.log('Phase 4: Writing data to TENTATIVE-Version2 sheet with merge approach...');
     
-    // Use the new writer system
+    // Use the new writer system with merge approach
     const writeStats = writeToTENTATIVEVersion2Sheet(activeStudentDataMap);
     
-    // Phase 5: Restore row formatting after writing new data
-    console.log('Phase 5: Restoring row formatting...');
-    restoreRowColors(preservedFormatting);
-    console.log('Row formatting restored successfully');
+    // Phase 5: Restore row formatting only for updated rows
+    console.log('Phase 5: Restoring formatting for updated rows...');
+    restoreFormattingForUpdatedRows(preservedFormatting);
+    console.log('Row formatting restoration completed');
     
     // Phase 6: Summary and completion
     const endTime = new Date();
@@ -846,6 +846,178 @@ function restoreRowColors(studentFormatting) {
   } catch (error) {
     console.error('Error restoring row formatting:', error);
     // Don't throw - formatting restoration shouldn't break the main process
+  }
+}
+
+/**
+ * Preserves formatting only for rows that will be updated in the merge approach.
+ * 
+ * This function works with the new merge approach by only preserving formatting
+ * for students that exist in the new data and will have their rows updated.
+ * This is more efficient than preserving all formatting.
+ * 
+ * @function preserveFormattingForUpdatedRows
+ * @memberof Main
+ * 
+ * @param {Map} activeStudentDataMap - Map of students that will be updated
+ * @returns {Object} Map of student IDs to their formatting properties
+ * 
+ * @since 2.0.0
+ */
+function preserveFormattingForUpdatedRows(activeStudentDataMap) {
+  try {
+    const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SHEET_NAMES.TENTATIVE_V2);
+    
+    if (!sheet) {
+      console.warn(`Sheet '${SHEET_NAMES.TENTATIVE_V2}' not found - skipping formatting preservation`);
+      return {};
+    }
+    
+    const dataRange = sheet.getDataRange();
+    
+    if (dataRange.getNumRows() <= 1) {
+      console.log('No data rows found - skipping formatting preservation');
+      return {};
+    }
+    
+    const data = dataRange.getValues();
+    const backgrounds = dataRange.getBackgrounds();
+    const fontColors = dataRange.getFontColors();
+    const fontWeights = dataRange.getFontWeights();
+    const fontStyles = dataRange.getFontStyles();
+    const textDecorations = dataRange.getTextStyles();
+    const fontFamilies = dataRange.getFontFamilies();
+    const fontSizes = dataRange.getFontSizes();
+    
+    const studentFormatting = {};
+    let formattedRowCount = 0;
+    
+    // Only preserve formatting for students that will be updated
+    for (let i = 1; i < data.length; i++) { // Skip header row
+      const studentId = data[i][3]; // Column D contains student ID
+      
+      // Only preserve if this student exists in the new data (will be updated)
+      if (studentId && activeStudentDataMap.has(studentId)) {
+        const rowBackgrounds = backgrounds[i];
+        const rowFontColors = fontColors[i];
+        const rowFontWeights = fontWeights[i];
+        const rowFontStyles = fontStyles[i];
+        const rowTextDecorations = textDecorations[i];
+        const rowFontFamilies = fontFamilies[i];
+        const rowFontSizes = fontSizes[i];
+        
+        // Check if this row has non-default formatting
+        const hasCustomFormatting = (
+          rowBackgrounds.some(color => color && color !== '#ffffff' && color !== '#FFFFFF' && color !== '') ||
+          rowFontColors.some(color => color && color !== '#000000' && color !== '#000' && color !== '') ||
+          rowFontWeights.some(weight => weight && weight !== 'normal') ||
+          rowFontStyles.some(style => style && style !== 'normal') ||
+          rowTextDecorations.some(decoration => decoration && typeof decoration === 'object' && decoration.underline === true)
+        );
+        
+        if (hasCustomFormatting) {
+          studentFormatting[studentId] = {
+            rowNumber: i + 1, // Store the current row number
+            backgrounds: rowBackgrounds,
+            fontColors: rowFontColors,
+            fontWeights: rowFontWeights,
+            fontStyles: rowFontStyles,
+            textDecorations: rowTextDecorations,
+            fontFamilies: rowFontFamilies,
+            fontSizes: rowFontSizes
+          };
+          formattedRowCount++;
+        }
+      }
+    }
+    
+    console.log(`Preserved formatting for ${formattedRowCount} rows that will be updated`);
+    return studentFormatting;
+    
+  } catch (error) {
+    console.error('Error preserving formatting for updated rows:', error);
+    return {};
+  }
+}
+
+/**
+ * Restores formatting for rows that were updated in the merge approach.
+ * 
+ * @function restoreFormattingForUpdatedRows
+ * @memberof Main
+ * 
+ * @param {Object} studentFormatting - Map of student IDs to formatting
+ * 
+ * @since 2.0.0
+ */
+function restoreFormattingForUpdatedRows(studentFormatting) {
+  try {
+    if (!studentFormatting || Object.keys(studentFormatting).length === 0) {
+      console.log('No formatting to restore for updated rows');
+      return;
+    }
+    
+    const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SHEET_NAMES.TENTATIVE_V2);
+    
+    if (!sheet) {
+      console.warn(`Sheet '${SHEET_NAMES.TENTATIVE_V2}' not found - cannot restore formatting`);
+      return;
+    }
+    
+    const newDataRange = sheet.getDataRange();
+    const newData = newDataRange.getValues();
+    
+    let restoredCount = 0;
+    
+    // Find the new location of each student and restore their formatting
+    for (let j = 1; j < newData.length; j++) { // Skip header row
+      const newStudentId = newData[j][3]; // Column D contains student ID
+      
+      if (newStudentId && studentFormatting[newStudentId]) {
+        try {
+          const range = sheet.getRange(j + 1, 1, 1, newData[0].length);
+          const formatting = studentFormatting[newStudentId];
+          
+          // Apply all formatting properties
+          if (formatting.backgrounds) {
+            range.setBackgrounds([formatting.backgrounds]);
+          }
+          
+          if (formatting.fontColors) {
+            range.setFontColors([formatting.fontColors]);
+          }
+          
+          if (formatting.fontWeights) {
+            range.setFontWeights([formatting.fontWeights]);
+          }
+          
+          if (formatting.fontStyles) {
+            range.setFontStyles([formatting.fontStyles]);
+          }
+          
+          if (formatting.textDecorations) {
+            range.setTextStyles([formatting.textDecorations]);
+          }
+          
+          if (formatting.fontFamilies) {
+            range.setFontFamilies([formatting.fontFamilies]);
+          }
+          
+          if (formatting.fontSizes) {
+            range.setFontSizes([formatting.fontSizes]);
+          }
+          
+          restoredCount++;
+        } catch (rangeError) {
+          console.warn(`Failed to restore formatting for student ${newStudentId}:`, rangeError);
+        }
+      }
+    }
+    
+    console.log(`Successfully restored formatting for ${restoredCount} updated rows`);
+    
+  } catch (error) {
+    console.error('Error restoring formatting for updated rows:', error);
   }
 }
 

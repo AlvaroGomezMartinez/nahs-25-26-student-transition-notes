@@ -67,19 +67,30 @@
  */
 function writeToTENTATIVEVersion2Sheet(activeStudentDataMap) {
   try {
+    console.log(`Initializing merge-based write operation for ${activeStudentDataMap.size} students`);
+    
     // Get the writer instance
     const writer = sheetWriterFactory.getWriter('tentative');
+    console.log('TentativeSheetWriter instance obtained successfully');
     
-    // Write the data
+    // Write the data using merge approach
+    console.log('Starting merge-based data write...');
     writer.writeStudentData(activeStudentDataMap);
     
     // Get statistics
     const stats = writer.getWriteStatistics(activeStudentDataMap);
     
-    console.log('Write completed successfully:', stats);
+    console.log('=== Final Write Statistics ===');
+    console.log(`Students processed: ${stats.studentsProcessed}`);
+    console.log(`Total rows in sheet: ${stats.rowsWritten}`);
+    console.log(`Sheet name: ${stats.sheetName}`);
+    console.log(`Completed at: ${stats.writeTimestamp}`);
+    console.log(`Has errors: ${stats.hasErrors ? 'Yes' : 'No'}`);
+    
     return stats;
     
   } catch (error) {
+    console.error('=== Write Operation Failed ===');
     console.error('Error in writeToTENTATIVEVersion2Sheet:', error);
     throw error;
   }
