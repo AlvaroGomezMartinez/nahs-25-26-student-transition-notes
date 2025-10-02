@@ -123,11 +123,8 @@ class TentativeRowBuilder {
         // 8th Period data
         ...this._buildPeriodData('8th', teacherInput, tentativeEntry),
 
-        // Period 10 Special Education Teacher (Column BB)
-        this._extractPeriod10Teacher(studentData),
-
-        // Special Education data
-        ...this._buildSpecialEducationData(teacherInput, tentativeEntry),
+        // Special Education data (with Period 10 teacher in Column BB)
+        ...this._buildSpecialEducationData(teacherInput, tentativeEntry, studentData),
 
         // Additional fields
         registrationEntry?.["Home Campus"] || null,
@@ -473,14 +470,14 @@ class TentativeRowBuilder {
 
   /**
    * Builds special education data array.
-   * Now preserves existing SE comments from TENTATIVE sheet when no form responses exist.
+   * Now uses Period 10 teacher for Column BB and preserves existing SE comments.
    */
-  _buildSpecialEducationData(teacherInput, tentativeEntry) {
+  _buildSpecialEducationData(teacherInput, tentativeEntry, studentData) {
     const seData = teacherInput["Special Education"] || {};
     
     return [
-      seData["Case Manager"] || 
-        tentativeEntry?.["SE - Special Education Case Manager"] || "",
+      // Column BB: Period 10 Special Education Teacher (replaces Case Manager)
+      this._extractPeriod10Teacher(studentData),
       seData["What accommodations seem to work well with this student to help them be successful?"] || 
         tentativeEntry?.["SE - What accommodations seem to work well with this student to help them be successful?"] || "",
       seData["What are the student's strengths, as far as behavior?"] || 
@@ -536,7 +533,7 @@ class TentativeRowBuilder {
    * Builds an error row when data processing fails.
    */
   _buildErrorRow(studentId, errorMessage) {
-    const errorRow = new Array(61).fill("");  // Updated to 61 columns (added Period 10 teacher)
+    const errorRow = new Array(60).fill("");
     errorRow[0] = this.dateUtils.formatToMMDDYYYY(new Date());
     errorRow[1] = "ERROR";
     errorRow[2] = "ERROR";
