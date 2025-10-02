@@ -10,8 +10,8 @@
  * sources, format it properly, and write it efficiently to the output sheet.
  * 
  * @author Alvaro Gomez
- * @version 2.0.0
- * @since 2024-01-01
+ * @version 2.1.0
+ * @since 2.1.0
  * @memberof Writers
  */
 
@@ -50,7 +50,7 @@
  *   console.error('Failed to write student data:', error.message);
  * }
  * 
- * @since 2.0.0
+ * @since 2.1.0
  */
 class TentativeSheetWriter extends BaseSheetWriter {
   /**
@@ -68,7 +68,7 @@ class TentativeSheetWriter extends BaseSheetWriter {
    * const writer = new TentativeSheetWriter();
    * // All components are initialized and ready for data writing
    * 
-   * @since 2.0.0
+   * @since 2.1.0
    */
   constructor() {
     super(SHEET_NAMES.TENTATIVE_V2);

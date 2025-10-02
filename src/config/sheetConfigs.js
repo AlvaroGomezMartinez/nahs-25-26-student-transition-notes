@@ -1,5 +1,8 @@
 /**
- * @fileoverview Sheet Configuration Mappings for the NAHS system.
+ * @fil * @author Alvaro Gomez
+ * @version 2.0.0
+ * @since 2.0.0
+ * @memberof Configrview Sheet Configuration Mappings for the NAHS system.
  * 
  * This module defines the structure and column mappings for each Google Sheet
  * used in the student transition system. It provides configuration objects

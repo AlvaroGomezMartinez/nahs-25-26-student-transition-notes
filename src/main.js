@@ -6,8 +6,8 @@
  * writing operations using a modular architecture.
  * 
  * @author Alvaro Gomez
- * @version 2.0.0
- * @since 2024-01-01
+ * @version 2.1.0
+ * @since 2.0.0
  */
 
 /**
@@ -54,7 +54,7 @@
  * @see {@link writeToTENTATIVEVersion2Sheet} For data writing details
  * @see {@link https://docs.google.com/spreadsheets/d/SHEET_ID} Source data sheets
  * 
- * @since 2.0.0
+ * @since 2.1.0
  */
 function loadTENTATIVEVersion2() {
   try {
@@ -223,7 +223,7 @@ function loadTENTATIVEVersion2_OriginalName() {
  * @see {@link DataLoaderFactory} For the loader creation mechanism
  * @see {@link BaseDataLoader} For the base loader interface
  * 
- * @since 2.0.0
+ * @since 2.1.0
  */
 function loadAllStudentData() {
   console.log('Loading data from all sheets using new data loaders...');
@@ -285,7 +285,7 @@ function loadAllStudentData() {
  * @see {@link StudentDataMerger} For data merging logic
  * @see {@link TeacherInputProcessor} For form response processing
  * 
- * @since 2.0.0
+ * @since 2.1.0
  */
 function processStudentData(rawData) {
   console.log('Processing student data using new processors...');
@@ -322,7 +322,7 @@ function processStudentData(rawData) {
  * @see {@link StudentFilterProcessor} For the actual filtering implementation
  * @see {@link processAllStudentData} Where filtering is automatically applied
  * 
- * @since 1.0.0
+ * @since 2.1.0
  */
 function filterActiveStudents(studentData) {
   console.log('Student filtering already handled in processing pipeline...');
@@ -378,7 +378,7 @@ function filterActiveStudents(studentData) {
  * @see {@link TentativeSheetWriter} For the writer class
  * @see {@link SHEET_NAMES.TENTATIVE_V2} For the target sheet name
  * 
- * @since 2.0.0
+ * @since 2.1.0
  */
 function writeProcessedDataToSheet(activeStudents) {
   console.log('Writing data to TENTATIVE-Version2 sheet...');
@@ -441,7 +441,7 @@ function writeProcessedDataToSheet(activeStudents) {
  * @see {@link SHEET_NAMES.TENTATIVE_V2} For the target sheet
  * @see {@link SpreadsheetApp} For Google Sheets API reference
  * 
- * @since 2.0.0
+ * @since 2.1.0
  */
 function preserveExistingRowColors() {
   try {
@@ -548,7 +548,7 @@ function preserveExistingRowColors() {
  * const diagnostics = runSystemDiagnostics();
  * console.log(diagnostics.configurationReport);
  * 
- * @since 2.0.0
+ * @since 2.1.0
  */
 function runSystemDiagnostics() {
   try {

@@ -5,8 +5,9 @@
  * in the Google Sheets interface for easy access to system functions.
  * 
  * @author Alvaro Gomez
- * @version 1.0.0
- * @since 2025-08-05
+ * @version 2.0.0
+ * @since 2.0.0
+ * @memberof Utils
  */
 
 /**
