@@ -26,11 +26,15 @@
  * **Key Features:**
  * - **Teacher Response Loading**: Captures all teacher form submissions  
  * - **Email Mapping**: Associates responses with specific teacher email addresses
- * - **Column F Student ID Extraction**: Optimized for cleaned sheet structure where student IDs are in column F
+ * - **Column F Student ID Extraction**: Optimized for cleaned sheet structure
+ *                                       where student IDs are extracted from the
+ *                                       data in column F
  * - **Multiple Records**: Supports multiple teacher responses per student
  * - **Response Validation**: Ensures data integrity and completeness
  * - **Feedback Integration**: Provides teacher input for transition decisions
- * - **Duplicate Handling**: Works with TeacherInputProcessor for intelligent duplicate resolution
+ * - **Duplicate Handling**: In the case where a student re-enrolls at NAHS,
+ *                           works with TeacherInputProcessor for intelligent
+ *                           duplicate resolution
  * 
  * @class FormResponsesDataLoader
  * @extends BaseDataLoader
