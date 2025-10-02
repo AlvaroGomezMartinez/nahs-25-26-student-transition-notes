@@ -123,6 +123,9 @@ class TentativeRowBuilder {
         // 8th Period data
         ...this._buildPeriodData('8th', teacherInput, tentativeEntry),
 
+        // Period 10 Special Education Teacher (Column BB)
+        this._extractPeriod10Teacher(studentData),
+
         // Special Education data
         ...this._buildSpecialEducationData(teacherInput, tentativeEntry),
 
@@ -492,10 +495,48 @@ class TentativeRowBuilder {
   }
 
   /**
+   * Extracts Period 10 teacher name from student data.
+   * @param {Object} studentData - Complete student data object
+   * @returns {string} Period 10 teacher name or empty string
+   */
+  _extractPeriod10Teacher(studentData) {
+    // First check if Period10Teacher was set by StudentDataMerger
+    if (studentData.Period10Teacher) {
+      return studentData.Period10Teacher;
+    }
+    
+    // Fallback: check schedules directly if Period10Teacher not found
+    const schedules = studentData.Schedules;
+    if (Array.isArray(schedules)) {
+      const period10Schedule = schedules.find(schedule => {
+        const periodText = schedule["Per Beg"]; // Using COLUMN_NAMES.PERIOD value
+        if (!periodText) return false;
+        
+        // Extract period number - handle "10th", "10", or numeric 10
+        let periodNumber = 0;
+        if (typeof periodText === 'number') {
+          periodNumber = periodText;
+        } else if (typeof periodText === 'string') {
+          const match = periodText.match(/(\d+)/);
+          periodNumber = match ? parseInt(match[1], 10) : 0;
+        }
+        
+        return periodNumber === 10;
+      });
+      
+      if (period10Schedule && period10Schedule["Teacher Name"]) {
+        return period10Schedule["Teacher Name"].trim();
+      }
+    }
+    
+    return "";
+  }
+
+  /**
    * Builds an error row when data processing fails.
    */
   _buildErrorRow(studentId, errorMessage) {
-    const errorRow = new Array(60).fill("");  // Assuming ~60 columns
+    const errorRow = new Array(61).fill("");  // Updated to 61 columns (added Period 10 teacher)
     errorRow[0] = this.dateUtils.formatToMMDDYYYY(new Date());
     errorRow[1] = "ERROR";
     errorRow[2] = "ERROR";

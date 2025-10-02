@@ -196,6 +196,7 @@ const COLUMN_NAMES = {
  * @property {string} SIXTH - Sixth period identifier
  * @property {string} SEVENTH - Seventh period identifier
  * @property {string} EIGHTH - Eighth period identifier
+ * @property {string} TENTH - Tenth period identifier (Special Education)
  * @property {string} SPECIAL_ED - Special education period identifier
  * 
  * @example
@@ -221,6 +222,7 @@ const PERIODS = {
   SIXTH: '6th',
   SEVENTH: '7th',
   EIGHTH: '8th',
+  TENTH: '10th',
   SPECIAL_ED: 'Special Education'
 };
 

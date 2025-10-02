@@ -99,6 +99,7 @@ class StudentDataMerger extends BaseDataProcessor {
    */
   constructor() {
     super('StudentDataMerger');
+    this.scheduleProcessor = new ScheduleProcessor();
   }
 
   /**
@@ -549,10 +550,14 @@ class StudentDataMerger extends BaseDataProcessor {
       // Extract the most recent entry date from active schedules for "FIRST DAY OF AEP"
       const firstDayOfAEP = this.extractMostRecentEntryDate(activeSchedules);
       
-      // Update student data with schedules and entry date
+      // Extract period 10 teacher (Special Education teacher)
+      const period10Teacher = this.scheduleProcessor.extractPeriod10Teacher(activeSchedules);
+      
+      // Update student data with schedules, entry date, and period 10 teacher
       const updatedStudentData = {
         ...studentData,
-        Schedules: activeSchedules.length > 0 ? activeSchedules : null
+        Schedules: activeSchedules.length > 0 ? activeSchedules : null,
+        Period10Teacher: period10Teacher
       };
       
       // If we found an entry date, update both TENTATIVE and Entry/Withdrawal records

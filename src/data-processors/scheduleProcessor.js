@@ -261,7 +261,8 @@ class ScheduleProcessor extends BaseDataProcessor {
       5: PERIODS.FIFTH,
       6: PERIODS.SIXTH,
       7: PERIODS.SEVENTH,
-      8: PERIODS.EIGHTH
+      8: PERIODS.EIGHTH,
+      10: PERIODS.TENTH
     };
 
     return periodMap[periodNumber] || `Period_${periodNumber}`;
@@ -307,5 +308,29 @@ class ScheduleProcessor extends BaseDataProcessor {
     });
 
     return Array.from(teachers).sort();
+  }
+
+  /**
+   * Extracts the teacher name from period 10 (Special Education)
+   * @param {Array} schedules - Array of schedule records for a student
+   * @returns {string|null} Period 10 teacher name or null if not found
+   */
+  extractPeriod10Teacher(schedules) {
+    if (!Array.isArray(schedules)) {
+      return null;
+    }
+
+    // Find schedule record with period 10
+    const period10Schedule = schedules.find(schedule => {
+      const periodNumber = this.extractPeriodNumber(schedule[COLUMN_NAMES.PERIOD]);
+      return periodNumber === 10;
+    });
+
+    if (period10Schedule) {
+      const teacherName = period10Schedule[COLUMN_NAMES.TEACHER_NAME];
+      return this.formatTeacherName(teacherName);
+    }
+
+    return null;
   }
 }
