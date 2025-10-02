@@ -124,26 +124,26 @@ class TentativeRowBuilder {
         ...this._buildPeriodData('8th', teacherInput, tentativeEntry),
 
         // Special Education data
-        ...this._buildSpecialEducationData(teacherInput),
+        ...this._buildSpecialEducationData(teacherInput, tentativeEntry),
 
         // Additional fields
         registrationEntry?.["Home Campus"] || null,
         this._getFormattedEntryDate(entryWithdrawalEntry),
         this.dateUtils.formatToMMDDYYYY(estimatedExitDay) || null,
-        "", // Parent Notice Date
-        "", // Withdrawn Date
-        "", // Attendance Recovery
+        tentativeEntry?.["Parent Notice Date"] || "", // Preserve existing Parent Notice Date
+        tentativeEntry?.["Withdrawn Date"] || "", // Preserve existing Withdrawn Date
+        tentativeEntry?.["Attendance Recovery"] || "", // Preserve existing Attendance Recovery
         registrationEntry?.["Eligibilty"] || null,
-        "", // Credit Retrieval
+        tentativeEntry?.["Credit Retrieval"] || "", // Preserve existing Credit Retrieval
         registrationEntry?.["Behavior Contract"] || null,
-        "", // Campus Mentor
-        "", // Other Intervention 1
-        "", // Other Intervention 2
+        tentativeEntry?.["Campus Mentor"] || "", // Preserve existing Campus Mentor
+        tentativeEntry?.["Other Intervention 1"] || "", // Preserve existing Other Intervention 1
+        tentativeEntry?.["Other Intervention 2"] || "", // Preserve existing Other Intervention 2
         contains504Result,
         containsESLResult,
-        "", // Additional notes or counseling services and Support
-        "", // Licensed social worker consultation
-        "", // Check if you're ready to create Transition Letter with Autocrat
+        tentativeEntry?.["Additional notes or counseling services and Support"] || "", // Preserve existing notes
+        tentativeEntry?.["Licensed social worker consultation"] || "", // Preserve existing consultation notes
+        tentativeEntry?.["Check if you're ready to create Transition Letter with Autocrat"] ?? "", // Preserve existing autocrat checkbox (use ?? to preserve false)
         contactEntry?.["Student Email"] || null,
         contactEntry?.["Parent Name"] || null,
         contactEntry?.["Guardian 1 Email"] || null,
@@ -450,6 +450,7 @@ class TentativeRowBuilder {
 
   /**
    * Builds period-specific data array.
+   * Now preserves existing comments from TENTATIVE sheet when no form responses exist.
    */
   _buildPeriodData(period, teacherInput, tentativeEntry) {
     const periodData = teacherInput[period] || {};
@@ -459,24 +460,34 @@ class TentativeRowBuilder {
       periodData["Teacher Name"] || "",
       tentativeEntry?.[`${period} Period - Transfer Grade`] ?? "",
       tentativeEntry?.[`${period} Period - Current Grade`] ?? "",
-      periodData["How would you assess this student's academic growth?"] || "",
-      periodData["Academic and Behavioral Progress Notes"] || ""
+      periodData["How would you assess this student's academic growth?"] || 
+        tentativeEntry?.[`${period} Period - How would you assess this student's academic progress?`] || 
+        tentativeEntry?.[`${period} Period - How would you assess this student's progress?`] || "",
+      periodData["Academic and Behavioral Progress Notes"] || 
+        tentativeEntry?.[`${period} Period - Academic and Behavioral Progress Notes`] || ""
     ];
   }
 
   /**
    * Builds special education data array.
+   * Now preserves existing SE comments from TENTATIVE sheet when no form responses exist.
    */
-  _buildSpecialEducationData(teacherInput) {
+  _buildSpecialEducationData(teacherInput, tentativeEntry) {
     const seData = teacherInput["Special Education"] || {};
     
     return [
-      seData["Case Manager"] || "",
-      seData["What accommodations seem to work well with this student to help them be successful?"] || "",
-      seData["What are the student's strengths, as far as behavior?"] || "",
-      seData["What are the student's needs, as far as behavior?"] || "",
-      seData["What are the student's needs, as far as functional skills?"] || "",
-      seData["Please add any other comments or concerns here:"] || ""
+      seData["Case Manager"] || 
+        tentativeEntry?.["SE - Special Education Case Manager"] || "",
+      seData["What accommodations seem to work well with this student to help them be successful?"] || 
+        tentativeEntry?.["SE - What accommodations seem to work well with this student to help them be successful?"] || "",
+      seData["What are the student's strengths, as far as behavior?"] || 
+        tentativeEntry?.["SE - What are the student's strengths, as far as behavior?"] || "",
+      seData["What are the student's needs, as far as behavior?"] || 
+        tentativeEntry?.["SE - What are the student's needs, as far as behavior?  (Pick behavior having most effect on his/her ability to be successful in class.  If there are no concerns, note that.)"] || "",
+      seData["What are the student's needs, as far as functional skills?"] || 
+        tentativeEntry?.["SE - What are the student's needs, as far as functional skills?  (Include daily living skills, fine/gross motor skills, organizational skills, self-advocacy, attendance, etc.)"] || "",
+      seData["Please add any other comments or concerns here:"] || 
+        tentativeEntry?.["SE - Please add any other comments or concerns here:"] || ""
     ];
   }
 
