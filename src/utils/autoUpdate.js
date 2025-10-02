@@ -81,6 +81,9 @@ function autoCheckAndUpdate() {
       // Run the main update process
       loadTENTATIVEVersion2();
       
+      // Update A1 with timestamp (same as manual update)
+      updateTimestampInA1();
+      
       // Log the successful update
       console.log('✅ AUTO-UPDATE: TENTATIVE-Version2 has been updated successfully');
       
@@ -112,6 +115,10 @@ function manualCheckAndUpdate() {
     
     const startTime = new Date();
     loadTENTATIVEVersion2();
+    
+    // Update A1 with timestamp (consistent with menu update)
+    updateTimestampInA1();
+    
     const endTime = new Date();
     
     console.log(`✅ MANUAL UPDATE: Completed in ${(endTime - startTime) / 1000} seconds`);
@@ -320,6 +327,10 @@ function onSpreadsheetEdit(e) {
       if (updateInfo.needsUpdate) {
         console.log('🔄 UPDATE TRIGGERED: Running TENTATIVE sheet update...');
         loadTENTATIVEVersion2();
+        
+        // Update A1 with timestamp (consistent with menu update)
+        updateTimestampInA1();
+        
         console.log('✅ AUTO-UPDATE: TENTATIVE sheet updated successfully');
       } else {
         console.log('ℹ️ No update needed after change');
@@ -411,6 +422,9 @@ function onFormSubmit(e) {
     
     // Run the update
     loadTENTATIVEVersion2();
+    
+    // Update A1 with timestamp (consistent with menu update)
+    updateTimestampInA1();
     
     console.log('✅ FORM SUBMIT: TENTATIVE sheet updated successfully');
     
