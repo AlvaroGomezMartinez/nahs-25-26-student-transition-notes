@@ -109,10 +109,10 @@ function loadTENTATIVEVersion2() {
 
     console.log(`Successfully processed data for ${activeStudentDataMap.size} students`);
     
-    // Phase 3: Preserve row formatting for rows that will be updated
-    console.log('Phase 3: Preserving formatting for rows being updated...');
+    // Phase 3: Preserve row formatting for all students (since sheet will be sorted)
+    console.log('Phase 3: Preserving formatting for all students before sorting...');
     const preservedFormatting = preserveFormattingForUpdatedRows(activeStudentDataMap);
-    console.log(`Preserved formatting for ${Object.keys(preservedFormatting).length} rows that will be updated`);
+    console.log(`Preserved formatting for ${Object.keys(preservedFormatting).length} students`);
     
     // Phase 4: Write processed data to sheets using the new merge approach
     console.log('Phase 4: Writing data to TENTATIVE-Version2 sheet with merge approach...');
@@ -120,8 +120,8 @@ function loadTENTATIVEVersion2() {
     // Use the new writer system with merge approach
     const writeStats = writeToTENTATIVEVersion2Sheet(activeStudentDataMap);
     
-    // Phase 5: Restore row formatting only for updated rows
-    console.log('Phase 5: Restoring formatting for updated rows...');
+    // Phase 5: Restore row formatting for all students in their new sorted positions
+    console.log('Phase 5: Restoring formatting for all students in their new alphabetical positions...');
     restoreFormattingForUpdatedRows(preservedFormatting);
     console.log('Row formatting restoration completed');
     
@@ -850,16 +850,16 @@ function restoreRowColors(studentFormatting) {
 }
 
 /**
- * Preserves formatting only for rows that will be updated in the merge approach.
+ * Preserves formatting for all students since the entire sheet is rewritten with sorting.
  * 
- * This function works with the new merge approach by only preserving formatting
- * for students that exist in the new data and will have their rows updated.
- * This is more efficient than preserving all formatting.
+ * This function works with the new sorting approach by preserving formatting
+ * for all students because they will all be repositioned when the sheet is sorted
+ * alphabetically. This ensures no formatting is lost during the sort operation.
  * 
  * @function preserveFormattingForUpdatedRows
  * @memberof Main
  * 
- * @param {Map} activeStudentDataMap - Map of students that will be updated
+ * @param {Map} activeStudentDataMap - Map of students being processed (used for logging)
  * @returns {Object} Map of student IDs to their formatting properties
  * 
  * @since 2.0.0
@@ -892,12 +892,12 @@ function preserveFormattingForUpdatedRows(activeStudentDataMap) {
     const studentFormatting = {};
     let formattedRowCount = 0;
     
-    // Only preserve formatting for students that will be updated
+    // Preserve formatting for ALL students since we're rewriting the entire sheet with sorting
     for (let i = 1; i < data.length; i++) { // Skip header row
       const studentId = data[i][3]; // Column D contains student ID
       
-      // Only preserve if this student exists in the new data (will be updated)
-      if (studentId && activeStudentDataMap.has(studentId)) {
+      // Preserve formatting for all students (they will all be repositioned due to sorting)
+      if (studentId) {
         const rowBackgrounds = backgrounds[i];
         const rowFontColors = fontColors[i];
         const rowFontWeights = fontWeights[i];
@@ -931,7 +931,7 @@ function preserveFormattingForUpdatedRows(activeStudentDataMap) {
       }
     }
     
-    console.log(`Preserved formatting for ${formattedRowCount} rows that will be updated`);
+    console.log(`Preserved formatting for ${formattedRowCount} students (all will be repositioned due to sorting)`);
     return studentFormatting;
     
   } catch (error) {
@@ -941,7 +941,10 @@ function preserveFormattingForUpdatedRows(activeStudentDataMap) {
 }
 
 /**
- * Restores formatting for rows that were updated in the merge approach.
+ * Restores formatting for all students in their new sorted positions.
+ * 
+ * This function finds each student by their ID in the newly sorted sheet
+ * and applies their preserved formatting to their new row position.
  * 
  * @function restoreFormattingForUpdatedRows
  * @memberof Main
@@ -953,7 +956,7 @@ function preserveFormattingForUpdatedRows(activeStudentDataMap) {
 function restoreFormattingForUpdatedRows(studentFormatting) {
   try {
     if (!studentFormatting || Object.keys(studentFormatting).length === 0) {
-      console.log('No formatting to restore for updated rows');
+      console.log('No formatting to restore');
       return;
     }
     
@@ -1014,10 +1017,10 @@ function restoreFormattingForUpdatedRows(studentFormatting) {
       }
     }
     
-    console.log(`Successfully restored formatting for ${restoredCount} updated rows`);
+    console.log(`Successfully restored formatting for ${restoredCount} students in their new sorted positions`);
     
   } catch (error) {
-    console.error('Error restoring formatting for updated rows:', error);
+    console.error('Error restoring formatting after sorting:', error);
   }
 }
 

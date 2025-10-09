@@ -99,24 +99,17 @@ class TentativeSheetWriter extends BaseSheetWriter {
       
       // Validate data structure
       this.validateDataStructure(outputData);
-      
-      // Sort data by last name, then first name
-      const sortedData = this.sortData(outputData, [
-        { column: 1, ascending: true },  // Last name
-        { column: 2, ascending: true }   // First name
-      ]);
-      console.log(`Sorted ${sortedData.length} records by last name, then first name`);
 
-      // Write to sheet using merge approach
-      console.log('Performing merge operation to sheet...');
-      this._writeToSheet(sortedData);
+      // Write to sheet using merge approach with alphabetical sorting
+      console.log('Performing merge operation to sheet with alphabetical sorting...');
+      this._writeToSheet(outputData);
 
       // Apply formatting and borders
       console.log('Applying post-write formatting and borders...');
       this._applyPostWriteFormatting();
 
       console.log(`=== Merge Operation Completed Successfully ===`);
-      console.log(`Final result: ${sortedData.length} student records processed`);
+      console.log(`Final result: ${outputData.length} student records processed`);
 
     } catch (error) {
       console.error('=== Merge Operation Failed ===');
@@ -188,7 +181,7 @@ class TentativeSheetWriter extends BaseSheetWriter {
 
   /**
    * Writes the data to the sheet using merge/update approach.
-   * Preserves existing rows that aren't being updated.
+   * Maintains alphabetical order by sorting the entire sheet after merging all data.
    * @param {Array<Array>} data - The data to write
    */
   _writeToSheet(data) {
@@ -203,51 +196,58 @@ class TentativeSheetWriter extends BaseSheetWriter {
     
     console.log(`Found ${Object.keys(existingRowMap).length} existing rows and ${Object.keys(newStudentData).length} new student records`);
     
-    // Update existing students and track which ones we've processed
+    // Build the complete dataset by merging existing and new data
+    const allStudentData = [];
     const processedStudents = new Set();
     let updatedCount = 0;
+    let preservedCount = 0;
     
+    // Process new/updated students first
     for (const [studentId, rowData] of Object.entries(newStudentData)) {
-      if (existingRowMap[studentId]) {
-        // Update existing row
-        const rowNumber = existingRowMap[studentId].rowNumber;
-        const range = sheet.getRange(rowNumber, 1, 1, rowData.length);
-        range.setValues([rowData]);
-        processedStudents.add(studentId);
-        updatedCount++;
-        console.log(`Updated existing row ${rowNumber} for student ${studentId}`);
-      }
-    }
-    
-    // Add new students (those not in existing rows)
-    const newStudents = Object.entries(newStudentData).filter(
-      ([studentId]) => !existingRowMap[studentId]
-    );
-    
-    if (newStudents.length > 0) {
-      const newRowsData = newStudents.map(([_, rowData]) => rowData);
-      const startRow = sheet.getLastRow() + 1;
+      allStudentData.push(rowData);
+      processedStudents.add(studentId);
       
-      if (newRowsData.length > 0) {
-        const range = sheet.getRange(startRow, 1, newRowsData.length, newRowsData[0].length);
-        range.setValues(newRowsData);
-        console.log(`Added ${newRowsData.length} new student rows starting at row ${startRow}`);
+      if (existingRowMap[studentId]) {
+        updatedCount++;
+        console.log(`Updated data for existing student ${studentId}`);
+      } else {
+        console.log(`Added new student ${studentId}`);
       }
     }
     
-    // Log preservation of existing rows
-    const preservedStudents = Object.keys(existingRowMap).filter(
-      studentId => !processedStudents.has(studentId)
-    );
-    
-    if (preservedStudents.length > 0) {
-      console.log(`Preserved ${preservedStudents.length} existing rows that were not updated:`, preservedStudents.slice(0, 5));
-      if (preservedStudents.length > 5) {
-        console.log(`... and ${preservedStudents.length - 5} more`);
+    // Add preserved students (existing students not in the new data)
+    for (const [studentId, existingStudent] of Object.entries(existingRowMap)) {
+      if (!processedStudents.has(studentId)) {
+        allStudentData.push(existingStudent.data);
+        preservedCount++;
       }
     }
     
-    console.log(`Merge operation completed: ${updatedCount} updated, ${newStudents.length} added, ${preservedStudents.length} preserved`);
+    console.log(`Combined dataset: ${allStudentData.length} total students (${updatedCount} updated, ${Object.keys(newStudentData).length - updatedCount} new, ${preservedCount} preserved)`);
+    
+    // Sort all data alphabetically by last name (column 1), then first name (column 2)
+    const sortedData = this.sortData(allStudentData, [
+      { column: 1, ascending: true },  // Last name
+      { column: 2, ascending: true }   // First name
+    ]);
+    
+    console.log(`Sorted all ${sortedData.length} student records alphabetically by last name, then first name`);
+    
+    // Clear existing data (keep headers) and write all sorted data
+    if (sortedData.length > 0) {
+      // Clear existing data rows while preserving headers
+      const lastRow = sheet.getLastRow();
+      if (lastRow > 1) {
+        sheet.getRange(2, 1, lastRow - 1, sheet.getLastColumn()).clear();
+      }
+      
+      // Write all sorted data starting from row 2
+      const range = sheet.getRange(2, 1, sortedData.length, sortedData[0].length);
+      range.setValues(sortedData);
+      console.log(`Wrote ${sortedData.length} student records to sheet in alphabetical order`);
+    }
+    
+    console.log(`Merge operation completed with alphabetical sorting: ${updatedCount} updated, ${Object.keys(newStudentData).length - updatedCount} added, ${preservedCount} preserved`);
   }
 
   /**
