@@ -103,6 +103,13 @@ function registerAllTests() {
       console.warn('Writer tests not available');
     }
     
+    // Register bug condition exploration tests
+    if (typeof registerBugConditionTests === 'function') {
+      registerBugConditionTests();
+    } else {
+      console.warn('Bug condition tests not available');
+    }
+
     // Register integration tests
     if (typeof registerIntegrationTests === 'function') {
       registerIntegrationTests();

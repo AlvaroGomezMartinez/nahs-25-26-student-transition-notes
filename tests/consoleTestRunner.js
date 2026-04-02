@@ -92,6 +92,14 @@ function runTestsInConsole() {
       testResults.warnings.push("Integration tests not available");
     }
     
+    if (typeof registerBugConditionTests === 'function') {
+      registerBugConditionTests();
+      console.log("✅ Bug condition tests registered");
+    } else {
+      console.log("⚠️ Bug condition tests not available");
+      testResults.warnings.push("Bug condition tests not available");
+    }
+
     // Check for other test modules
     const otherTestModules = [
       'registerDataUtilTests',
@@ -203,6 +211,46 @@ function quickSystemCheck() {
     
   } catch (error) {
     console.error("❌ System check error:", error);
+  }
+}
+
+/**
+ * Run only the bug condition exploration tests.
+ * Select this from the GAS editor function dropdown to run in isolation.
+ */
+function runBugConditionTestsOnly() {
+  console.log("=== Running Bug Condition Tests Only ===");
+
+  try {
+    if (typeof initializeNAHSSystem === 'function') {
+      initializeNAHSSystem();
+    } else {
+      console.error("Bootstrap system not available");
+      return;
+    }
+
+    QUnitGS2.init();
+
+    QUnit.done(function(details) {
+      console.log("\n=== Bug Condition Test Results ===");
+      console.log("Passed: " + details.passed + " ✅");
+      console.log("Failed: " + details.failed + (details.failed > 0 ? " ❌" : ""));
+      console.log("Runtime: " + details.runtime + "ms");
+    });
+
+    QUnit.testDone(function(details) {
+      var status = details.failed === 0 ? "✅" : "❌";
+      console.log(status + " " + details.name);
+      if (details.failed > 0) {
+        console.log("   Failed assertions: " + details.failed + "/" + details.total);
+      }
+    });
+
+    registerBugConditionTests();
+    QUnit.start();
+
+  } catch (error) {
+    console.error("Error running bug condition tests:", error);
   }
 }
 
