@@ -110,6 +110,13 @@ function registerAllTests() {
       console.warn('Bug condition tests not available');
     }
 
+    // Register preservation property tests
+    if (typeof registerPreservationTests === 'function') {
+      registerPreservationTests();
+    } else {
+      console.warn('Preservation property tests not available');
+    }
+
     // Register integration tests
     if (typeof registerIntegrationTests === 'function') {
       registerIntegrationTests();

@@ -255,6 +255,46 @@ function runBugConditionTestsOnly() {
 }
 
 /**
+ * Run only the preservation property tests.
+ * Select this from the GAS editor function dropdown to run in isolation.
+ */
+function runPreservationTestsOnly() {
+  console.log("=== Running Preservation Property Tests Only ===");
+
+  try {
+    if (typeof initializeNAHSSystem === 'function') {
+      initializeNAHSSystem();
+    } else {
+      console.error("Bootstrap system not available");
+      return;
+    }
+
+    QUnitGS2.init();
+
+    QUnit.done(function(details) {
+      console.log("\n=== Preservation Test Results ===");
+      console.log("Passed: " + details.passed + " ✅");
+      console.log("Failed: " + details.failed + (details.failed > 0 ? " ❌" : ""));
+      console.log("Runtime: " + details.runtime + "ms");
+    });
+
+    QUnit.testDone(function(details) {
+      var status = details.failed === 0 ? "✅" : "❌";
+      console.log(status + " " + details.name);
+      if (details.failed > 0) {
+        console.log("   Failed assertions: " + details.failed + "/" + details.total);
+      }
+    });
+
+    registerPreservationTests();
+    QUnit.start();
+
+  } catch (error) {
+    console.error("Error running preservation tests:", error);
+  }
+}
+
+/**
  * Run tests for a specific module only.
  * @param {string} moduleName - Name of the test module to run
  */
