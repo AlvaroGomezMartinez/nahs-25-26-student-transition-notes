@@ -206,11 +206,11 @@ class TentativeRowBuilder {
     // Try to get entry date from multiple sources
     let entryData = entryWithdrawalEntry["Entry Date"];
     
-    // Fallback to most recent Entry Date from Schedules if Entry/Withdrawal date is not available
+    // Fallback to earliest Entry Date from Schedules if Entry/Withdrawal date is not available
     if (!entryData) {
-      entryData = this._extractMostRecentEntryDateFromSchedules(studentData);
+      entryData = this._extractEarliestEntryDateFromSchedules(studentData);
       if (entryData) {
-        console.log('Using most recent Entry Date from schedules:', entryData);
+        console.log('Using earliest Entry Date from schedules:', entryData);
       }
     }
     
@@ -235,7 +235,7 @@ class TentativeRowBuilder {
         Entry Date: ${entryData}
         Placement Days: ${placementDays}
         Available in Entry/Withdrawal: ${entryWithdrawalEntry["Entry Date"]}
-        Available in Schedules: ${this._extractMostRecentEntryDateFromSchedules(studentData)}`);
+        Available in Schedules: ${this._extractEarliestEntryDateFromSchedules(studentData)}`);
       return null;
     }
 
@@ -268,9 +268,9 @@ class TentativeRowBuilder {
   }
 
   /**
-   * Extracts the most recent entry date from active schedules (same logic as StudentDataMerger)
+   * Extracts the earliest entry date from active schedules (same logic as StudentDataMerger)
    */
-  _extractMostRecentEntryDateFromSchedules(studentData) {
+  _extractEarliestEntryDateFromSchedules(studentData) {
     const schedules = studentData["Schedules"];
     if (!schedules || !Array.isArray(schedules) || schedules.length === 0) {
       return null;
@@ -287,8 +287,8 @@ class TentativeRowBuilder {
       return null;
     }
 
-    let mostRecentDate = null;
-    let mostRecentTimestamp = 0;
+    let earliestDate = null;
+    let earliestTimestamp = Infinity;
 
     activeSchedules.forEach(schedule => {
       const entryDateValue = schedule[COLUMN_NAMES.ENTRY_DATE];
@@ -306,9 +306,9 @@ class TentativeRowBuilder {
           // Validate the date is valid
           if (!isNaN(dateToCheck.getTime())) {
             const timestamp = dateToCheck.getTime();
-            if (timestamp > mostRecentTimestamp) {
-              mostRecentTimestamp = timestamp;
-              mostRecentDate = entryDateValue instanceof Date ? 
+            if (timestamp < earliestTimestamp) {
+              earliestTimestamp = timestamp;
+              earliestDate = entryDateValue instanceof Date ? 
                 entryDateValue.toLocaleDateString() : 
                 entryDateValue;
             }
@@ -319,7 +319,7 @@ class TentativeRowBuilder {
       }
     });
 
-    return mostRecentDate;
+    return earliestDate;
   }
 
   /**
