@@ -453,7 +453,7 @@ class StudentDataMerger extends BaseDataProcessor {
                        firstSchedule["Grade"] ||
                        '';
           
-          const entryDate = this.extractMostRecentEntryDate(activeSchedules);
+          const entryDate = this.extractEarliestEntryDate(activeSchedules);
           
           // Create base student record from schedule data
           baseMap.set(studentId, {
@@ -547,8 +547,8 @@ class StudentDataMerger extends BaseDataProcessor {
       // Filter schedules to only include active ones (no withdrawal date)
       const activeSchedules = this.filterActiveSchedules(rawSchedules);
       
-      // Extract the most recent entry date from active schedules for "FIRST DAY OF AEP"
-      const firstDayOfAEP = this.extractMostRecentEntryDate(activeSchedules);
+      // Extract the earliest entry date from active schedules for "FIRST DAY OF AEP"
+      const firstDayOfAEP = this.extractEarliestEntryDate(activeSchedules);
       
       // Extract period 10 teacher (Special Education teacher)
       const period10Teacher = this.scheduleProcessor.extractPeriod10Teacher(activeSchedules);
@@ -561,27 +561,36 @@ class StudentDataMerger extends BaseDataProcessor {
       };
       
       // If we found an entry date, update both TENTATIVE and Entry/Withdrawal records
+      // Only populate when existing value is falsy (preserves immutable FIRST DAY OF AEP)
       if (firstDayOfAEP) {
-        // Update TENTATIVE record(s)
+        // Update TENTATIVE record(s) — only when no existing date
         if (studentData.TENTATIVE && Array.isArray(studentData.TENTATIVE)) {
-          updatedStudentData.TENTATIVE = studentData.TENTATIVE.map(tentativeRecord => ({
-            ...tentativeRecord,
-            'FIRST DAY OF AEP': firstDayOfAEP,
-            ENTRY_DATE: firstDayOfAEP
-          }));
+          updatedStudentData.TENTATIVE = studentData.TENTATIVE.map(tentativeRecord => {
+            const existingAEP = tentativeRecord['FIRST DAY OF AEP'];
+            const existingEntryDate = tentativeRecord.ENTRY_DATE;
+            return {
+              ...tentativeRecord,
+              'FIRST DAY OF AEP': existingAEP ? existingAEP : firstDayOfAEP,
+              ENTRY_DATE: existingEntryDate ? existingEntryDate : firstDayOfAEP
+            };
+          });
         }
         
-        // Update Entry/Withdrawal record(s) - this is what TentativeRowBuilder uses
+        // Update Entry/Withdrawal record(s) — only when no existing Entry Date
         if (studentData.Entry_Withdrawal && Array.isArray(studentData.Entry_Withdrawal)) {
-          updatedStudentData.Entry_Withdrawal = studentData.Entry_Withdrawal.map(entryRecord => ({
-            ...entryRecord,
-            'Entry Date': firstDayOfAEP
-          }));
+          updatedStudentData.Entry_Withdrawal = studentData.Entry_Withdrawal.map(entryRecord => {
+            const existingEntryDate = entryRecord['Entry Date'];
+            return {
+              ...entryRecord,
+              'Entry Date': existingEntryDate ? existingEntryDate : firstDayOfAEP
+            };
+          });
         } else if (studentData.Entry_Withdrawal && !Array.isArray(studentData.Entry_Withdrawal)) {
           // Handle single object case
+          const existingEntryDate = studentData.Entry_Withdrawal['Entry Date'];
           updatedStudentData.Entry_Withdrawal = [{
             ...studentData.Entry_Withdrawal,
-            'Entry Date': firstDayOfAEP
+            'Entry Date': existingEntryDate ? existingEntryDate : firstDayOfAEP
           }];
         } else if (firstDayOfAEP) {
           // Create Entry/Withdrawal record if it doesn't exist
@@ -622,13 +631,13 @@ class StudentDataMerger extends BaseDataProcessor {
    * @param {Array} activeSchedules - Array of active schedule records
    * @returns {string|null} The most recent entry date or null if none found
    */
-  extractMostRecentEntryDate(activeSchedules) {
+  extractEarliestEntryDate(activeSchedules) {
     if (!Array.isArray(activeSchedules) || activeSchedules.length === 0) {
       return null;
     }
 
-    let mostRecentDate = null;
-    let mostRecentTimestamp = 0;
+    let earliestDate = null;
+    let earliestTimestamp = Infinity;
 
     activeSchedules.forEach(schedule => {
       const entryDateValue = schedule[COLUMN_NAMES.ENTRY_DATE];
@@ -646,9 +655,9 @@ class StudentDataMerger extends BaseDataProcessor {
           // Validate the date is valid
           if (!isNaN(dateToCheck.getTime())) {
             const timestamp = dateToCheck.getTime();
-            if (timestamp > mostRecentTimestamp) {
-              mostRecentTimestamp = timestamp;
-              mostRecentDate = entryDateValue instanceof Date ? 
+            if (timestamp < earliestTimestamp) {
+              earliestTimestamp = timestamp;
+              earliestDate = entryDateValue instanceof Date ? 
                 entryDateValue.toLocaleDateString() : 
                 entryDateValue;
             }
@@ -659,11 +668,11 @@ class StudentDataMerger extends BaseDataProcessor {
       }
     });
 
-    if (mostRecentDate) {
-      this.log(`Found most recent entry date: ${mostRecentDate}`);
+    if (earliestDate) {
+      this.log(`Found earliest entry date: ${earliestDate}`);
     }
 
-    return mostRecentDate;
+    return earliestDate;
   }
 
   /**
