@@ -1,5 +1,5 @@
 /**
- * @fileoverview Bootstrap file for the NAHS system.
+ * @fileoverview Bootstrap file for the Student Transition Notes system.
  * 
  * This file ensures that all base classes and dependencies are loaded before
  * other files try to use them. In Google Apps Script, files are loaded
@@ -10,9 +10,6 @@
  * - 02_baseDataProcessor.js  
  * - 03_constants.js
  * 
- * @author Alvaro Gomez
- * @version 2.0.0
- * @since 2024-01-01
  */
 
 /**
