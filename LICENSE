@@ -1,6 +1,11 @@
 MIT License
 
-Copyright (c) 2023 Alvaro Gomez
+Copyright (c) 2025 Alvaro Gomez
+
+This system was originally developed for Northside Independent School District (NISD)
+to automate student transition note collection and processing at a district alternative 
+education program. The code has since been generalized and is made available for use by any
+school, district, or organization with similar needs.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

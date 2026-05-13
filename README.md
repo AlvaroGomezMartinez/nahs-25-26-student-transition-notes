@@ -1,232 +1,88 @@
-# NAHS Student Transition Notes - Production Ready System
+# Student Transition Notes
 
-![Status](https://img.shields.io/badge/Status-Production%20Ready-brightgreen)
 ![Google Apps Script](https://img.shields.io/badge/Google%20Apps%20Script-Enabled-blue)
 ![Version](https://img.shields.io/badge/Version-2.1.0-success)
-![Documentation](https://img.shields.io/badge/Documentation-Complete-green)
 
-## Overview
-This project manages student transition data for NAHS (Alternative High School) students. The system loads data from multiple Google Sheets, processes it with enhanced duplicate detection and data precedence logic, and writes consolidated information to a TENTATIVE-Version2 sheet.
+A Google Apps Script system that automates student transition note collection and processing for a district alternative education program. This system is meant to facilitate [HB 2184](https://capitol.texas.gov/tlodocs/86R/billtext/html/HB02184H.HTM) and [TEC §37.023](https://statutes.capitol.texas.gov/?tab=1&code=ED&chapter=ED.37&artSec=37.023). It pulls data from multiple Google Sheets, merges teacher form responses with student records, and writes a consolidated output sheet used to generate transition letters via [Autocrat](https://workspace.google.com/marketplace/app/autocrat/539341275670).
 
-**🎯 System Status:** Production-ready with enhanced teacher input processing and comprehensive duplicate detection capabilities.
+## What it does
 
-## Key Features
+- Loads student data from 8+ Google Sheets (registrations, schedules, attendance, contact info, entry/withdrawal records, and teacher form responses)
+- Detects and resolves duplicate teacher submissions, keeping the most recent response
+- Calculates each student's anticipated release date based on placement days, attendance, and school holidays
+- Preserves manual row formatting (highlights, colors) across data refreshes
+- Sends automated daily email reminders to teachers when students reach their 10-day enrollment milestone
+- Writes a fully merged output to the `TENTATIVE-Version2` sheet, ready for Autocrat document generation
 
-### ✨ **Enhanced Duplicate Detection System**
-- **Intelligent Teacher Grouping**: Automatically identifies and groups duplicate teacher submissions
-- **Timestamp-Based Resolution**: Selects most recent teacher responses based on submission timestamps
-- **Smart Data Precedence**: Form responses take priority over tentative data with intelligent fallback
-- **Production-Ready Architecture**: Clean, optimized code without debugging artifacts
-
-### 🔄 **Advanced Data Processing**
-- **Multi-Source Integration**: Combines data from 8+ different Google Sheets
-- **Column F Student ID Extraction**: Optimized for cleaned sheet structure
-- **Source Data Compatibility**: Handles eligibility field mapping with proper source spelling
-- **Comprehensive Validation**: Ensures data integrity across all processing stages
-
-## Project Structure
+## Architecture
 
 ```
 src/
-├── config/                 # Configuration files
-│   ├── constants.js        # System constants and sheet names
-│   └── sheetConfigs.js     # Sheet configuration mappings
-├── data-loaders/           # Data loading classes
-│   └── baseDataLoader.js   # Base class for loading sheet data
-├── data-processors/        # Data processing logic
-├── writers/               # Sheet writing functionality
-├── utils/                 # Utility functions
-│   ├── dateUtils.js       # Date manipulation functions
-│   └── dataUtils.js       # Data validation and processing
-├── services/              # Business logic services
-└── main.js               # Main entry point
+├── config/
+│   └── sheetConfigs.js         # Sheet structure and column mappings
+├── data-loaders/               # One class per data source (BaseDataLoader pattern)
+├── data-processors/            # Merging, filtering, schedule and teacher input processing
+├── writers/                    # Row builder and sheet writer classes
+├── services/
+│   └── emailReminderService.js # 10-day milestone email automation
+└── utils/                      # Date, data, validation, and config utilities
 
 tests/
-├── unit/                  # Unit tests
-└── integration/           # Integration tests
+├── unit/                       # Unit tests by module
+├── debug/                      # Diagnostic scripts for troubleshooting
+└── consoleTestRunner.js
 
-legacy/ (old files at root level)
+03_constants.example.js         # ← Start here when setting up a new instance
 ```
 
-## System Architecture
+The entry point is `loadTENTATIVEVersion2()` in `src/main.js`.
 
-### 🏗️ **Production-Ready Components**
+## Setup
 
-#### **TeacherInputProcessor**
-- **Duplicate Detection**: Automatically identifies multiple teacher submissions per student
-- **Timestamp Analysis**: Intelligently selects most recent responses based on submission timestamps
-- **Data Precedence Logic**: Form responses override tentative data with intelligent fallback
-- **Email Integration**: Sophisticated teacher email mapping and validation
+This project connects to several external Google Spreadsheets. The real IDs and staff email addresses are kept out of version control.
 
-#### **Enhanced Data Loaders**
-- **FormResponsesDataLoader**: Column F student ID extraction with optimized sheet processing
-- **StudentDataMerger**: Smart data precedence with comprehensive conflict resolution
-- **TentativeRowBuilder**: Production-ready row assembly with source data compatibility
+1. Copy the constants template:
+   ```bash
+   cp 03_constants.example.js 03_constants.js
+   ```
+2. Open `03_constants.js` and replace every `YOUR_..._SPREADSHEET_ID` placeholder with the actual Google Spreadsheet ID from each source sheet's URL.
+3. Replace the `TEACHER_EMAIL_MAPPINGS` entries with your staff's email addresses.
+4. Push to your Apps Script project:
+   ```bash
+   clasp push
+   ```
+5. Run `checkExternalConfiguration()` from the Apps Script editor to verify all external sheet connections.
 
-#### **Robust Processing Pipeline**
-- **Multi-Source Integration**: Seamlessly combines data from 8+ Google Sheets
-- **Validation Framework**: Comprehensive data integrity checks at every stage
-- **Error Resilience**: Graceful handling of missing data and processing errors
-- **Performance Optimization**: Efficient Map operations for large datasets
+## Running the system
 
-### 📊 **Data Processing Flow**
-
-1. **Load Data Sources**: Import from all Google Sheets with optimized loaders
-2. **Detect Duplicates**: Identify and group duplicate teacher submissions
-3. **Apply Precedence**: Form responses take priority over tentative data
-4. **Merge & Validate**: Combine all sources with comprehensive validation
-5. **Build Output**: Assemble final rows with calculated fields and formatting
-6. **Write Results**: Update TENTATIVE-Version2 sheet with processed data
-
-## Key System Improvements
-
-### ✅ **Enhanced Functionality (Completed)**
-- **Duplicate Teacher Detection**: Intelligent handling of multiple teacher submissions
-- **Smart Data Precedence**: Form responses override tentative data appropriately
-- **Column F Optimization**: Streamlined student ID extraction from cleaned sheets
-- **Source Data Compatibility**: Proper handling of eligibility field spelling constraints
-- **Production Architecture**: Clean, optimized code without debugging artifacts
-- **Comprehensive JSDoc**: Fully documented system with examples and usage guides
-
-### 🔧 **System Reliability**
-- **Error Handling**: Robust error management with graceful degradation
-- **Data Validation**: Multi-level validation ensures data integrity
-- **Backward Compatibility**: Maintains compatibility with existing workflows
-- **Performance Optimization**: Efficient processing for large datasets
-- **Clean Architecture**: Modular design with clear separation of concerns
-
-## Usage
-
-### Main Entry Point
 ```javascript
-// Call this function to run the complete data processing
+// Full data refresh — run from the Apps Script editor
 loadTENTATIVEVersion2();
+
+// Check system health before running
+runSystemDiagnostics();
+
+// Send daily teacher reminder emails (also runs on a time-based trigger)
+sendEmailsForToday();
 ```
 
-### Configuration
-All configuration is centralized in `src/config/`:
-- Sheet names and IDs
-- Column mappings
-- Teacher email mappings
-- System settings
+## Key design decisions
 
-### Data Loading
-The new structure uses a base class pattern with specific loaders:
-```javascript
-// Using individual loaders
-const tentativeLoader = new TentativeDataLoader();
-const tentativeData = tentativeLoader.loadData();
+**Duplicate teacher submission handling** — Teachers sometimes submit the form more than once for the same student. `TeacherInputProcessor` groups responses by teacher name and selects the most recent by timestamp, so the output always reflects the latest feedback.
 
-const registrationLoader = new RegistrationDataLoader();
-const registrationData = registrationLoader.loadData();
+**Formatting preservation** — The output sheet is fully rewritten and sorted alphabetically on each run. Before writing, the system captures any manual row highlighting and restores it after the sort so staff annotations survive data refreshes.
 
-// Or load all data at once
-const allData = loadAllStudentDataWithLoaders();
+**Anticipated release date** — Calculated using `NAHS_EXPECTED_WITHDRAW_DATE()`, which counts forward from the student's entry date by their placement days, skipping weekends and district holidays defined in `holidayDates.js`.
 
-// Backward compatible functions still work
-const scheduleData = schedulesSheet(); // Still works
-const contactData = loadContactData(); // Still works
-```
-
-## Migration Status
-
-### ✅ Completed
-- [x] Created folder structure
-- [x] Added configuration files
-- [x] Created utility functions
-- [x] Added base data loader class
-- [x] Created main entry point
-- [x] Implemented all specific data loader classes
-- [x] Created backward-compatible functions
-- [x] Updated main.js to use new data loaders
-- [x] Implemented data processor classes
-- [x] Created validation utilities
-- [x] Built comprehensive processing pipeline
-- [x] Broke down the 701-line writeToTENTATIVEVersion2Sheet function
-- [x] Implemented modular sheet writer classes
-- [x] Created backward compatibility layer
-
-### ✅ Completed
-- [x] Add comprehensive error handling and logging
-- [x] Create comprehensive unit tests
-- [x] Add JSDoc documentation
-
-### 📋 Todo
-- [x] Add unit tests for all functions
-- [x] Create integration tests
-- [x] Add JSDoc documentation
-- [x] Remove legacy version1scripts folder
-- [ ] Add logging system
-- [ ] Create deployment guide
-
-## File Migration Plan
-
-### Phase 1: Configuration (✅ Complete)
-- Move constants to `src/config/constants.js`
-- Create sheet configurations
-
-### Phase 2: Utilities (✅ Complete)
-- Extract date functions to `src/utils/dateUtils.js`
-- Extract data functions to `src/utils/dataUtils.js`
-
-### Phase 3: Data Loaders (✅ Complete)
-- [x] `loadTentativeData.js` → `src/data-loaders/tentativeDataLoader.js`
-- [x] `loadRegistrationsData.js` → `src/data-loaders/registrationDataLoader.js`
-- [x] `loadSchedules.js` → `src/data-loaders/scheduleDataLoader.js`
-- [x] `loadContactData.js` → `src/data-loaders/contactDataLoader.js`
-- [x] `loadEntryWithdrawalData.js` → `src/data-loaders/entryWithdrawalDataLoader.js`
-- [x] `loadFormResponses1Data.js` → `src/data-loaders/formResponsesDataLoader.js`
-- [x] `loadWithdrawnData.js` → `src/data-loaders/withdrawnDataLoader.js`
-- [x] `loadWDOther.js` → `src/data-loaders/wdOtherDataLoader.js`
-- [x] `loadStudentAttendanceData.js` → `src/data-loaders/attendanceDataLoader.js`
-- [x] Created `src/data-loaders/index.js` for centralized access
-
-### Phase 4: Processors (✅ Complete)
-- Extract processing logic from main functions
-- Create testable, single-purpose processors
-- [x] `StudentDataMerger` - Handles complex data merging operations
-- [x] `StudentFilterProcessor` - Manages student filtering logic
-- [x] `ScheduleProcessor` - Processes course and schedule data
-- [x] `TeacherInputProcessor` - Handles form response processing
-- [x] Created validation utilities for data integrity
-
-### Phase 5: Writers (✅ Complete)
-- [x] `writeToTENTATIVEVersion2.js` → `src/writers/tentativeSheetWriter.js`
-- [x] `BaseSheetWriter` - Common functionality for all sheet writers
-- [x] `TentativeRowBuilder` - Builds individual student data rows
-- [x] `TentativeSheetWriter` - Handles complete sheet writing process
-- [x] `SheetWriterFactory` - Manages writer instances
-- [x] Broke down 701-line function into manageable classes
-- [x] Added comprehensive error handling and recovery
-- [x] Created backward compatibility layer
-
-## Testing
-
-### Unit Tests
-Located in `tests/unit/`. Test individual functions and classes.
-
-### Integration Tests  
-Located in `tests/integration/`. Test complete workflows.
-
-### Running Tests
-```javascript
-// Run from Google Apps Script editor
-doGet(); // Runs QUnit tests
-```
+**Backward compatibility** — Legacy function names are preserved as thin wrappers so existing Apps Script triggers don't break during incremental updates.
 
 ## Contributing
 
-When adding new functionality:
+1. Follow the existing folder structure — one responsibility per file
+2. Use constants from `03_constants.js` rather than hardcoding strings
+3. Add error handling that degrades gracefully (a single bad student record shouldn't stop the whole run)
+4. Write unit tests in `tests/unit/` for new logic
 
-1. Follow the established folder structure
-2. Use the constants from `src/config/constants.js`
-3. Add appropriate error handling
-4. Write unit tests for new functions
-5. Update this README with changes
+## License
 
-## Support
-
-Contact: Alvaro Gomez (alvaro.gomez@nisd.net)
-Office: +1-210-397-9408
-Mobile: +1-210-363-1577
-
+See [LICENSE](LICENSE).

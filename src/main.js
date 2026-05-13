@@ -1025,26 +1025,21 @@ function restoreFormattingForUpdatedRows(studentFormatting) {
 }
 
 /**
- * Ensures checkboxes are present in column BX (legacy function)
- * This function maintains backward compatibility while using the new utility.
- * 
- * @deprecated Use ensureCheckboxesInColumn utility function instead
+ * Ensures checkboxes are present in column BX (legacy function).
+ * @deprecated Use ensureCheckboxesInColumn utility function instead.
  * @see ensureCheckboxesInColumn
  */
 function ensureCheckboxesInColumnBX() {
   try {
     const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SHEET_NAMES.TENTATIVE_V2);
-    
     if (!sheet) {
       console.error('TENTATIVE-Version2 sheet not found');
       return false;
     }
-    
-    // Use the new utility function
     return ensureCheckboxesInColumn(sheet, 76, 'BX');
-    
   } catch (error) {
     console.error('Error in ensureCheckboxesInColumnBX:', error);
     return false;
   }
 }
+

@@ -338,8 +338,7 @@ class TentativeRowBuilder {
       }
 
       // Access the backup "Registrations SY 24.25" sheet - specifically "Copy of Form Responses 2"
-      const backupSpreadsheetId = "1kAWRpWO4xDtRShLB5YtTtWxTbVg800fuU2RvAlYhrfA";
-      const backupSpreadsheet = SpreadsheetApp.openById(backupSpreadsheetId);
+      const backupSpreadsheet = SpreadsheetApp.openById(EXTERNAL_SPREADSHEETS.REGISTRATIONS_BACKUP_SOURCE);
       const backupSheet = backupSpreadsheet.getSheetByName("Copy of Form Responses 2");
       
       // Get all data from the backup sheet
