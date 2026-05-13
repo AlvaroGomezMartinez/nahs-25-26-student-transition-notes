@@ -1,9 +1,16 @@
 # macOS system files
 .DS_Store
 
-# Ignore clasp authentication files
-.clasp.json
+# Clasp — only ignore the claspignore meta file, not .clasp.json itself
 .claspignore
+
+# Sensitive configuration — contains real spreadsheet IDs and staff email addresses.
+# Copy 03_constants.example.js → 03_constants.js and fill in your own values.
+03_constants.js
+
+# IDE workspace files — not relevant to contributors
+.kiro/
+.vscode/
 
 # Ignore debugging files
 debug-*.js
