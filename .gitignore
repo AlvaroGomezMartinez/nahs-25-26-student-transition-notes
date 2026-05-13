@@ -8,9 +8,10 @@
 # Copy 03_constants.example.js → 03_constants.js and fill in your own values.
 03_constants.js
 
-# IDE workspace files — not relevant to contributors
+# IDE workspace files and local docs — not relevant to contributors
 .kiro/
 .vscode/
+docs/
 
 # Ignore debugging files
 debug-*.js
